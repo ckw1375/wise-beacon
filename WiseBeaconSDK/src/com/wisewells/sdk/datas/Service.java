@@ -2,10 +2,10 @@ package com.wisewells.sdk.datas;
 
 import java.util.ArrayList;
 
-import com.wisewells.sdk.datas.topology.Topology;
-
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.wisewells.sdk.datas.topology.Topology;
 
 public class Service implements Parcelable{
 	
@@ -13,7 +13,7 @@ public class Service implements Parcelable{
 	private String code;
 	private Topology topology;
 	private Service parent;
-	private ArrayList<Service> children;
+	private ArrayList<String> children;
 	
 	public static final Parcelable.Creator<Service> CREATOR = new Creator<Service>() {
 		
@@ -33,13 +33,16 @@ public class Service implements Parcelable{
 	}
 	
 	public Service(Parcel p) {
+		init();
 		name = p.readString();
 		code = p.readString();
 		topology = p.readParcelable(Topology.class.getClassLoader());
-		parent = p.readParcelable(Service.class.getClassLoader());
-		
-		children = new ArrayList<Service>();
-		p.readTypedList(children, Service.CREATOR);
+		parent = p.readParcelable(Service.class.getClassLoader());		
+		p.readStringList(children);
+	}
+	
+	private void init() {
+		children = new ArrayList<String>();
 	}
 	
 	@Override
@@ -53,7 +56,7 @@ public class Service implements Parcelable{
 		dest.writeString(code);
 		dest.writeParcelable(topology, 0);
 		dest.writeParcelable(parent, 0);
-		dest.writeTypedList(children);
+		dest.writeStringList(children);
 	}
 
 	public String getName() {
@@ -88,11 +91,11 @@ public class Service implements Parcelable{
 		this.parent = parent;
 	}
 
-	public ArrayList<Service> getChildren() {
+	public ArrayList<String> getChildren() {
 		return children;
 	}
 
-	public void setChildren(ArrayList<Service> children) {
+	public void setChildren(ArrayList<String> children) {
 		this.children = children;
 	}
 	

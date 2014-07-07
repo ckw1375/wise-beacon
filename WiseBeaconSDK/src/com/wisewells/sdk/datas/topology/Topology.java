@@ -11,7 +11,7 @@ public class Topology implements Parcelable{
 	protected String code;
 	protected String name;
 	protected BeaconGroup beaconGroup;
-	protected Service serviceContent;
+	protected Service service;
 	
 	public static final Parcelable.Creator<Topology> CREATOR = new Creator<Topology>() {
 		
@@ -34,7 +34,7 @@ public class Topology implements Parcelable{
 		code = p.readString();
 		name = p.readString();
 		beaconGroup = p.readParcelable(BeaconGroup.class.getClassLoader());
-		serviceContent = p.readParcelable(Service.class.getClassLoader());
+		service = p.readParcelable(Service.class.getClassLoader());
 	}
 	
 	@Override
@@ -47,7 +47,7 @@ public class Topology implements Parcelable{
 		dest.writeString(code);
 		dest.writeString(name);
 		dest.writeParcelable(beaconGroup, 0);
-		dest.writeParcelable(serviceContent, 0);
+		dest.writeParcelable(service, 0);
 	}
 
 	public String getCode() {
@@ -75,10 +75,10 @@ public class Topology implements Parcelable{
 	}
 
 	public Service getServiceContent() {
-		return serviceContent;
+		return service;
 	}
 
 	public void setServiceContent(Service content) {
-		this.serviceContent = content;
+		this.service = content;
 	}
 }

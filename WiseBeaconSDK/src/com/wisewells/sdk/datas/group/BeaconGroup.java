@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.WiseObjectManager;
 import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.datas.WiseObjectManager;
 import com.wisewells.sdk.datas.topology.Topology;
 import com.wisewells.sdk.utils.L;
 
