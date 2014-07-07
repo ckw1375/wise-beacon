@@ -11,8 +11,8 @@ public class Service implements Parcelable{
 	
 	private String name;
 	private String code;
-	private Topology topology;
-	private Service parent;
+	private String topology;
+	private String parent;
 	private ArrayList<String> children;
 	
 	public static final Parcelable.Creator<Service> CREATOR = new Creator<Service>() {
@@ -36,8 +36,8 @@ public class Service implements Parcelable{
 		init();
 		name = p.readString();
 		code = p.readString();
-		topology = p.readParcelable(Topology.class.getClassLoader());
-		parent = p.readParcelable(Service.class.getClassLoader());		
+		topology = p.readString();
+		parent = p.readString();		
 		p.readStringList(children);
 	}
 	
@@ -54,8 +54,8 @@ public class Service implements Parcelable{
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(name);
 		dest.writeString(code);
-		dest.writeParcelable(topology, 0);
-		dest.writeParcelable(parent, 0);
+		dest.writeString(topology);
+		dest.writeString(parent);
 		dest.writeStringList(children);
 	}
 
@@ -75,19 +75,19 @@ public class Service implements Parcelable{
 		this.code = code;
 	}
 
-	public Topology getTopology() {
+	public String getTopology() {
 		return topology;
 	}
 
-	public void setTopology(Topology topology) {
+	public void setTopology(String topology) {
 		this.topology = topology;
 	}
 
-	public Service getParent() {
+	public String getParent() {
 		return parent;
 	}
 
-	public void setParent(Service parent) {
+	public void setParent(String parent) {
 		this.parent = parent;
 	}
 
@@ -98,6 +98,4 @@ public class Service implements Parcelable{
 	public void setChildren(ArrayList<String> children) {
 		this.children = children;
 	}
-	
-	
 }

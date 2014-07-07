@@ -10,53 +10,53 @@ import com.wisewells.sdk.datas.group.BeaconGroup;
 import com.wisewells.sdk.datas.topology.Topology;
 
 /**
- * @file	TreeHelper.java
+ * @file	WiseObjects.java
  * @author 	Mingook
  * @date	2014. 7. 7.
  * @description
  * This class is for managing all objects made tree structure.
  */
 
-public class TreeHelper implements Parcelable {
+public class WiseObjects implements Parcelable {
 	
 	private Bundle beacons;
 	private Bundle beaconGroups;
 	private Bundle services;
 	private Bundle topologies;
 	
-	public static TreeHelper instance;
-	public static Parcelable.Creator<TreeHelper> CREATOR = new Creator<TreeHelper>() {
+	public static WiseObjects instance;
+	public static Parcelable.Creator<WiseObjects> CREATOR = new Creator<WiseObjects>() {
 		
 		@Override
-		public TreeHelper[] newArray(int size) {
-			return new TreeHelper[size];
+		public WiseObjects[] newArray(int size) {
+			return new WiseObjects[size];
 		}
 		
 		@Override
-		public TreeHelper createFromParcel(Parcel source) {
-			return new TreeHelper(source);
+		public WiseObjects createFromParcel(Parcel source) {
+			return new WiseObjects(source);
 		}
 	};
 	
-	public static TreeHelper getInstance() {
+	public static WiseObjects getInstance() {
 		if(instance == null)
-			instance = new TreeHelper();
+			instance = new WiseObjects();
 		
 		return instance;
 	}
 	
-	private TreeHelper() {
+	private WiseObjects() {
 		init();
 	}
 		
-	public TreeHelper(Bundle beacons, Bundle beaconGroups, Bundle services, Bundle topologies) {
+	public WiseObjects(Bundle beacons, Bundle beaconGroups, Bundle services, Bundle topologies) {
 		this.beacons = beacons;
 		this.beaconGroups = beaconGroups;
 		this.services = services;
 		this.topologies = topologies;
 	}
 
-	private TreeHelper(Parcel p) {
+	private WiseObjects(Parcel p) {
 		beacons = p.readBundle();
 		beaconGroups = p.readBundle();
 		services = p.readBundle();

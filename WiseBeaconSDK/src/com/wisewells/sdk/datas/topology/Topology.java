@@ -1,8 +1,5 @@
 package com.wisewells.sdk.datas.topology;
 
-import com.wisewells.sdk.datas.Service;
-import com.wisewells.sdk.datas.group.BeaconGroup;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -10,8 +7,8 @@ public class Topology implements Parcelable{
 	
 	protected String code;
 	protected String name;
-	protected BeaconGroup beaconGroup;
-	protected Service service;
+	protected String beaconGroup;
+	protected String service;
 	
 	public static final Parcelable.Creator<Topology> CREATOR = new Creator<Topology>() {
 		
@@ -30,7 +27,7 @@ public class Topology implements Parcelable{
 		
 	}
 	
-	public Topology(String code, String name, BeaconGroup beaconGroup, Service service) {
+	public Topology(String code, String name, String beaconGroup, String service) {
 		this.code = code;
 		this.name = name;
 		this.beaconGroup = beaconGroup;
@@ -40,8 +37,8 @@ public class Topology implements Parcelable{
 	public Topology(Parcel p) {
 		code = p.readString();
 		name = p.readString();
-		beaconGroup = p.readParcelable(BeaconGroup.class.getClassLoader());
-		service = p.readParcelable(Service.class.getClassLoader());
+		beaconGroup = p.readString();
+		service = p.readString();
 	}
 	
 	@Override
@@ -53,8 +50,8 @@ public class Topology implements Parcelable{
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(code);
 		dest.writeString(name);
-		dest.writeParcelable(beaconGroup, 0);
-		dest.writeParcelable(service, 0);
+		dest.writeString(beaconGroup);
+		dest.writeString(service);
 	}
 
 	public String getCode() {
@@ -73,19 +70,19 @@ public class Topology implements Parcelable{
 		this.name = name;
 	}
 
-	public BeaconGroup getBeaconGroup() {
+	public String getBeaconGroup() {
 		return beaconGroup;
 	}
 
-	public void setBeaconGroup(BeaconGroup beaconGroup) {
+	public void setBeaconGroup(String beaconGroup) {
 		this.beaconGroup = beaconGroup;
 	}
 
-	public Service getServiceContent() {
+	public String getService() {
 		return service;
 	}
 
-	public void setServiceContent(Service content) {
-		this.service = content;
+	public void setService(String service) {
+		this.service = service;
 	}
 }

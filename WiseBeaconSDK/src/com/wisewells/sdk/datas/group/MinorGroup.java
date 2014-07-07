@@ -10,7 +10,7 @@ import android.os.Parcelable;
 public class MinorGroup extends BeaconGroup implements Parcelable{
 	
 	private int minor;
-	private ArrayList<Beacon> beacons;
+	private ArrayList<String> beacons;
 
 	public static Parcelable.Creator<MinorGroup> CREATOR = new Creator<MinorGroup>() {
 		
@@ -32,7 +32,7 @@ public class MinorGroup extends BeaconGroup implements Parcelable{
 	private MinorGroup(Parcel p) {
 		super(p);
 		minor = p.readInt();
-		p.readTypedList(beacons, Beacon.CREATOR);
+		p.readStringList(beacons);
 	}
 	
 	@Override
@@ -44,12 +44,8 @@ public class MinorGroup extends BeaconGroup implements Parcelable{
 	public void writeToParcel(Parcel dest, int flags) {
 		super.writeToParcel(dest, flags);
 		dest.writeInt(minor);
-		dest.writeTypedList(beacons);
+		dest.writeStringList(beacons);
 	}
-
-	/*
-	 * Getter, Setter
-	 */
 	
 	public int getMinor() {
 		return minor;
@@ -59,11 +55,11 @@ public class MinorGroup extends BeaconGroup implements Parcelable{
 		this.minor = minor;
 	}
 
-	public ArrayList<Beacon> getBeacons() {
+	public ArrayList<String> getBeacons() {
 		return beacons;
 	}
 
-	public void setBeacons(ArrayList<Beacon> beacons) {
+	public void setBeacons(ArrayList<String> beacons) {
 		this.beacons = beacons;
 	}
 }
