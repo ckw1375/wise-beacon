@@ -3,9 +3,9 @@ package com.wisewells.sdk.datas.group;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wisewells.sdk.TreeHelper;
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.WiseObjectManager;
 import com.wisewells.sdk.datas.topology.Topology;
 import com.wisewells.sdk.utils.L;
 
@@ -37,6 +37,13 @@ public class BeaconGroup implements Parcelable{
 		L.i("BeaconGroup »ý¼º");
 	}
 	
+	public BeaconGroup(String code, BeaconGroup parent, ArrayList<String> children, ArrayList<String> topologies) {
+		this.code = code;
+		this.parent = parent;
+		this.children = children;
+		this.topologies = topologies;
+	}
+
 	protected BeaconGroup(Parcel p) {
 		init();
 		
@@ -73,7 +80,7 @@ public class BeaconGroup implements Parcelable{
 				beacons.add(b);
 		}
 		
-		WiseObjectManager manager = WiseObjectManager.getInstance();
+		TreeHelper manager = TreeHelper.getInstance();
 		for(String child : children) {
 			BeaconGroup bg = manager.getBeaconGroup(child);
 			bg.getBeaconsInGroup();

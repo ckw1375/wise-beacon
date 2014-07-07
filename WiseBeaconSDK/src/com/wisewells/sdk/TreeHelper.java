@@ -1,60 +1,62 @@
-package com.wisewells.sdk.datas;
+package com.wisewells.sdk;
 
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.group.BeaconGroup;
 import com.wisewells.sdk.datas.topology.Topology;
 
 /**
- * @file	WiseObjectManager.java
+ * @file	TreeHelper.java
  * @author 	Mingook
  * @date	2014. 7. 7.
  * @description
- * This class is for managing all objects related to WiseBeaconProject.
+ * This class is for managing all objects made tree structure.
  */
 
-public class WiseObjectManager implements Parcelable {
+public class TreeHelper implements Parcelable {
 	
 	private Bundle beacons;
 	private Bundle beaconGroups;
 	private Bundle services;
 	private Bundle topologies;
 	
-	public static WiseObjectManager instance;
-	public static Parcelable.Creator<WiseObjectManager> CREATOR = new Creator<WiseObjectManager>() {
+	public static TreeHelper instance;
+	public static Parcelable.Creator<TreeHelper> CREATOR = new Creator<TreeHelper>() {
 		
 		@Override
-		public WiseObjectManager[] newArray(int size) {
-			return new WiseObjectManager[size];
+		public TreeHelper[] newArray(int size) {
+			return new TreeHelper[size];
 		}
 		
 		@Override
-		public WiseObjectManager createFromParcel(Parcel source) {
-			return new WiseObjectManager(source);
+		public TreeHelper createFromParcel(Parcel source) {
+			return new TreeHelper(source);
 		}
 	};
 	
-	public static WiseObjectManager getInstance() {
+	public static TreeHelper getInstance() {
 		if(instance == null)
-			instance = new WiseObjectManager();
+			instance = new TreeHelper();
 		
 		return instance;
 	}
 	
-	private WiseObjectManager() {
+	private TreeHelper() {
 		init();
 	}
 		
-	public WiseObjectManager(Bundle beacons, Bundle beaconGroups, Bundle services, Bundle topologies) {
+	public TreeHelper(Bundle beacons, Bundle beaconGroups, Bundle services, Bundle topologies) {
 		this.beacons = beacons;
 		this.beaconGroups = beaconGroups;
 		this.services = services;
 		this.topologies = topologies;
 	}
 
-	private WiseObjectManager(Parcel p) {
+	private TreeHelper(Parcel p) {
 		beacons = p.readBundle();
 		beaconGroups = p.readBundle();
 		services = p.readBundle();

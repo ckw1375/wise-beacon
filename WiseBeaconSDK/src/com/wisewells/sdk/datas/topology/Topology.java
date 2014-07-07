@@ -30,6 +30,13 @@ public class Topology implements Parcelable{
 		
 	}
 	
+	public Topology(String code, String name, BeaconGroup beaconGroup, Service service) {
+		this.code = code;
+		this.name = name;
+		this.beaconGroup = beaconGroup;
+		this.service = service;
+	}
+
 	public Topology(Parcel p) {
 		code = p.readString();
 		name = p.readString();
