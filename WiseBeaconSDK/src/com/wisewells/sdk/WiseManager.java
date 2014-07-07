@@ -1,11 +1,19 @@
 package com.wisewells.sdk;
 
-import android.content.Context;
-import android.os.Messenger;
+
 
 public class WiseManager {
-	private Context mContext;
-	private Messenger mIncomingMessenger;
-	private Messenger mSendingMessenger;
 	
+	private static WiseManager instance;
+	
+	private WiseManager() {
+		
+	}
+
+	public static WiseManager getInstance() {
+		if(instance == null) 
+			instance = new WiseManager();
+		
+		return instance;
+	}		
 }

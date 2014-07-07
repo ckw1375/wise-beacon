@@ -1,6 +1,6 @@
 package com.wisewells.sdk.datas.topology;
 
-import com.wisewells.sdk.datas.ServiceContent;
+import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.group.BeaconGroup;
 
 import android.os.Parcel;
@@ -11,7 +11,7 @@ public class Topology implements Parcelable{
 	protected String code;
 	protected String name;
 	protected BeaconGroup beaconGroup;
-	protected ServiceContent serviceContent;
+	protected Service serviceContent;
 	
 	public static final Parcelable.Creator<Topology> CREATOR = new Creator<Topology>() {
 		
@@ -34,7 +34,7 @@ public class Topology implements Parcelable{
 		code = p.readString();
 		name = p.readString();
 		beaconGroup = p.readParcelable(BeaconGroup.class.getClassLoader());
-		serviceContent = p.readParcelable(ServiceContent.class.getClassLoader());
+		serviceContent = p.readParcelable(Service.class.getClassLoader());
 	}
 	
 	@Override
@@ -74,11 +74,11 @@ public class Topology implements Parcelable{
 		this.beaconGroup = beaconGroup;
 	}
 
-	public ServiceContent getServiceContent() {
+	public Service getServiceContent() {
 		return serviceContent;
 	}
 
-	public void setServiceContent(ServiceContent content) {
+	public void setServiceContent(Service content) {
 		this.serviceContent = content;
 	}
 }

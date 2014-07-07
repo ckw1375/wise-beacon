@@ -7,39 +7,39 @@ import com.wisewells.sdk.datas.topology.Topology;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class ServiceContent implements Parcelable{
+public class Service implements Parcelable{
 	
 	private String name;
 	private String code;
 	private Topology topology;
-	private ServiceContent parent;
-	private ArrayList<ServiceContent> children;
+	private Service parent;
+	private ArrayList<Service> children;
 	
-	public static final Parcelable.Creator<ServiceContent> CREATOR = new Creator<ServiceContent>() {
+	public static final Parcelable.Creator<Service> CREATOR = new Creator<Service>() {
 		
 		@Override
-		public ServiceContent[] newArray(int size) {
-			return new ServiceContent[size];
+		public Service[] newArray(int size) {
+			return new Service[size];
 		}
 		
 		@Override
-		public ServiceContent createFromParcel(Parcel source) {
-			return new ServiceContent(source);
+		public Service createFromParcel(Parcel source) {
+			return new Service(source);
 		}
 	};
 	
-	public ServiceContent() {
+	public Service() {
 		
 	}
 	
-	public ServiceContent(Parcel p) {
+	public Service(Parcel p) {
 		name = p.readString();
 		code = p.readString();
 		topology = p.readParcelable(Topology.class.getClassLoader());
-		parent = p.readParcelable(ServiceContent.class.getClassLoader());
+		parent = p.readParcelable(Service.class.getClassLoader());
 		
-		children = new ArrayList<ServiceContent>();
-		p.readTypedList(children, ServiceContent.CREATOR);
+		children = new ArrayList<Service>();
+		p.readTypedList(children, Service.CREATOR);
 	}
 	
 	@Override
@@ -80,19 +80,19 @@ public class ServiceContent implements Parcelable{
 		this.topology = topology;
 	}
 
-	public ServiceContent getParent() {
+	public Service getParent() {
 		return parent;
 	}
 
-	public void setParent(ServiceContent parent) {
+	public void setParent(Service parent) {
 		this.parent = parent;
 	}
 
-	public ArrayList<ServiceContent> getChildren() {
+	public ArrayList<Service> getChildren() {
 		return children;
 	}
 
-	public void setChildren(ArrayList<ServiceContent> children) {
+	public void setChildren(ArrayList<Service> children) {
 		this.children = children;
 	}
 	
