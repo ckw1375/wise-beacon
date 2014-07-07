@@ -37,6 +37,22 @@ public class Beacon implements Parcelable {
 		
 	}
 	
+	public Beacon(String code, String macAddress, String uuid, int major,
+			int minor, double txPower, double interval, double rssi,
+			MinorGroup parent) {
+		
+		super();
+		this.code = code;
+		this.macAddress = macAddress;
+		this.uuid = UUID.fromString(uuid);
+		this.major = major;
+		this.minor = minor;
+		this.txPower = txPower;
+		this.interval = interval;
+		this.rssi = rssi;
+		this.parent = parent;
+	}
+
 	public Beacon(com.estimote.sdk.Beacon b) {
 		this.macAddress = b.getMacAddress();
 		this.uuid = UUID.fromString(b.getProximityUUID());
