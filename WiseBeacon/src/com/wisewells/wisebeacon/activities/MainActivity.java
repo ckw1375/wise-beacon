@@ -9,8 +9,11 @@ import android.os.IBinder;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
-import com.wisewells.sdk.services.WiseService;
+import com.wisewells.sdk.WiseObjects;
+import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.services.WiseAgent;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 
@@ -50,7 +53,28 @@ public class MainActivity extends Activity {
 				onTopologyButtonClick();
 			}
 		});
+        
+        mHistoryButton = (Button) findViewById(R.id.main_history_button);
+        mHistoryButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onHistoryButtonClick();
+			}
+		});
     }
+
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+	
+	private void onHistoryButtonClick() {
+		Beacon b = WiseObjects.getInstance().getBeacon("Beacon0");
+		if(b == null)
+			return;
+		Toast.makeText(this, "Beacon Code : " + b.getCode(), Toast.LENGTH_SHORT).show();
+	}
 
     private void onTopologyButtonClick() {
     	
@@ -70,19 +94,12 @@ public class MainActivity extends Activity {
 			}
 		};
 		
-		startService(new Intent(this, WiseService.class));
-    	boolean result = bindService(new Intent(this, WiseService.class), conn, 0);
+		startService(new Intent(this, WiseAgent.class));
+    	boolean result = bindService(new Intent(this, WiseAgent.class), conn, 0);
 	}
 
 	private void onBeaconButtonClick() {
-    	Intent intent = new Intent(this, BeaconActivity.class);
+    	Intent intent = new Intent(this, GroupActivity.class);
     	startActivity(intent);
 	}
-
-	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-    
 }

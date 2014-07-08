@@ -16,24 +16,20 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name=".activities.MainActivity"
-            android:label="@string/app_name" >
+        <activity android:name=".activities.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activities.BeaconActivity"
-            android:label="@string/title_activity_beacon" >
+        <activity android:name=".activities.GroupActivity" >
         </activity>
 
         <service android:name="com.estimote.sdk.service.BeaconService" >
         </service>
         <service
-            android:name="com.wisewells.wisebeacon.services.WiseService"
+            android:name=".services.WiseService"
             android:enabled="true"
             android:exported="true"
             android:process=":service" >
@@ -41,6 +37,9 @@
                 <action android:name="com.wisewells.wisebeacon.service" />
             </intent-filter>
         </service>
+
+        <activity android:name="com.wisewells.wisebeacon.activities.GroupAddActivity" >
+        </activity>
     </application>
 
 </manifest>

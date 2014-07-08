@@ -98,4 +98,20 @@ public class WiseObjects implements Parcelable {
 	public Topology getTopology(String code) {
 		return (Topology) topologies.get(code);
 	}
+	
+	public void putBeacon(String code, Beacon beacon) {
+		beacons.putParcelable(code, beacon);		
+	}
+	
+	public void putBeaconGroup(String code, BeaconGroup beaconGroup) {
+		beaconGroups.putParcelable(code, beaconGroup);
+	}
+	
+	public void putService(String code, Service service) {
+		services.putParcelable(code, service);
+	}
+	
+	public void putTopology(String code, Topology topology) {
+		topologies.putParcelable(code, topology);
+	}
 }

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/row_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="10dp" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +17,7 @@
             android:text="UUID \t: " />
 
         <TextView
-            android:id="@+id/beacon_list_uuid"
+            android:id="@+id/row_uuid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView" />
@@ -34,7 +35,7 @@
             android:text="Major \t: " />
 
         <TextView
-            android:id="@+id/beacon_list_major"
+            android:id="@+id/row_major"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView" />
@@ -52,7 +53,7 @@
             android:text="Minor \t: " />
 
         <TextView
-            android:id="@+id/beacon_list_minor"
+            android:id="@+id/row_minor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView" />
