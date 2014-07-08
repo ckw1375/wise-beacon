@@ -12,7 +12,7 @@ public class Beacon implements Parcelable {
 
 	private String code;
 	private String macAddress;
-	private String beaconGroup;
+	private String beaconGroupCode;
 	private UUID uuid;
 	private int major;
 	private int minor;
@@ -43,7 +43,7 @@ public class Beacon implements Parcelable {
 		super();
 		this.code = code;
 		this.macAddress = macAddress;
-		this.beaconGroup = beaconGroup;
+		this.beaconGroupCode = beaconGroup;
 		this.uuid = UUID.fromString(uuid);
 		this.major = major;
 		this.minor = minor;
@@ -62,7 +62,7 @@ public class Beacon implements Parcelable {
 	private Beacon(Parcel p) {
 		code = p.readString();
 		macAddress = p.readString();
-		beaconGroup = p.readString();
+		beaconGroupCode = p.readString();
 		uuid = (UUID) p.readSerializable();
 		major = p.readInt();
 		minor = p.readInt();
@@ -80,7 +80,7 @@ public class Beacon implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(code);
 		dest.writeString(macAddress);
-		dest.writeString(beaconGroup);
+		dest.writeString(beaconGroupCode);
 		dest.writeSerializable(uuid);
 		dest.writeInt(major);
 		dest.writeInt(minor);
@@ -105,5 +105,41 @@ public class Beacon implements Parcelable {
 	
 	public void detach() {
 		
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public String getMacAddress() {
+		return macAddress;
+	}
+
+	public String getBeaconGroupCode() {
+		return beaconGroupCode;
+	}
+
+	public UUID getUuid() {
+		return uuid;
+	}
+
+	public int getMajor() {
+		return major;
+	}
+
+	public int getMinor() {
+		return minor;
+	}
+
+	public double getTxPower() {
+		return txPower;
+	}
+
+	public double getInterval() {
+		return interval;
+	}
+
+	public double getRssi() {
+		return rssi;
 	}
 }

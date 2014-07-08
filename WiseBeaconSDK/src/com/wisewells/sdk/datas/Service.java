@@ -11,9 +11,9 @@ public class Service implements Parcelable{
 	
 	private String name;
 	private String code;
-	private String topology;
-	private String parent;
-	private ArrayList<String> children;
+	private String topologyCode;
+	private String parentCode;
+	private ArrayList<String> childCodes;
 	
 	public static final Parcelable.Creator<Service> CREATOR = new Creator<Service>() {
 		
@@ -36,13 +36,13 @@ public class Service implements Parcelable{
 		init();
 		name = p.readString();
 		code = p.readString();
-		topology = p.readString();
-		parent = p.readString();		
-		p.readStringList(children);
+		topologyCode = p.readString();
+		parentCode = p.readString();		
+		p.readStringList(childCodes);
 	}
 	
 	private void init() {
-		children = new ArrayList<String>();
+		childCodes = new ArrayList<String>();
 	}
 	
 	@Override
@@ -54,9 +54,9 @@ public class Service implements Parcelable{
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(name);
 		dest.writeString(code);
-		dest.writeString(topology);
-		dest.writeString(parent);
-		dest.writeStringList(children);
+		dest.writeString(topologyCode);
+		dest.writeString(parentCode);
+		dest.writeStringList(childCodes);
 	}
 
 	public String getName() {
@@ -75,27 +75,27 @@ public class Service implements Parcelable{
 		this.code = code;
 	}
 
-	public String getTopology() {
-		return topology;
+	public String getTopologyCode() {
+		return topologyCode;
 	}
 
-	public void setTopology(String topology) {
-		this.topology = topology;
+	public void setTopologyCode(String topologyCode) {
+		this.topologyCode = topologyCode;
 	}
 
-	public String getParent() {
-		return parent;
+	public String getParentCode() {
+		return parentCode;
 	}
 
-	public void setParent(String parent) {
-		this.parent = parent;
+	public void setParent(String parentCode) {
+		this.parentCode = parentCode;
 	}
 
-	public ArrayList<String> getChildren() {
-		return children;
+	public ArrayList<String> getChildCodes() {
+		return childCodes;
 	}
 
-	public void setChildren(ArrayList<String> children) {
-		this.children = children;
+	public void setChildCodes(ArrayList<String> childCodes) {
+		this.childCodes = childCodes;
 	}
 }

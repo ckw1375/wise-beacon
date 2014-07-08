@@ -2,15 +2,16 @@ package com.wisewells.sdk.datas.group;
 
 import java.util.ArrayList;
 
-import com.wisewells.sdk.datas.Beacon;
-
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.wisewells.sdk.WiseObjects;
+import com.wisewells.sdk.datas.Beacon;
 
 public class MinorGroup extends BeaconGroup implements Parcelable{
 	
 	private int minor;
-	private ArrayList<String> beacons;
+	private ArrayList<String> beaconCodes;
 
 	public static Parcelable.Creator<MinorGroup> CREATOR = new Creator<MinorGroup>() {
 		
@@ -32,7 +33,7 @@ public class MinorGroup extends BeaconGroup implements Parcelable{
 	private MinorGroup(Parcel p) {
 		super(p);
 		minor = p.readInt();
-		p.readStringList(beacons);
+		p.readStringList(beaconCodes);
 	}
 	
 	@Override
@@ -44,7 +45,18 @@ public class MinorGroup extends BeaconGroup implements Parcelable{
 	public void writeToParcel(Parcel dest, int flags) {
 		super.writeToParcel(dest, flags);
 		dest.writeInt(minor);
-		dest.writeStringList(beacons);
+		dest.writeStringList(beaconCodes);
+	}
+
+	public ArrayList<Beacon> getBeacons() {
+		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
+		
+		for(String beaconCode : beaconCodes) {
+			Beacon b = WiseObjects.getInstance().getBeacon(beaconCode);
+			beacons.add(b);
+		}
+		
+		return beacons;
 	}
 	
 	public int getMinor() {
@@ -55,11 +67,11 @@ public class MinorGroup extends BeaconGroup implements Parcelable{
 		this.minor = minor;
 	}
 
-	public ArrayList<String> getBeacons() {
-		return beacons;
+	public ArrayList<String> getBeaconCodes() {
+		return beaconCodes;
 	}
 
-	public void setBeacons(ArrayList<String> beacons) {
-		this.beacons = beacons;
+	public void setBeacons(ArrayList<String> beaconCodes) {
+		this.beaconCodes = beaconCodes;
 	}
 }

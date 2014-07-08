@@ -7,8 +7,8 @@ public class Topology implements Parcelable{
 	
 	protected String code;
 	protected String name;
-	protected String beaconGroup;
-	protected String service;
+	protected String beaconGroupCode;
+	protected String serviceCode;
 	
 	public static final Parcelable.Creator<Topology> CREATOR = new Creator<Topology>() {
 		
@@ -30,15 +30,15 @@ public class Topology implements Parcelable{
 	public Topology(String code, String name, String beaconGroup, String service) {
 		this.code = code;
 		this.name = name;
-		this.beaconGroup = beaconGroup;
-		this.service = service;
+		this.beaconGroupCode = beaconGroup;
+		this.serviceCode = service;
 	}
 
 	public Topology(Parcel p) {
 		code = p.readString();
 		name = p.readString();
-		beaconGroup = p.readString();
-		service = p.readString();
+		beaconGroupCode = p.readString();
+		serviceCode = p.readString();
 	}
 	
 	@Override
@@ -50,8 +50,8 @@ public class Topology implements Parcelable{
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(code);
 		dest.writeString(name);
-		dest.writeString(beaconGroup);
-		dest.writeString(service);
+		dest.writeString(beaconGroupCode);
+		dest.writeString(serviceCode);
 	}
 
 	public String getCode() {
@@ -70,19 +70,19 @@ public class Topology implements Parcelable{
 		this.name = name;
 	}
 
-	public String getBeaconGroup() {
-		return beaconGroup;
+	public String getBeaconGroupCode() {
+		return beaconGroupCode;
 	}
 
-	public void setBeaconGroup(String beaconGroup) {
-		this.beaconGroup = beaconGroup;
+	public void setBeaconGroupCode(String beaconGroupCode) {
+		this.beaconGroupCode = beaconGroupCode;
 	}
 
-	public String getService() {
-		return service;
+	public String getServiceCode() {
+		return serviceCode;
 	}
 
-	public void setService(String service) {
-		this.service = service;
+	public void setServiceCode(String serviceCode) {
+		this.serviceCode = serviceCode;
 	}
 }
