@@ -3,6 +3,8 @@ package com.wisewells.sdk.datas.topology;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wisewells.sdk.datas.group.BeaconGroup;
+
 public class Topology implements Parcelable{
 	
 	protected String code;
@@ -23,15 +25,9 @@ public class Topology implements Parcelable{
 		}
 	};
 	
-	public Topology() {
-		
-	}
-	
-	public Topology(String code, String name, String beaconGroup, String service) {
+	public Topology(String code, String name) {
 		this.code = code;
 		this.name = name;
-		this.beaconGroupCode = beaconGroup;
-		this.serviceCode = service;
 	}
 
 	public Topology(Parcel p) {
@@ -52,6 +48,10 @@ public class Topology implements Parcelable{
 		dest.writeString(name);
 		dest.writeString(beaconGroupCode);
 		dest.writeString(serviceCode);
+	}
+	
+	public void attachTo(BeaconGroup bg) {
+		beaconGroupCode = bg.getCode();
 	}
 
 	public String getCode() {

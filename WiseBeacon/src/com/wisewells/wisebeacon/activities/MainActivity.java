@@ -1,5 +1,7 @@
 package com.wisewells.wisebeacon.activities;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -13,8 +15,10 @@ import android.widget.Toast;
 
 import com.wisewells.sdk.WiseObjects;
 import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.datas.topology.LocationTopology;
 import com.wisewells.sdk.services.WiseAgent;
 import com.wisewells.sdk.utils.L;
+import com.wisewells.wisebeacon.Dummy;
 import com.wisewells.wisebeacon.R;
 
 public class MainActivity extends Activity {
@@ -61,6 +65,8 @@ public class MainActivity extends Activity {
 				onHistoryButtonClick();
 			}
 		});
+        
+        WiseObjects.getInstance().putBeaconGroup(Dummy.getUUidGroup());
     }
 
 	@Override
@@ -69,15 +75,11 @@ public class MainActivity extends Activity {
         return true;
     }
 	
+	
 	private void onHistoryButtonClick() {
-		Beacon b = WiseObjects.getInstance().getBeacon("Beacon0");
-		if(b == null)
-			return;
-		Toast.makeText(this, "Beacon Code : " + b.getCode(), Toast.LENGTH_SHORT).show();
 	}
-
+	
     private void onTopologyButtonClick() {
-    	
 	}
 
 	private void onServiceButtonClick() {

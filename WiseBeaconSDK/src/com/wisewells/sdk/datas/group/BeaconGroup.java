@@ -1,24 +1,23 @@
 package com.wisewells.sdk.datas.group;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
-import com.wisewells.sdk.WiseObjects;
-import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.topology.Topology;
-import com.wisewells.sdk.utils.L;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.wisewells.sdk.WiseObjects;
+import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.datas.topology.Topology;
 
 public class BeaconGroup implements Parcelable{
 		
 	protected String code;
 	protected String name;
 	protected String parentCode;	
-	protected ArrayList<String> childCodes;
-	protected ArrayList<Topology> topologyCodes;
+	protected HashSet<String> childCodes;
+	protected HashSet<String> topologyCodes;
 	
 	public static final Parcelable.Creator<BeaconGroup> CREATOR = new Creator<BeaconGroup>() {
 		
@@ -32,19 +31,11 @@ public class BeaconGroup implements Parcelable{
 			return new BeaconGroup(source);
 		}
 	};
-	
-	public BeaconGroup() {
-		init();
-		L.i("BeaconGroup »ý¼º");
-	}
 
-	public BeaconGroup(String code, String name, String parent, ArrayList<String> childCodes, 
-			ArrayList<Topology> topologyCodes) {
+	public BeaconGroup(String code, String name) {
+		init();
 		this.code = code;
 		this.name = name;
-		this.parentCode = parent;
-		this.childCodes = childCodes;
-		this.topologyCodes = topologyCodes;
 	}
 
 	protected BeaconGroup(Parcel p) {
@@ -53,13 +44,13 @@ public class BeaconGroup implements Parcelable{
 		code = p.readString();
 		name = p.readString();
 		parentCode = p.readString();
-		p.readStringList(childCodes);
-		p.readTypedList(topologyCodes, Topology.CREATOR);
+		childCodes = (HashSet<String>) p.readSerializable();
+		topologyCodes = (HashSet<String>) p.readSerializable();
 	}
 	
 	private void init() {
-		childCodes = new ArrayList<String>();
-		topologyCodes = new ArrayList<Topology>();
+		childCodes = new HashSet<String>();
+		topologyCodes = new HashSet<String>();
 	}
 	
 	@Override
@@ -72,8 +63,8 @@ public class BeaconGroup implements Parcelable{
 		dest.writeString(code);
 		dest.writeString(name);
 		dest.writeString(parentCode);
-		dest.writeStringList(childCodes);
-		dest.writeTypedList(topologyCodes);
+		dest.writeSerializable(childCodes);
+		dest.writeSerializable(topologyCodes);
 	}
 	
 	public List<Beacon> getBeaconsInGroup() {
@@ -94,6 +85,16 @@ public class BeaconGroup implements Parcelable{
 		return beacons;
 	}
 
+	public void addChild(BeaconGroup group) {
+		childCodes.add(group.getCode());
+		group.setParentCode(this.code);
+	}
+	
+	public void attachTo(Topology t) {
+		topologyCodes.add(t.getCode());
+		t.setBeaconGroupCode(this.code);
+	}
+	
 	/*
 	 * Getter, Setter
 	 */
@@ -114,8 +115,20 @@ public class BeaconGroup implements Parcelable{
 		this.parentCode = parent;
 	}
 	
-	public void setTopologyCodes(ArrayList<Topology> t) {
+	public HashSet<String> getChildCodes() {
+		return this.childCodes;
+	}
+	
+	public void setChildCodes(HashSet<String> codes) {
+		this.childCodes = codes;
+	}
+	
+	public void setTopologyCodes(HashSet<String> t) {
 		topologyCodes = t;
+	}
+	
+	public void setName(String name) {
+		this.name = name;		
 	}
 	
 	public String getName() {

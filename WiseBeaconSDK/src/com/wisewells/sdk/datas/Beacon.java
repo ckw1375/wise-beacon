@@ -1,18 +1,18 @@
 package com.wisewells.sdk.datas;
 
+import java.util.HashSet;
 import java.util.UUID;
 
-import com.wisewells.sdk.datas.group.MinorGroup;
-
 import android.os.Parcel;
-import android.os.ParcelUuid;
 import android.os.Parcelable;
+
+import com.wisewells.sdk.datas.group.MinorGroup;
 
 public class Beacon implements Parcelable {
 
 	private String code;
 	private String macAddress;
-	private String beaconGroupCode;
+	private HashSet<String> beaconGroupCodes;
 	private UUID uuid;
 	private int major;
 	private int minor;
@@ -32,18 +32,14 @@ public class Beacon implements Parcelable {
 			return new Beacon(source);
 		}
 	};
-
-	public Beacon() {
-		
-	}
 	
-	public Beacon(String code, String macAddress, String beaconGroup, String uuid, int major,
+	public Beacon(String code, String macAddress, String uuid, int major,
 			int minor, double txPower, double interval, double rssi) {
 		
 		super();
+		init();
 		this.code = code;
 		this.macAddress = macAddress;
-		this.beaconGroupCode = beaconGroup;
 		this.uuid = UUID.fromString(uuid);
 		this.major = major;
 		this.minor = minor;
@@ -52,23 +48,21 @@ public class Beacon implements Parcelable {
 		this.rssi = rssi;
 	}
 
-	public Beacon(com.estimote.sdk.Beacon b) {
-		this.macAddress = b.getMacAddress();
-		this.uuid = UUID.fromString(b.getProximityUUID());
-		this.major = b.getMajor();
-		this.minor = b.getMinor();
-	}
-
 	private Beacon(Parcel p) {
+		init();
 		code = p.readString();
 		macAddress = p.readString();
-		beaconGroupCode = p.readString();
+		beaconGroupCodes = (HashSet<String>) p.readSerializable();
 		uuid = (UUID) p.readSerializable();
 		major = p.readInt();
 		minor = p.readInt();
 		txPower = p.readDouble();
 		interval = p.readDouble();
 		rssi = p.readDouble();
+	}
+	
+	private void init() {
+		beaconGroupCodes = new HashSet<String>();
 	}
 
 	@Override
@@ -80,7 +74,7 @@ public class Beacon implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(code);
 		dest.writeString(macAddress);
-		dest.writeString(beaconGroupCode);
+		dest.writeSerializable(beaconGroupCodes);
 		dest.writeSerializable(uuid);
 		dest.writeInt(major);
 		dest.writeInt(minor);
@@ -99,8 +93,12 @@ public class Beacon implements Parcelable {
 		 */
 	}
 	
-	public void attach(MinorGroup parent) {
+	public void attachTo(MinorGroup parent) {
 		
+	}
+	
+	public void addBeaconGroupCode(String code) {
+		beaconGroupCodes.add(code);
 	}
 	
 	public void detach() {
@@ -115,8 +113,8 @@ public class Beacon implements Parcelable {
 		return macAddress;
 	}
 
-	public String getBeaconGroupCode() {
-		return beaconGroupCode;
+	public HashSet<String> getBeaconGroupCodes() {
+		return beaconGroupCodes;
 	}
 
 	public UUID getUuid() {

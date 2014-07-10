@@ -1,14 +1,17 @@
 package com.wisewells.sdk.datas.topology;
 
+import java.util.HashMap;
+
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.RssiVector;
+import com.wisewells.sdk.utils.Utils;
 
 public class ProximityTopology extends Topology implements Parcelable {
-	private Bundle searchRanges;
+	private HashMap<String, Double> searchRanges;
 
 	public static Parcelable.Creator<ProximityTopology> CREATOR = new Creator<ProximityTopology>() {
 		
@@ -22,17 +25,19 @@ public class ProximityTopology extends Topology implements Parcelable {
 			return new ProximityTopology(source);
 		}
 	};
-
-	public ProximityTopology() {
-		init();
+	
+	public ProximityTopology(String code, String name) {
+		super(code, name);
+		searchRanges = new HashMap<String, Double>();
 	}
 	
 	private ProximityTopology(Parcel p) {
-		searchRanges = p.readBundle();
+		super(p);
+		searchRanges = 
 	}
 
 	private void init() {
-		searchRanges = new Bundle();
+		searchRanges = new HashMap<String, Double>();
 	}
 	
 	@Override
@@ -43,7 +48,7 @@ public class ProximityTopology extends Topology implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		super.writeToParcel(dest, flags);
-		dest.writeBundle(searchRanges);
+		Utils.writeMapToParcel(dest, map);
 	}
 	
 	public void setSearchRange(String beaconCode, double searchRange) {

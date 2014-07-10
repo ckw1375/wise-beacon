@@ -1,5 +1,8 @@
 package com.wisewells.sdk;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,6 +11,7 @@ import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.group.BeaconGroup;
 import com.wisewells.sdk.datas.topology.Topology;
+import com.wisewells.sdk.utils.Utils;
 
 /**
  * @file	WiseObjects.java
@@ -19,10 +23,10 @@ import com.wisewells.sdk.datas.topology.Topology;
 
 public class WiseObjects implements Parcelable {
 	
-	private Bundle beacons;
-	private Bundle beaconGroups;
-	private Bundle services;
-	private Bundle topologies;
+	private HashMap<String, Beacon> beacons;
+	private HashMap<String, BeaconGroup> beaconGroups;
+	private HashMap<String, Service> services;
+	private HashMap<String, Topology> topologies;
 	
 	public static WiseObjects instance;
 	public static Parcelable.Creator<WiseObjects> CREATOR = new Creator<WiseObjects>() {
@@ -48,26 +52,19 @@ public class WiseObjects implements Parcelable {
 	private WiseObjects() {
 		init();
 	}
-		
-	public WiseObjects(Bundle beacons, Bundle beaconGroups, Bundle services, Bundle topologies) {
-		this.beacons = beacons;
-		this.beaconGroups = beaconGroups;
-		this.services = services;
-		this.topologies = topologies;
-	}
 
 	private WiseObjects(Parcel p) {
-		beacons = p.readBundle();
-		beaconGroups = p.readBundle();
-		services = p.readBundle();
-		topologies = p.readBundle();
+		beacons = (HashMap<String, Beacon>) Utils.readMapFromParcel(p, Beacon.class.getClassLoader());;
+		beaconGroups = (HashMap<String, BeaconGroup>) Utils.readMapFromParcel(p, BeaconGroup.class.getClassLoader());
+		services = (HashMap<String, Service>) Utils.readMapFromParcel(p, Service.class.getClassLoader());
+		topologies = (HashMap<String, Topology>) Utils.readMapFromParcel(p, Topology.class.getClassLoader());
 	}
 		
 	private void init() {
-		beacons = new Bundle(Beacon.class.getClassLoader());
-		beaconGroups = new Bundle(BeaconGroup.class.getClassLoader());
-		services = new Bundle(Service.class.getClassLoader());
-		topologies = new Bundle(Topology.class.getClassLoader());
+		beacons = new HashMap<String, Beacon>();
+		beaconGroups = new HashMap<String, BeaconGroup>();
+		services = new HashMap<String, Service>();
+		topologies = new HashMap<String, Topology>();
 	}
 	
 	@Override
@@ -77,10 +74,18 @@ public class WiseObjects implements Parcelable {
 	
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeBundle(beacons);
-		dest.writeBundle(beaconGroups);
-		dest.writeBundle(services);
-		dest.writeBundle(topologies);
+		Utils.writeMapToParcel(dest, beacons);
+		Utils.writeMapToParcel(dest, beaconGroups);
+		Utils.writeMapToParcel(dest, services);
+		Utils.writeMapToParcel(dest, topologies);
+	}
+	
+	public void attach() {
+		
+	}
+	
+	public void detach() {
+		
 	}
 	
 	public Beacon getBeacon(String code) {
@@ -99,19 +104,19 @@ public class WiseObjects implements Parcelable {
 		return (Topology) topologies.get(code);
 	}
 	
-	public void putBeacon(String code, Beacon beacon) {
-		beacons.putParcelable(code, beacon);		
+	public void putBeacon(Beacon beacon) {
+		beacons.put(beacon.getCode(), beacon);		
 	}
 	
-	public void putBeaconGroup(String code, BeaconGroup beaconGroup) {
-		beaconGroups.putParcelable(code, beaconGroup);
+	public void putBeaconGroup(BeaconGroup beaconGroup) {
+		beaconGroups.put(beaconGroup.getCode(), beaconGroup);
 	}
 	
-	public void putService(String code, Service service) {
-		services.putParcelable(code, service);
+	public void putService(Service service) {
+		services.put(service.getCode(), service);
 	}
 	
-	public void putTopology(String code, Topology topology) {
-		topologies.putParcelable(code, topology);
+	public void putTopology(Topology topology) {
+		topologies.put(topology.getCode(), topology);
 	}
 }

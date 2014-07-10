@@ -1,7 +1,5 @@
 package com.wisewells.sdk;
 
-
-
 public class WiseManager {
 	
 	private static WiseManager instance;

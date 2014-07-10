@@ -24,12 +24,15 @@ public class SectorTopology extends Topology implements Parcelable {
 		}
 	};
 	
-	public SectorTopology() {
+	public SectorTopology(String code, String name) {
+		super(code, name);
 		init();
 	}
 	
+	
 	public SectorTopology(Parcel p) {
 		super(p);
+		init();
 		p.readTypedList(sectors, Sector.CREATOR);
 	}
 	

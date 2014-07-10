@@ -1,6 +1,6 @@
 package com.wisewells.sdk.datas;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -13,7 +13,7 @@ public class Service implements Parcelable{
 	private String code;
 	private String topologyCode;
 	private String parentCode;
-	private ArrayList<String> childCodes;
+	private HashSet<String> childCodes;
 	
 	public static final Parcelable.Creator<Service> CREATOR = new Creator<Service>() {
 		
@@ -27,9 +27,11 @@ public class Service implements Parcelable{
 			return new Service(source);
 		}
 	};
-	
-	public Service() {
-		
+
+	public Service(String name, String code) {
+		init();
+		this.name = name;
+		this.code = code;
 	}
 	
 	public Service(Parcel p) {
@@ -38,11 +40,11 @@ public class Service implements Parcelable{
 		code = p.readString();
 		topologyCode = p.readString();
 		parentCode = p.readString();		
-		p.readStringList(childCodes);
+		childCodes = (HashSet<String>) p.readSerializable();
 	}
 	
 	private void init() {
-		childCodes = new ArrayList<String>();
+		childCodes = new HashSet<String>();
 	}
 	
 	@Override
@@ -56,7 +58,17 @@ public class Service implements Parcelable{
 		dest.writeString(code);
 		dest.writeString(topologyCode);
 		dest.writeString(parentCode);
-		dest.writeStringList(childCodes);
+		dest.writeSerializable(childCodes);
+	}
+	
+	public void attachTo(Topology t) {
+		topologyCode = t.getCode();
+		t.setServiceCode(this.code);
+	}
+	
+	public void addChild(Service s) {
+		childCodes.add(s.getCode());
+		s.setParentCode(this.code);
 	}
 
 	public String getName() {
@@ -87,15 +99,15 @@ public class Service implements Parcelable{
 		return parentCode;
 	}
 
-	public void setParent(String parentCode) {
+	public void setParentCode(String parentCode) {
 		this.parentCode = parentCode;
 	}
 
-	public ArrayList<String> getChildCodes() {
+	public HashSet<String> getChildCodes() {
 		return childCodes;
 	}
 
-	public void setChildCodes(ArrayList<String> childCodes) {
+	public void setChildCodes(HashSet<String> childCodes) {
 		this.childCodes = childCodes;
 	}
 }

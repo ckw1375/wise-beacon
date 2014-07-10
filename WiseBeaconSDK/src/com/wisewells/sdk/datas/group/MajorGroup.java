@@ -20,8 +20,8 @@ public class MajorGroup extends BeaconGroup implements Parcelable{
 		}
 	};
 	
-	public MajorGroup() {
-		
+	public MajorGroup(String code, String name) {
+		super(code, name);
 	}
 	
 	private MajorGroup(Parcel p) {
@@ -48,7 +48,7 @@ public class MajorGroup extends BeaconGroup implements Parcelable{
 		return major;
 	}
 
-	public void setMajor(int minor) {
-		this.major = minor;
+	public void setMajor(int major) {
+		this.major = major;
 	}
 }

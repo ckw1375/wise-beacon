@@ -4,9 +4,6 @@ import java.util.UUID;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.Parcelable.Creator;
-
-import com.wisewells.sdk.utils.L;
 
 
 public class UuidGroup extends BeaconGroup implements Parcelable {
@@ -24,11 +21,12 @@ public class UuidGroup extends BeaconGroup implements Parcelable {
 			return new UuidGroup(source);
 		}
 	};
-	
-	public UuidGroup() {
-		L.i("UuidGroup »ý¼º");
+
+	public UuidGroup(String code, String name, String uuid) {
+		super(code, name);
+		this.uuid = UUID.fromString(uuid);
 	}
-	
+
 	public UuidGroup(Parcel p) {
 		super(p);
 		uuid = (UUID) p.readSerializable();

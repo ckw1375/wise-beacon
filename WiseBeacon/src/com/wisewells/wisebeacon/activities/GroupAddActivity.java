@@ -1,6 +1,6 @@
 package com.wisewells.wisebeacon.activities;
 
-import java.io.ObjectOutputStream.PutField;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -13,7 +13,8 @@ import android.widget.ListView;
 
 import com.wisewells.sdk.WiseObjects;
 import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.group.BeaconGroup;
+import com.wisewells.sdk.datas.group.MajorGroup;
+import com.wisewells.sdk.datas.group.MinorGroup;
 import com.wisewells.wisebeacon.Dummy;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.adapters.BeaconAdapter;
@@ -56,12 +57,23 @@ public class GroupAddActivity extends Activity {
 	}
 	
 	private void saveBeaconGroup() {
+		String name = mNameView.getText().toString();
+		MajorGroup mg = new MajorGroup(name, name);
 		
 		SparseBooleanArray sba = mListView.getCheckedItemPositions();
 		for(int i=0; i<mListView.getCount(); i++) {			
-			if(!sba.get(i)) continue;				
-			Beacon b = mAdapter.getItem(i);
-			WiseObjects.getInstance().putBeacon("Beacon" + i, b);
+			if(!sba.get(i)) continue;		
+			
+			Beacon beacon = mAdapter.getItem(i);
+			
+			MinorGroup minor = new MinorGroup("minor"+i, "minor"+i, i);			
+			minor.addBeacon(beacon);
+			
+			mg.addChild(minor);
+			
+			WiseObjects.getInstance().putBeacon(beacon);
+			WiseObjects.getInstance().putBeaconGroup(minor);			
 		}
+		WiseObjects.getInstance().putBeaconGroup(mg);
 	}
 }
