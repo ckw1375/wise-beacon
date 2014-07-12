@@ -45,7 +45,7 @@ public class Beacon implements Parcelable {
 		this.minor = minor;
 		this.txPower = txPower;
 		this.interval = interval;
-		this.rssi = rssi;
+		this.rssi = rssi;		
 	}
 
 	private Beacon(Parcel p) {

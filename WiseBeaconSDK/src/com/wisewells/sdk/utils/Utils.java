@@ -27,18 +27,6 @@ public class Utils {
 		return count;
 	}
 	
-	public static Bundle toBundleWithMap(Map<String, ? extends Parcelable> map) {
-		ArrayList<String> keys = new ArrayList<String>();
-		ArrayList<Parcelable> values = new ArrayList<Parcelable>();		
-		Bundle bundle = new Bundle();
-		
-		for(String key : map.keySet()) 		keys.add(key);
-		for(Parcelable obj : map.values()) 	values.add(obj);		
-		for(int i=0; i<keys.size(); i++) 	bundle.putParcelable(keys.get(i), values.get(i));
-				
-		return bundle;
-	}
-	
 	public static void writeMapToParcel(Parcel dest, Map<String, ? extends Parcelable> map) {
 		Bundle bundle = new Bundle();
 		Set<String> keySet = map.keySet();
@@ -52,16 +40,16 @@ public class Utils {
 		
 		dest.writeStringArray(keys);
 		dest.writeBundle(bundle);
-	}
-	
-	public static HashMap<String, ? extends Parcelable> readMapFromParcel(Parcel in, ClassLoader loader) {
+	}	
+
+	public static HashMap<String, ? extends Parcelable> readMapFromParcel(Parcel in, ClassLoader valueLoader) {
 		String[] keys = in.createStringArray();
-		Bundle bundle = in.readBundle(loader);
+		Bundle bundle = in.readBundle(valueLoader);
 		HashMap<String, Parcelable> map = new HashMap<String, Parcelable>();
-		
+
 		for(String key : keys) 
 			map.put(key, bundle.getParcelable(key));
-		
+
 		return map;
-		}
+	}
 }

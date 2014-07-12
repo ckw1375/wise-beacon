@@ -57,7 +57,7 @@ class RangingRegion
 		Iterator iterator = this.beacons.entrySet().iterator();
 		while (iterator.hasNext()) {
 			Map.Entry entry = (Map.Entry)iterator.next();
-			if (currentTimeMillis - ((Long)entry.getValue()).longValue() > BeaconService.EXPIRATION_MILLIS) {
+			if (currentTimeMillis - ((Long)entry.getValue()).longValue() > WiseAgent.EXPIRATION_MILLIS) {
 				L.v("Not seen lately: " + entry.getKey());
 				iterator.remove();
 			}

@@ -32,8 +32,7 @@ import com.estimote.sdk.Utils;
 import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.sdk.utils.L;
 
-public class BeaconService extends Service
-{
+public class WiseAgent extends Service {
 	public static final int MSG_START_RANGING = 1;
 	public static final int MSG_STOP_RANGING = 2;
 	public static final int MSG_RANGING_RESPONSE = 3;
@@ -45,99 +44,100 @@ public class BeaconService extends Service
 	public static final int MSG_SET_FOREGROUND_SCAN_PERIOD = 9;
 	public static final int MSG_SET_BACKGROUND_SCAN_PERIOD = 10;
 	public static final int ERROR_COULD_NOT_START_LOW_ENERGY_SCANNING = -1;
+	
 	static final long EXPIRATION_MILLIS = TimeUnit.SECONDS.toMillis(10L);
-	private static final String SCAN_START_ACTION_NAME = "startScan";
-	private static final String AFTER_SCAN_ACTION_NAME = "afterScan";
-	private static final Intent SCAN_START_INTENT = new Intent("startScan");
-	private static final Intent AFTER_SCAN_INTENT = new Intent("afterScan");
-	private final Messenger messenger;
-	private final BluetoothAdapter.LeScanCallback leScanCallback;
-	private final ConcurrentHashMap<Beacon, Long> beaconsFoundInScanCycle;
-	private final List<RangingRegion> rangedRegions;
-	private final List<MonitoringRegion> monitoredRegions;
-	private BluetoothAdapter adapter;
-	private AlarmManager alarmManager;
-	private HandlerThread handlerThread;
-	private Handler handler;
-	private Runnable afterScanCycleTask;
-	private boolean scanning;
-	private Messenger errorReplyTo;
-	private BroadcastReceiver bluetoothBroadcastReceiver;
-	private BroadcastReceiver scanStartBroadcastReceiver;
-	private PendingIntent scanStartBroadcastPendingIntent;
-	private BroadcastReceiver afterScanBroadcastReceiver;
-	private PendingIntent afterScanBroadcastPendingIntent;
-	private ScanPeriodData foregroundScanPeriod;
-	private ScanPeriodData backgroundScanPeriod;
+	
+	private static final String THREAD_NAME_AGENT = "WiseAgentThread";
+	private static final String ACTION_NAME_START_SCAN = "com.wisewells.agent.startScan";
+	private static final String ACTION_NAME_AFTER_SCAN = "com.wisewells.agent.afterScan";
+	
+	private static final Intent INTENT_START_SCAN = new Intent(ACTION_NAME_START_SCAN);
+	private static final Intent INTENT_AFTER_SCAN = new Intent(ACTION_NAME_AFTER_SCAN);
+	
+	private final Messenger mMessenger;
+	private final BluetoothAdapter.LeScanCallback mLeScanCallback;
+	private final ConcurrentHashMap<Beacon, Long> mBeaconsFoundInScanCycle;
+	private final List<RangingRegion> mRangedRegions;
+	private final List<MonitoringRegion> mMonitoredRegions;
+	private BluetoothAdapter mAdapter;
+	private AlarmManager mAlarmManager;
+	private HandlerThread mHandlerThread;
+	private Handler mHandler;
+	private Runnable mAfterScanCycleTask;
+	private boolean mScanning;
+	private Messenger mErrorReplyTo;
+	private BroadcastReceiver mBluetoothReceiver;
+	private BroadcastReceiver mStartScanReceiver;
+	private BroadcastReceiver mAfterScanReceiver;
+	private PendingIntent mStartScanPendingIntent;	
+	private PendingIntent mAfterScanPendingIntent;
+	private ScanPeriodData mForegroundScanPeriod;
+	private ScanPeriodData mBackgroundScanPeriod;
 
-	public BeaconService()
-	{
-		this.messenger = new Messenger(new IncomingHandler());
-		this.leScanCallback = new InternalLeScanCallback();
-		this.beaconsFoundInScanCycle = new ConcurrentHashMap();
-		this.rangedRegions = new ArrayList();
-		this.monitoredRegions = new ArrayList();
-		this.foregroundScanPeriod = new ScanPeriodData(TimeUnit.SECONDS.toMillis(1L), TimeUnit.SECONDS.toMillis(0L));
-		this.backgroundScanPeriod = new ScanPeriodData(TimeUnit.SECONDS.toMillis(5L), TimeUnit.SECONDS.toMillis(30L));
+	public WiseAgent() {
+		mMessenger = new Messenger(new IncomingHandler());
+		mLeScanCallback = new InternalLeScanCallback();
+		mBeaconsFoundInScanCycle = new ConcurrentHashMap<Beacon, Long>();
+		mRangedRegions = new ArrayList<RangingRegion>();
+		mMonitoredRegions = new ArrayList<MonitoringRegion>();
+		mForegroundScanPeriod = new ScanPeriodData(TimeUnit.SECONDS.toMillis(1L), TimeUnit.SECONDS.toMillis(0L));
+		mBackgroundScanPeriod = new ScanPeriodData(TimeUnit.SECONDS.toMillis(5L), TimeUnit.SECONDS.toMillis(30L));
 	}
 
-	public void onCreate()
-	{
+	public void onCreate() {
 		super.onCreate();
 		L.i("Creating service");
  
-		this.alarmManager = ((AlarmManager)getSystemService("alarm"));
+		mAlarmManager = ((AlarmManager)getSystemService("alarm"));
 		BluetoothManager bluetoothManager = (BluetoothManager)getSystemService("bluetooth");
-		this.adapter = bluetoothManager.getAdapter();
-		this.afterScanCycleTask = new AfterScanCycleTask();
-		this.handlerThread = new HandlerThread("BeaconServiceThread", 10);
-		this.handlerThread.start();
-		this.handler = new Handler(this.handlerThread.getLooper());
+		mAdapter = bluetoothManager.getAdapter();
+		mAfterScanCycleTask = new AfterScanCycleTask();
+		mHandlerThread = new HandlerThread(THREAD_NAME_AGENT, 10);
+		mHandlerThread.start();
+		mHandler = new Handler(mHandlerThread.getLooper());
 
-		this.bluetoothBroadcastReceiver = createBluetoothBroadcastReceiver();
-		this.scanStartBroadcastReceiver = createScanStartBroadcastReceiver();
-		this.afterScanBroadcastReceiver = createAfterScanBroadcastReceiver();
-		registerReceiver(this.bluetoothBroadcastReceiver, new IntentFilter("android.bluetooth.adapter.action.STATE_CHANGED"));
-		registerReceiver(this.scanStartBroadcastReceiver, new IntentFilter("startScan"));
-		registerReceiver(this.afterScanBroadcastReceiver, new IntentFilter("afterScan"));
-		this.afterScanBroadcastPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, AFTER_SCAN_INTENT, 0);
-		this.scanStartBroadcastPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, SCAN_START_INTENT, 0);
+		mBluetoothReceiver = createBluetoothBroadcastReceiver();
+		mStartScanReceiver = createScanStartBroadcastReceiver();
+		mAfterScanReceiver = createAfterScanBroadcastReceiver();
+		registerReceiver(mBluetoothReceiver, new IntentFilter("android.bluetooth.adapter.action.STATE_CHANGED"));
+		registerReceiver(mStartScanReceiver, new IntentFilter(ACTION_NAME_START_SCAN));
+		registerReceiver(mAfterScanReceiver, new IntentFilter(ACTION_NAME_AFTER_SCAN));
+		mAfterScanPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, INTENT_AFTER_SCAN, 0);
+		mStartScanPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, INTENT_START_SCAN, 0);
 	}
 
-	public void onDestroy()
-	{
+	public void onDestroy() {
 		L.i("Service destroyed");
-		unregisterReceiver(this.bluetoothBroadcastReceiver);
-		unregisterReceiver(this.scanStartBroadcastReceiver);
-		unregisterReceiver(this.afterScanBroadcastReceiver);
+		unregisterReceiver(mBluetoothReceiver);
+		unregisterReceiver(mStartScanReceiver);
+		unregisterReceiver(mAfterScanReceiver);
 
-		if (this.adapter != null) {
+		if (mAdapter != null) {
 			stopScanning();
 		}
 
 		removeAfterScanCycleCallback();
-		this.handlerThread.quit();
+		mHandlerThread.quit();
 
 		super.onDestroy();
 	}
  
-	public IBinder onBind(Intent intent)
-	{
-		return this.messenger.getBinder();
+	public IBinder onBind(Intent intent) {
+		return mMessenger.getBinder();
 	}
  
 	private void startRanging(RangingRegion rangingRegion) {
 		checkNotOnUiThread();
 		L.v("Start ranging: " + rangingRegion.region);
-		Preconditions.checkNotNull(this.adapter, "Bluetooth adapter cannot be null");
-		this.rangedRegions.add(rangingRegion);
+		Preconditions.checkNotNull(mAdapter, "Bluetooth adapter cannot be null");
+		mRangedRegions.add(rangingRegion);
 		startScanning();
 	}
 
 	private void stopRanging(String regionId) {
 		L.v("Stopping ranging: " + regionId);
 		checkNotOnUiThread();
-		Iterator iterator = this.rangedRegions.iterator();
+		Iterator iterator = mRangedRegions.iterator();
 		while (iterator.hasNext()) {
 			RangingRegion rangingRegion = (RangingRegion)iterator.next();
 			if (regionId.equals(rangingRegion.region.getIdentifier())) {
@@ -145,25 +145,25 @@ public class BeaconService extends Service
 			}
 		}
      
-		if ((this.rangedRegions.isEmpty()) && (this.monitoredRegions.isEmpty())) {
+		if ((mRangedRegions.isEmpty()) && (mMonitoredRegions.isEmpty())) {
 			removeAfterScanCycleCallback();
 			stopScanning();
-			this.beaconsFoundInScanCycle.clear();
+			mBeaconsFoundInScanCycle.clear();
 		}
 	}
 
 	public void startMonitoring(MonitoringRegion monitoringRegion) {
 		checkNotOnUiThread();
 		L.v("Starting monitoring: " + monitoringRegion.region);
-		Preconditions.checkNotNull(this.adapter, "Bluetooth adapter cannot be null");
-		this.monitoredRegions.add(monitoringRegion);
+		Preconditions.checkNotNull(mAdapter, "Bluetooth adapter cannot be null");
+		mMonitoredRegions.add(monitoringRegion);
 		startScanning();
    }
 
 	public void stopMonitoring(String regionId) {
 		L.v("Stopping monitoring: " + regionId);
 		checkNotOnUiThread();
-		Iterator iterator = this.monitoredRegions.iterator();
+		Iterator iterator = mMonitoredRegions.iterator();
 		while (iterator.hasNext()) {
 			MonitoringRegion monitoringRegion = (MonitoringRegion)iterator.next();
 			if (regionId.equals(monitoringRegion.region.getIdentifier())) {
@@ -171,63 +171,63 @@ public class BeaconService extends Service
 			}
 		}
      
-		if ((this.monitoredRegions.isEmpty()) && (this.rangedRegions.isEmpty())) {
+		if ((mMonitoredRegions.isEmpty()) && (mRangedRegions.isEmpty())) {
 			removeAfterScanCycleCallback();
 			stopScanning();
-			this.beaconsFoundInScanCycle.clear();
+			mBeaconsFoundInScanCycle.clear();
 		}
 	}
 
    
 	private void startScanning() {
-		if (this.scanning) {
+		if (mScanning) {
 			L.d("Scanning already in progress, not starting one more");
 			
 			return;
 		}
     
-		if ((this.monitoredRegions.isEmpty()) && (this.rangedRegions.isEmpty())) {
+		if ((mMonitoredRegions.isEmpty()) && (mRangedRegions.isEmpty())) {
 			L.d("Not starting scanning, no monitored on ranged regions");
       
 			return;
 		}
     
-		if (!this.adapter.isEnabled()) {
+		if (!mAdapter.isEnabled()) {
 			L.d("Bluetooth is disabled, not starting scanning");
       
 			return;
 		}
      
-		if (!this.adapter.startLeScan(this.leScanCallback)) {
+		if (!mAdapter.startLeScan(mLeScanCallback)) {
 			L.wtf("Bluetooth adapter did not start le scan");
 			sendError(Integer.valueOf(-1));
       
 			return;
 		}
 		
-		this.scanning = true;
+		mScanning = true;
 		removeAfterScanCycleCallback();
-		setAlarm(this.afterScanBroadcastPendingIntent, scanPeriodTimeMillis());
+		setAlarm(mAfterScanPendingIntent, scanPeriodTimeMillis());
 	
 	}
 
 	private void stopScanning()
 	{
 		try {
-			this.scanning = false;
-			this.adapter.stopLeScan(this.leScanCallback);
+			mScanning = false;
+			mAdapter.stopLeScan(mLeScanCallback);
 		} catch (Exception e) {
 			L.wtf("BluetoothAdapter throws unexpected exception", e);
 		}
 	}
  
 	private void sendError(Integer errorId) {
-		if (this.errorReplyTo != null) {
+		if (mErrorReplyTo != null) {
 			Message errorMsg = Message.obtain(null, 8);
 			errorMsg.obj = errorId;
 			try {
 				
-				this.errorReplyTo.send(errorMsg);
+				mErrorReplyTo.send(errorMsg);
 			} catch (RemoteException e) {
 				L.e("Error while reporting message, funny right?", e);
 			}
@@ -236,31 +236,31 @@ public class BeaconService extends Service
 
    
 	private long scanPeriodTimeMillis() {
-		if (!this.rangedRegions.isEmpty()) {
-			return this.foregroundScanPeriod.scanPeriodMillis;
+		if (!mRangedRegions.isEmpty()) {
+			return mForegroundScanPeriod.scanPeriodMillis;
 		}
     
-		return this.backgroundScanPeriod.scanPeriodMillis;
+		return mBackgroundScanPeriod.scanPeriodMillis;
 	}
 
 	private long scanWaitTimeMillis()
 	{
-		if (!this.rangedRegions.isEmpty()) {
-			return this.foregroundScanPeriod.waitTimeMillis;
+		if (!mRangedRegions.isEmpty()) {
+			return mForegroundScanPeriod.waitTimeMillis;
 		}
 		
-		return this.backgroundScanPeriod.waitTimeMillis;
+		return mBackgroundScanPeriod.waitTimeMillis;
 	}
 
 	private void setAlarm(PendingIntent pendingIntent, long delayMillis)
 	{
-		this.alarmManager.set(2, SystemClock.elapsedRealtime() + delayMillis, pendingIntent);
+		mAlarmManager.set(2, SystemClock.elapsedRealtime() + delayMillis, pendingIntent);
 	}
  
 	private void checkNotOnUiThread()
 	{
 		Preconditions.checkArgument(Looper.getMainLooper().getThread() != Thread.currentThread(), "This cannot be run on UI thread, starting BLE scan can be expensive");
-		Preconditions.checkNotNull(Boolean.valueOf(this.handlerThread.getLooper() == Looper.myLooper()), "It must be executed on service's handlerThread");
+		Preconditions.checkNotNull(Boolean.valueOf(mHandlerThread.getLooper() == Looper.myLooper()), "It must be executed on service's handlerThread");
 	}
  
 	private BroadcastReceiver createBluetoothBroadcastReceiver()
@@ -271,23 +271,23 @@ public class BeaconService extends Service
 				if ("android.bluetooth.adapter.action.STATE_CHANGED".equals(intent.getAction())) {
 					int state = intent.getIntExtra("android.bluetooth.adapter.extra.STATE", -1);
 					if (state == 10)
-						BeaconService.this.handler.post(new Runnable()
+						WiseAgent.this.mHandler.post(new Runnable()
 						{
 							public void run() {
 								L.i("Bluetooth is OFF: stopping scanning");
-								BeaconService.this.removeAfterScanCycleCallback();
-								BeaconService.this.stopScanning();
-								BeaconService.this.beaconsFoundInScanCycle.clear();
+								WiseAgent.this.removeAfterScanCycleCallback();
+								WiseAgent.this.stopScanning();
+								WiseAgent.this.mBeaconsFoundInScanCycle.clear();
 							}
 						});
            
 					else if (state == 12)
-						BeaconService.this.handler.post(new Runnable()
+						WiseAgent.this.mHandler.post(new Runnable()
 						{
 							public void run() {
-								if ((!BeaconService.this.monitoredRegions.isEmpty()) || (!BeaconService.this.rangedRegions.isEmpty())) {
-									L.i(String.format("Bluetooth is ON: resuming scanning (monitoring: %d ranging:%d)", new Object[] { Integer.valueOf(BeaconService.this.monitoredRegions.size()), Integer.valueOf(BeaconService.this.rangedRegions.size()) }));
-									BeaconService.this.startScanning();
+								if ((!WiseAgent.this.mMonitoredRegions.isEmpty()) || (!WiseAgent.this.mRangedRegions.isEmpty())) {
+									L.i(String.format("Bluetooth is ON: resuming scanning (monitoring: %d ranging:%d)", new Object[] { Integer.valueOf(WiseAgent.this.mMonitoredRegions.size()), Integer.valueOf(WiseAgent.this.mRangedRegions.size()) }));
+									WiseAgent.this.startScanning();
 								}
 							}
 						});
@@ -298,16 +298,16 @@ public class BeaconService extends Service
  
 	private void removeAfterScanCycleCallback()
 	{
-		this.handler.removeCallbacks(this.afterScanCycleTask);
-		this.alarmManager.cancel(this.afterScanBroadcastPendingIntent);
-		this.alarmManager.cancel(this.scanStartBroadcastPendingIntent);
+		this.mHandler.removeCallbacks(this.mAfterScanCycleTask);
+		this.mAlarmManager.cancel(this.mAfterScanPendingIntent);
+		this.mAlarmManager.cancel(this.mStartScanPendingIntent);
 	}
 
 	private BroadcastReceiver createAfterScanBroadcastReceiver() {
 		return new BroadcastReceiver()
 		{
 			public void onReceive(Context context, Intent intent) {
-				BeaconService.this.handler.post(BeaconService.this.afterScanCycleTask);
+				WiseAgent.this.mHandler.post(WiseAgent.this.mAfterScanCycleTask);
 			}
 		};
 	}
@@ -316,10 +316,10 @@ public class BeaconService extends Service
 		return new BroadcastReceiver()
 		{
 			public void onReceive(Context context, Intent intent) {
-				BeaconService.this.handler.post(new Runnable()
+				WiseAgent.this.mHandler.post(new Runnable()
 				{
 					public void run() {
-						BeaconService.this.startScanning();
+						WiseAgent.this.startScanning();
 					}
 				});
 			}
@@ -335,14 +335,14 @@ public class BeaconService extends Service
  
 		public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord)
 		{
-			BeaconService.this.checkNotOnUiThread();
+			WiseAgent.this.checkNotOnUiThread();
 			Beacon beacon = Utils.beaconFromLeScan(device, rssi, scanRecord);
 			//if ((beacon == null) || (!EstimoteBeacons.isEstimoteBeacon(beacon))) {
 			//	L.v("Device " + device + " is not an Estimote beacon");
 			//	return;
 			//}
 			
-			BeaconService.this.beaconsFoundInScanCycle.put(beacon, Long.valueOf(System.currentTimeMillis()));
+			WiseAgent.this.mBeaconsFoundInScanCycle.put(beacon, Long.valueOf(System.currentTimeMillis()));
 		}
 	}
  
@@ -358,36 +358,36 @@ public class BeaconService extends Service
 			final int what = msg.what;
 			final Object obj = msg.obj;
 			final Messenger replyTo = msg.replyTo;
-			BeaconService.this.handler.post(new Runnable()
+			WiseAgent.this.mHandler.post(new Runnable()
 			{
 				public void run() {
 					switch (what) {
 						case 1:
 							RangingRegion rangingRegion = new RangingRegion((Region)obj, replyTo);
-							BeaconService.this.startRanging(rangingRegion);
+							WiseAgent.this.startRanging(rangingRegion);
 							break;
 						case 2:
 							String rangingRegionId = (String)obj;
-							BeaconService.this.stopRanging(rangingRegionId);
+							WiseAgent.this.stopRanging(rangingRegionId);
 							break;
 						case 4:
 							MonitoringRegion monitoringRegion = new MonitoringRegion((Region)obj, replyTo);
-							BeaconService.this.startMonitoring(monitoringRegion);
+							WiseAgent.this.startMonitoring(monitoringRegion);
 							break;
 						case 5:
 							String monitoredRegionId = (String)obj;
-							BeaconService.this.stopMonitoring(monitoredRegionId);
+							WiseAgent.this.stopMonitoring(monitoredRegionId);
 							break;
 						case 7:
-							BeaconService.this.errorReplyTo = replyTo;
+							WiseAgent.this.mErrorReplyTo = replyTo;
 							break;
 						case 9:
-							L.d("Setting foreground scan period: " + BeaconService.this.foregroundScanPeriod);
-							BeaconService.this.foregroundScanPeriod = ((ScanPeriodData)obj);
+							L.d("Setting foreground scan period: " + WiseAgent.this.mForegroundScanPeriod);
+							WiseAgent.this.mForegroundScanPeriod = ((ScanPeriodData)obj);
 							break;
 						case 10:
-							L.d("Setting background scan period: " + BeaconService.this.backgroundScanPeriod);
-							BeaconService.this.backgroundScanPeriod = ((ScanPeriodData)obj);
+							L.d("Setting background scan period: " + WiseAgent.this.mBackgroundScanPeriod);
+							WiseAgent.this.mBackgroundScanPeriod = ((ScanPeriodData)obj);
 							break;
 						case 3:
 						case 6:
@@ -409,8 +409,8 @@ public class BeaconService extends Service
 
 		private void processRanging()
 		{
-			for (RangingRegion rangedRegion : BeaconService.this.rangedRegions){
-				rangedRegion.processFoundBeacons(BeaconService.this.beaconsFoundInScanCycle);
+			for (RangingRegion rangedRegion : WiseAgent.this.mRangedRegions){
+				rangedRegion.processFoundBeacons(WiseAgent.this.mBeaconsFoundInScanCycle);
 			}
 			
 		}
@@ -419,9 +419,9 @@ public class BeaconService extends Service
 		{
 			List didEnterRegions = new ArrayList();
 			//for (Map.Entry entry : BeaconService.this.beaconsFoundInScanCycle.entrySet()) {
-			for (Entry<Beacon, Long> entry : BeaconService.this.beaconsFoundInScanCycle.entrySet()) {
+			for (Entry<Beacon, Long> entry : WiseAgent.this.mBeaconsFoundInScanCycle.entrySet()) {
 				for (MonitoringRegion monitoringRegion : matchingMonitoredRegions((Beacon)entry.getKey())) {
-					monitoringRegion.processFoundBeacons(BeaconService.this.beaconsFoundInScanCycle);
+					monitoringRegion.processFoundBeacons(WiseAgent.this.mBeaconsFoundInScanCycle);
 					if (monitoringRegion.markAsSeen(currentTimeMillis)) {
 						didEnterRegions.add(monitoringRegion);
 					}
@@ -433,7 +433,7 @@ public class BeaconService extends Service
  
 		private List<MonitoringRegion> matchingMonitoredRegions(Beacon beacon) {
 			List results = new ArrayList();
-			for (MonitoringRegion monitoredRegion : BeaconService.this.monitoredRegions) {
+			for (MonitoringRegion monitoredRegion : WiseAgent.this.mMonitoredRegions) {
 				if (Utils.isBeaconInRegion(beacon, monitoredRegion.region)) {
 					results.add(monitoredRegion);
 				}
@@ -443,11 +443,11 @@ public class BeaconService extends Service
 		}
  
 		private void removeNotSeenBeacons(long currentTimeMillis) {
-			for (RangingRegion rangedRegion : BeaconService.this.rangedRegions) {
+			for (RangingRegion rangedRegion : WiseAgent.this.mRangedRegions) {
 				rangedRegion.removeNotSeenBeacons(currentTimeMillis);
 			}
        
-			for (MonitoringRegion monitoredRegion : BeaconService.this.monitoredRegions){
+			for (MonitoringRegion monitoredRegion : WiseAgent.this.mMonitoredRegions){
 				monitoredRegion.removeNotSeenBeacons(currentTimeMillis);
 			}
 		}
@@ -455,7 +455,7 @@ public class BeaconService extends Service
 		private List<MonitoringRegion> findExitedRegions(long currentTimeMillis)
 		{	
 			List didExitMonitors = new ArrayList();
-			for (MonitoringRegion monitoredRegion : BeaconService.this.monitoredRegions) {
+			for (MonitoringRegion monitoredRegion : WiseAgent.this.mMonitoredRegions) {
 				if (monitoredRegion.didJustExit(currentTimeMillis)) {
 					didExitMonitors.add(monitoredRegion);
 				}
@@ -465,7 +465,7 @@ public class BeaconService extends Service
 		}
  
 		private void invokeCallbacks(List<MonitoringRegion> enteredMonitors, List<MonitoringRegion> exitedMonitors) {
-			for (RangingRegion rangingRegion : BeaconService.this.rangedRegions) {
+			for (RangingRegion rangingRegion : WiseAgent.this.mRangedRegions) {
 				try {
 					Message rangingResponseMsg = Message.obtain(null, 3);
 					rangingResponseMsg.obj = new RangingResult(rangingRegion.region, rangingRegion.getSortedBeacons());
@@ -500,19 +500,19 @@ public class BeaconService extends Service
  		
 		public void run()
 		{
-			BeaconService.this.checkNotOnUiThread();
+			WiseAgent.this.checkNotOnUiThread();
 			long now = System.currentTimeMillis();
-			BeaconService.this.stopScanning();
+			WiseAgent.this.stopScanning();
 			processRanging();
 			List enteredRegions = findEnteredRegions(now);
 			List exitedRegions = findExitedRegions(now);
 			removeNotSeenBeacons(now);
-			BeaconService.this.beaconsFoundInScanCycle.clear();
+			WiseAgent.this.mBeaconsFoundInScanCycle.clear();
 			invokeCallbacks(enteredRegions, exitedRegions);
-			if (BeaconService.this.scanWaitTimeMillis() == 0L)
-				BeaconService.this.startScanning();
+			if (WiseAgent.this.scanWaitTimeMillis() == 0L)
+				WiseAgent.this.startScanning();
 			else
-				BeaconService.this.setAlarm(BeaconService.this.scanStartBroadcastPendingIntent, BeaconService.this.scanWaitTimeMillis());
+				WiseAgent.this.setAlarm(WiseAgent.this.mStartScanPendingIntent, WiseAgent.this.scanWaitTimeMillis());
 		}
 	}
 }

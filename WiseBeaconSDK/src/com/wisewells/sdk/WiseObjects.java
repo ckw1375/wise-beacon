@@ -80,14 +80,6 @@ public class WiseObjects implements Parcelable {
 		Utils.writeMapToParcel(dest, topologies);
 	}
 	
-	public void attach() {
-		
-	}
-	
-	public void detach() {
-		
-	}
-	
 	public Beacon getBeacon(String code) {
 		return (Beacon) beacons.get(code);
 	}
@@ -102,6 +94,26 @@ public class WiseObjects implements Parcelable {
 	
 	public Topology getTopology(String code) {
 		return (Topology) topologies.get(code);
+	}
+	
+	public ArrayList<Beacon> getBeacons() {
+		ArrayList<Beacon> b = new ArrayList<Beacon>(this.beacons.values());
+		return b;
+	}
+	
+	public ArrayList<BeaconGroup> getBeaconGroups() {
+		ArrayList<BeaconGroup> bg = new ArrayList<BeaconGroup>(this.beaconGroups.values());
+		return bg;
+	}
+	
+	public ArrayList<Service> getServices() {
+		ArrayList<Service> s = new ArrayList<Service>(this.services.values());
+		return s;
+	}
+	
+	public ArrayList<Topology> getTopologies() {
+		ArrayList<Topology> t = new ArrayList<Topology>(this.topologies.values());
+		return t;
 	}
 	
 	public void putBeacon(Beacon beacon) {

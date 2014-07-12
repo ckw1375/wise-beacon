@@ -26,7 +26,7 @@ class MonitoringRegion extends RangingRegion
  
 	public boolean isInside(long currentTimeMillis)
 	{
-		return (this.lastSeenTimeMillis != -1L) && (currentTimeMillis - this.lastSeenTimeMillis < BeaconService.EXPIRATION_MILLIS);
+		return (this.lastSeenTimeMillis != -1L) && (currentTimeMillis - this.lastSeenTimeMillis < WiseAgent.EXPIRATION_MILLIS);
 	}
 
 	public boolean didJustExit(long currentTimeMillis)

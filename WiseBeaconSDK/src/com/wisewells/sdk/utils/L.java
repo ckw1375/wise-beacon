@@ -93,7 +93,7 @@ public class L
 		String className = stackTrace[4].getClassName();
 		String methodName = Thread.currentThread().getStackTrace()[4].getMethodName();
 		int lineNumber = stackTrace[4].getLineNumber();
-		return className + "." + methodName + ":" + lineNumber + " ";
+		return className + "." + methodName + ":" + lineNumber + "\n";
 	}
 
 	private static void logCrashlytics(String msg)

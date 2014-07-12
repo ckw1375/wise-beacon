@@ -1,6 +1,7 @@
 package com.wisewells.sdk.datas.topology;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import android.os.Bundle;
 import android.os.Parcel;
@@ -11,7 +12,7 @@ import com.wisewells.sdk.datas.RssiVector;
 import com.wisewells.sdk.utils.Utils;
 
 public class ProximityTopology extends Topology implements Parcelable {
-	private HashMap<String, Double> searchRanges;
+	private HashMap<String, Range> searchRanges;
 
 	public static Parcelable.Creator<ProximityTopology> CREATOR = new Creator<ProximityTopology>() {
 		
@@ -28,16 +29,16 @@ public class ProximityTopology extends Topology implements Parcelable {
 	
 	public ProximityTopology(String code, String name) {
 		super(code, name);
-		searchRanges = new HashMap<String, Double>();
+		init();
 	}
 	
 	private ProximityTopology(Parcel p) {
 		super(p);
-		searchRanges = 
+		searchRanges = (HashMap<String, Range>) Utils.readMapFromParcel(p, Range.class.getClassLoader());
 	}
 
 	private void init() {
-		searchRanges = new HashMap<String, Double>();
+		searchRanges = new HashMap<String, Range>();
 	}
 	
 	@Override
@@ -48,11 +49,11 @@ public class ProximityTopology extends Topology implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		super.writeToParcel(dest, flags);
-		Utils.writeMapToParcel(dest, map);
+		Utils.writeMapToParcel(dest, searchRanges);
 	}
 	
 	public void setSearchRange(String beaconCode, double searchRange) {
-		searchRanges.putDouble(beaconCode, searchRange);
+		searchRanges.put(beaconCode, new Range(searchRange));
 	}
 	
 	public Beacon getNearestBeacon(RssiVector vector) {
@@ -61,5 +62,46 @@ public class ProximityTopology extends Topology implements Parcelable {
 		 */
 		
 		return null;
+	}
+	
+	
+}
+
+class Range implements Parcelable {
+
+	double range;
+	
+	public static Parcelable.Creator<Range> CREATOR = new Creator<Range>() {
+		@Override
+		public Range[] newArray(int size) {
+			return new Range[size];
+		}
+		
+		@Override
+		public Range createFromParcel(Parcel source) {
+			return new Range(source);
+		}
+	};
+	
+	public Range(double range) {
+		this.range = range;
+	}
+	
+	private Range(Parcel in) {
+		range = in.readDouble();
+	}
+	
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeDouble(range);
+	}
+	
+	public double getRange() {
+		return this.range;
 	}
 }

@@ -1,9 +1,8 @@
 package com.estimote.sdk.internal;
 
-public class Preconditions
-{
-	public static <T> T checkNotNull(T reference, Object errorMessage)
-	{
+public class Preconditions {
+	
+	public static <T> T checkNotNull(T reference, Object errorMessage) {
 		if (reference == null) {
 			throw new NullPointerException(String.valueOf(errorMessage));
 		}
@@ -11,8 +10,7 @@ public class Preconditions
 		return reference;
 	}
 
-	public static <T> T checkNotNull(T reference)
-	{
+	public static <T> T checkNotNull(T reference) {
 		if (reference == null) {
 			throw new NullPointerException();
 		}
@@ -20,29 +18,27 @@ public class Preconditions
 		return reference;
 	}
 
-	public static void checkArgument(boolean expression)
-	{
+	public static void checkArgument(boolean expression) {
 		if (!expression)
 			throw new IllegalArgumentException();
 	}
 
-	public static void checkArgument(boolean expression, Object errorMessage)
-	{
+	public static void checkArgument(boolean expression, Object errorMessage) {
 		if (!expression)
 			throw new IllegalArgumentException(String.valueOf(errorMessage));
 	}
 
-	public static void checkArgument(boolean expression, String errorMessageTemplate, Object[] errorMessageArgs)
-	{
+	public static void checkArgument(boolean expression,
+			String errorMessageTemplate, Object[] errorMessageArgs) {
 		if (!expression)
 			throw new IllegalArgumentException(format(errorMessageTemplate, errorMessageArgs));
 	}
 
-	static String format(String template, Object[] args)
-	{
+	static String format(String template, Object[] args) {
 		template = String.valueOf(template);
 
-		StringBuilder builder = new StringBuilder(template.length() + 16 * args.length);
+		StringBuilder builder = new StringBuilder(template.length() + 16
+				* args.length);
 		int templateStart = 0;
 		int i = 0;
 		while (i < args.length) {
@@ -54,7 +50,7 @@ public class Preconditions
 			builder.append(args[(i++)]);
 			templateStart = placeholderStart + 2;
 		}
-		
+
 		builder.append(template.substring(templateStart));
 
 		if (i < args.length) {
@@ -70,4 +66,3 @@ public class Preconditions
 		return builder.toString();
 	}
 }
-

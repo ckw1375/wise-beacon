@@ -5,26 +5,26 @@ import android.os.Parcelable;
 
 import com.wisewells.sdk.datas.group.BeaconGroup;
 
-public class Topology implements Parcelable{
-	
+public class Topology implements Parcelable {
+
 	protected String code;
 	protected String name;
 	protected String beaconGroupCode;
 	protected String serviceCode;
-	
+
 	public static final Parcelable.Creator<Topology> CREATOR = new Creator<Topology>() {
-		
+
 		@Override
 		public Topology[] newArray(int size) {
 			return new Topology[size];
 		}
-		
+
 		@Override
 		public Topology createFromParcel(Parcel source) {
 			return new Topology(source);
 		}
 	};
-	
+
 	public Topology(String code, String name) {
 		this.code = code;
 		this.name = name;
@@ -36,12 +36,12 @@ public class Topology implements Parcelable{
 		beaconGroupCode = p.readString();
 		serviceCode = p.readString();
 	}
-	
+
 	@Override
 	public int describeContents() {
 		return 0;
 	}
-	
+
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(code);
@@ -49,7 +49,7 @@ public class Topology implements Parcelable{
 		dest.writeString(beaconGroupCode);
 		dest.writeString(serviceCode);
 	}
-	
+
 	public void attachTo(BeaconGroup bg) {
 		beaconGroupCode = bg.getCode();
 	}
