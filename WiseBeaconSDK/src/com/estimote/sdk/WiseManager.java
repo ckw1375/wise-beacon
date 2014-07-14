@@ -20,10 +20,11 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.estimote.sdk.internal.Preconditions;
-import com.estimote.sdk.service.WiseAgent;
 import com.estimote.sdk.service.MonitoringResult;
 import com.estimote.sdk.service.RangingResult;
 import com.estimote.sdk.service.ScanPeriodData;
+import com.estimote.sdk.service.WiseAgent;
+import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.utils.L;
 
 public class WiseManager
@@ -280,13 +281,13 @@ public class WiseManager
 
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			case 3:
+			case WiseAgent.MSG_RANGING_RESPONSE:
 				if (WiseManager.this.mRangingListener != null) {
 					RangingResult rangingResult = (RangingResult)msg.obj;
 					WiseManager.this.mRangingListener.onBeaconsDiscovered(rangingResult.region, rangingResult.beacons);
 				}
 				break;
-			case 6:
+			case WiseAgent.MSG_MONITORING_RESPONSE:
 				if (WiseManager.this.mMonitoringListener != null) {
 					MonitoringResult monitoringResult = (MonitoringResult)msg.obj;
 					if (monitoringResult.state == Region.State.INSIDE)
@@ -295,7 +296,7 @@ public class WiseManager
 						WiseManager.this.mMonitoringListener.onExitedRegion(monitoringResult.region);
 				}
 				break;
-			case 8:
+			case WiseAgent.MSG_ERROR_RESPONSE:
 				if (WiseManager.this.mErrorListener != null) {
 					Integer errorId = (Integer)msg.obj;
 					WiseManager.this.mErrorListener.onError(errorId);
@@ -340,16 +341,16 @@ public class WiseManager
 	}
 
 	public static abstract interface ErrorListener  {
-		public abstract void onError(Integer paramInteger);
+		public abstract void onError(Integer code);
 	}
 
 	public static abstract interface MonitoringListener {
-		public abstract void onEnteredRegion(Region paramRegion);
-		public abstract void onExitedRegion(Region paramRegion);
+		public abstract void onEnteredRegion(Region region);
+		public abstract void onExitedRegion(Region region);
 	}
 
 	public static abstract interface RangingListener {
-		public abstract void onBeaconsDiscovered(Region paramRegion, List<Beacon> paramList);
+		public abstract void onBeaconsDiscovered(Region region, List<Beacon> beacons);
 	}
 
 	public static abstract interface ServiceReadyCallback {

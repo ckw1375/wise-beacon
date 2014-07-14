@@ -1,6 +1,7 @@
 package com.estimote.sdk.service;
  
 import android.os.Messenger;
+
 import com.estimote.sdk.Region;
  
 class MonitoringRegion extends RangingRegion

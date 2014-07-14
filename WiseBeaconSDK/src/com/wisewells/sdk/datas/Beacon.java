@@ -1,23 +1,24 @@
 package com.wisewells.sdk.datas;
 
 import java.util.HashSet;
-import java.util.UUID;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wisewells.sdk.datas.group.MinorGroup;
-
 public class Beacon implements Parcelable {
 
-	private String code;
+	private String code;	
+	private String beaconGroupCode;
+	private double interval;
+	
+	/**
+	 * 	These attributes is gotten from Beacon Hardware
+	 */
 	private String macAddress;
-	private HashSet<String> beaconGroupCodes;
-	private UUID uuid;
+	private String uuid;
 	private int major;
 	private int minor;
-	private double txPower;
-	private double interval;
+	private double txPower;	
 	private double rssi;
 
 	public static final Parcelable.Creator<Beacon> CREATOR = new Creator<Beacon>() {
@@ -32,37 +33,47 @@ public class Beacon implements Parcelable {
 			return new Beacon(source);
 		}
 	};
-	
-	public Beacon(String code, String macAddress, String uuid, int major,
-			int minor, double txPower, double interval, double rssi) {
-		
+
+	public Beacon(String macAddress, String uuid, int major, int minor, double txPower, double rssi) {
 		super();
-		init();
-		this.code = code;
 		this.macAddress = macAddress;
-		this.uuid = UUID.fromString(uuid);
+		this.uuid = uuid;
 		this.major = major;
 		this.minor = minor;
 		this.txPower = txPower;
-		this.interval = interval;
-		this.rssi = rssi;		
+		this.rssi = rssi;
 	}
 
-	private Beacon(Parcel p) {
-		init();
-		code = p.readString();
-		macAddress = p.readString();
-		beaconGroupCodes = (HashSet<String>) p.readSerializable();
-		uuid = (UUID) p.readSerializable();
-		major = p.readInt();
-		minor = p.readInt();
-		txPower = p.readDouble();
-		interval = p.readDouble();
-		rssi = p.readDouble();
+	private Beacon(Parcel in) {
+		code = in.readString();		
+		beaconGroupCode = in.readString();
+		interval = in.readDouble();
+		macAddress = in.readString();
+		uuid = (String) in.readSerializable();
+		major = in.readInt();
+		minor = in.readInt();
+		txPower = in.readDouble();		
+		rssi = in.readDouble();
 	}
 	
-	private void init() {
-		beaconGroupCodes = new HashSet<String>();
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+		if((o == null) || (getClass() != o.getClass())) return false;
+		
+		Beacon beacon = (Beacon) o;
+		
+		if(this.major != beacon.major) return false;
+		if(this.minor != beacon.minor) return false;		
+		return this.uuid.equals(beacon.uuid);
+	}
+	
+	@Override
+	public int hashCode() {
+		int result = this.uuid.hashCode();
+		result = 31 * result + this.major;
+		result = 31 * result + this.minor;
+		return result;
 	}
 
 	@Override
@@ -72,18 +83,18 @@ public class Beacon implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(code);
+		dest.writeString(code);		
+		dest.writeSerializable(beaconGroupCode);
+		dest.writeDouble(interval);
 		dest.writeString(macAddress);
-		dest.writeSerializable(beaconGroupCodes);
 		dest.writeSerializable(uuid);
 		dest.writeInt(major);
 		dest.writeInt(minor);
-		dest.writeDouble(txPower);
-		dest.writeDouble(interval);
+		dest.writeDouble(txPower);		
 		dest.writeDouble(rssi);
 	}
 	
-	public void setAddress(UUID uuid, int major, int minor) {
+	public void setAddress(String uuid, int major, int minor) {
 		this.uuid = uuid;
 		this.major = major;
 		this.minor = minor;
@@ -92,52 +103,72 @@ public class Beacon implements Parcelable {
 		 * 실제 Beacon의 Address 값을 바꿔주는 동작 추가
 		 */
 	}
-	
-	public void attachTo(MinorGroup parent) {
-		
-	}
-	
-	public void addBeaconGroupCode(String code) {
-		beaconGroupCodes.add(code);
-	}
-	
-	public void detach() {
-		
-	}
 
 	public String getCode() {
 		return code;
 	}
 
-	public String getMacAddress() {
-		return macAddress;
-	}
-
-	public HashSet<String> getBeaconGroupCodes() {
-		return beaconGroupCodes;
-	}
-
-	public UUID getUuid() {
-		return uuid;
-	}
-
-	public int getMajor() {
-		return major;
-	}
-
-	public int getMinor() {
-		return minor;
-	}
-
-	public double getTxPower() {
-		return txPower;
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public double getInterval() {
 		return interval;
 	}
 
+	public void setInterval(double interval) {
+		this.interval = interval;
+	}
+
+	public String getMacAddress() {
+		return macAddress;
+	}
+
+	public void setMacAddress(String macAddress) {
+		this.macAddress = macAddress;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public int getMajor() {
+		return major;
+	}
+
+	public void setMajor(int major) {
+		this.major = major;
+	}
+
+	public int getMinor() {
+		return minor;
+	}
+
+	public void setMinor(int minor) {
+		this.minor = minor;
+	}
+
+	public double getTxPower() {
+		return txPower;
+	}
+
+	public void setTxPower(double txPower) {
+		this.txPower = txPower;
+	}
+
 	public double getRssi() {
 		return rssi;
+	}
+
+	public void setRssi(double rssi) {
+		this.rssi = rssi;
+	}
+	
+	public void setBeaconGroupCode(String code) {
+		beaconGroupCode = code;
 	}
 }

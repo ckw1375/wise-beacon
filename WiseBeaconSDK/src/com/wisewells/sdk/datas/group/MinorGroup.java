@@ -49,7 +49,7 @@ public class MinorGroup extends BeaconGroup implements Parcelable{
 	
 	public void addBeacon(Beacon b) {
 		childCodes.add(b.getCode());
-		b.addBeaconGroupCode(this.code);
+		b.setBeaconGroupCode(this.code);
 	}
 
 	public ArrayList<Beacon> getBeacons() {

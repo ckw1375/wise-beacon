@@ -2,16 +2,10 @@ package com.estimote.sdk.service;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.Parcelable.Creator;
-import com.estimote.sdk.Beacon;
+
 import com.estimote.sdk.Region;
-import com.estimote.sdk.Region.State;
 import com.estimote.sdk.internal.Objects;
-import com.estimote.sdk.internal.Objects.ToStringHelper;
 import com.estimote.sdk.internal.Preconditions;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class MonitoringResult implements Parcelable
 {

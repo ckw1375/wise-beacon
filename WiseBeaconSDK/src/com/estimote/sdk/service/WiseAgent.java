@@ -26,10 +26,10 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.SystemClock;
 
-import com.estimote.sdk.Beacon;
 import com.estimote.sdk.Region;
 import com.estimote.sdk.Utils;
 import com.estimote.sdk.internal.Preconditions;
+import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.utils.L;
 
 public class WiseAgent extends Service {
@@ -65,7 +65,7 @@ public class WiseAgent extends Service {
 	private Handler mHandler;
 	private Runnable mAfterScanCycleTask;
 	private boolean mScanning;
-	private Messenger mErrorReplyTo;
+	private Messenger mSendingMessenger;
 	private BroadcastReceiver mBluetoothReceiver;
 	private BroadcastReceiver mStartScanReceiver;
 	private BroadcastReceiver mAfterScanReceiver;
@@ -102,8 +102,8 @@ public class WiseAgent extends Service {
 		registerReceiver(mBluetoothReceiver, new IntentFilter("android.bluetooth.adapter.action.STATE_CHANGED"));
 		registerReceiver(mStartScanReceiver, new IntentFilter(ACTION_NAME_START_SCAN));
 		registerReceiver(mAfterScanReceiver, new IntentFilter(ACTION_NAME_AFTER_SCAN));
-		mAfterScanPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, INTENT_AFTER_SCAN, 0);
 		mStartScanPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, INTENT_START_SCAN, 0);
+		mAfterScanPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, INTENT_AFTER_SCAN, 0);		
 	}
 
 	public void onDestroy() {
@@ -135,9 +135,9 @@ public class WiseAgent extends Service {
 	}
 
 	private void stopRanging(String regionId) {
-		L.v("Stopping ranging: " + regionId);
 		checkNotOnUiThread();
-		Iterator iterator = mRangedRegions.iterator();
+		L.v("Stopping ranging: " + regionId);		
+		Iterator<RangingRegion> iterator = mRangedRegions.iterator();
 		while (iterator.hasNext()) {
 			RangingRegion rangingRegion = (RangingRegion)iterator.next();
 			if (regionId.equals(rangingRegion.region.getIdentifier())) {
@@ -163,7 +163,7 @@ public class WiseAgent extends Service {
 	public void stopMonitoring(String regionId) {
 		L.v("Stopping monitoring: " + regionId);
 		checkNotOnUiThread();
-		Iterator iterator = mMonitoredRegions.iterator();
+		Iterator<MonitoringRegion> iterator = mMonitoredRegions.iterator();
 		while (iterator.hasNext()) {
 			MonitoringRegion monitoringRegion = (MonitoringRegion)iterator.next();
 			if (regionId.equals(monitoringRegion.region.getIdentifier())) {
@@ -181,38 +181,32 @@ public class WiseAgent extends Service {
    
 	private void startScanning() {
 		if (mScanning) {
-			L.d("Scanning already in progress, not starting one more");
-			
+			L.d("Scanning already in progress, not starting one more");			
 			return;
 		}
     
 		if ((mMonitoredRegions.isEmpty()) && (mRangedRegions.isEmpty())) {
-			L.d("Not starting scanning, no monitored on ranged regions");
-      
+			L.d("Not starting scanning, no monitored on ranged regions");      
 			return;
 		}
     
 		if (!mAdapter.isEnabled()) {
-			L.d("Bluetooth is disabled, not starting scanning");
-      
+			L.d("Bluetooth is disabled, not starting scanning");      
 			return;
 		}
      
 		if (!mAdapter.startLeScan(mLeScanCallback)) {
 			L.wtf("Bluetooth adapter did not start le scan");
-			sendError(Integer.valueOf(-1));
-      
+			sendError(Integer.valueOf(-1));      
 			return;
 		}
 		
 		mScanning = true;
 		removeAfterScanCycleCallback();
-		setAlarm(mAfterScanPendingIntent, scanPeriodTimeMillis());
-	
+		setAlarm(mAfterScanPendingIntent, scanPeriodTimeMillis());	
 	}
 
-	private void stopScanning()
-	{
+	private void stopScanning() {
 		try {
 			mScanning = false;
 			mAdapter.stopLeScan(mLeScanCallback);
@@ -222,12 +216,12 @@ public class WiseAgent extends Service {
 	}
  
 	private void sendError(Integer errorId) {
-		if (mErrorReplyTo != null) {
+		if (mSendingMessenger != null) {
 			Message errorMsg = Message.obtain(null, 8);
 			errorMsg.obj = errorId;
 			try {
 				
-				mErrorReplyTo.send(errorMsg);
+				mSendingMessenger.send(errorMsg);
 			} catch (RemoteException e) {
 				L.e("Error while reporting message, funny right?", e);
 			}
@@ -243,36 +237,33 @@ public class WiseAgent extends Service {
 		return mBackgroundScanPeriod.scanPeriodMillis;
 	}
 
-	private long scanWaitTimeMillis()
-	{
+	private long scanWaitTimeMillis() {
 		if (!mRangedRegions.isEmpty()) {
 			return mForegroundScanPeriod.waitTimeMillis;
 		}
-		
+
 		return mBackgroundScanPeriod.waitTimeMillis;
 	}
 
-	private void setAlarm(PendingIntent pendingIntent, long delayMillis)
-	{
-		mAlarmManager.set(2, SystemClock.elapsedRealtime() + delayMillis, pendingIntent);
+	private void setAlarm(PendingIntent pendingIntent, long delayMillis) {
+		mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 
+				SystemClock.elapsedRealtime() + delayMillis, pendingIntent);
 	}
  
-	private void checkNotOnUiThread()
-	{
-		Preconditions.checkArgument(Looper.getMainLooper().getThread() != Thread.currentThread(), "This cannot be run on UI thread, starting BLE scan can be expensive");
-		Preconditions.checkNotNull(Boolean.valueOf(mHandlerThread.getLooper() == Looper.myLooper()), "It must be executed on service's handlerThread");
+	private void checkNotOnUiThread() {
+		Preconditions.checkArgument(Looper.getMainLooper().getThread() != Thread.currentThread(),
+						"This cannot be run on UI thread, starting BLE scan can be expensive");
+		Preconditions.checkNotNull(Boolean.valueOf(mHandlerThread.getLooper() == Looper.myLooper()),
+						"It must be executed on service's handlerThread");
 	}
  
-	private BroadcastReceiver createBluetoothBroadcastReceiver()
-	{
-		return new BroadcastReceiver()
-		{
+	private BroadcastReceiver createBluetoothBroadcastReceiver() {
+		return new BroadcastReceiver() {
 			public void onReceive(Context context, Intent intent) {
 				if ("android.bluetooth.adapter.action.STATE_CHANGED".equals(intent.getAction())) {
 					int state = intent.getIntExtra("android.bluetooth.adapter.extra.STATE", -1);
-					if (state == 10)
-						WiseAgent.this.mHandler.post(new Runnable()
-						{
+					if (state == BluetoothAdapter.STATE_OFF) 
+						WiseAgent.this.mHandler.post(new Runnable() {
 							public void run() {
 								L.i("Bluetooth is OFF: stopping scanning");
 								WiseAgent.this.removeAfterScanCycleCallback();
@@ -280,14 +271,13 @@ public class WiseAgent extends Service {
 								WiseAgent.this.mBeaconsFoundInScanCycle.clear();
 							}
 						});
-           
-					else if (state == 12)
-						WiseAgent.this.mHandler.post(new Runnable()
-						{
+
+					else if (state == BluetoothAdapter.STATE_ON)
+						WiseAgent.this.mHandler.post(new Runnable() {
 							public void run() {
 								if ((!WiseAgent.this.mMonitoredRegions.isEmpty()) || (!WiseAgent.this.mRangedRegions.isEmpty())) {
-									L.i(String.format("Bluetooth is ON: resuming scanning (monitoring: %d ranging:%d)", new Object[] { Integer.valueOf(WiseAgent.this.mMonitoredRegions.size()), Integer.valueOf(WiseAgent.this.mRangedRegions.size()) }));
-									WiseAgent.this.startScanning();
+									L.i(String.format("Bluetooth is ON: resuming scanning (monitoring: %d ranging:%d)", 
+											new Object[] { Integer.valueOf(WiseAgent.this.mMonitoredRegions.size()), Integer.valueOf(WiseAgent.this.mRangedRegions.size()) }));									WiseAgent.this.startScanning();
 								}
 							}
 						});
@@ -296,16 +286,14 @@ public class WiseAgent extends Service {
 		};
 	}
  
-	private void removeAfterScanCycleCallback()
-	{
+	private void removeAfterScanCycleCallback() {
 		this.mHandler.removeCallbacks(this.mAfterScanCycleTask);
 		this.mAlarmManager.cancel(this.mAfterScanPendingIntent);
 		this.mAlarmManager.cancel(this.mStartScanPendingIntent);
 	}
 
 	private BroadcastReceiver createAfterScanBroadcastReceiver() {
-		return new BroadcastReceiver()
-		{
+		return new BroadcastReceiver() {
 			public void onReceive(Context context, Intent intent) {
 				WiseAgent.this.mHandler.post(WiseAgent.this.mAfterScanCycleTask);
 			}
@@ -313,11 +301,9 @@ public class WiseAgent extends Service {
 	}
 
 	private BroadcastReceiver createScanStartBroadcastReceiver() {
-		return new BroadcastReceiver()
-		{
+		return new BroadcastReceiver() {
 			public void onReceive(Context context, Intent intent) {
-				WiseAgent.this.mHandler.post(new Runnable()
-				{
+				WiseAgent.this.mHandler.post(new Runnable() {
 					public void run() {
 						WiseAgent.this.startScanning();
 					}
@@ -326,15 +312,12 @@ public class WiseAgent extends Service {
 		};
 	}
  
-	private class InternalLeScanCallback implements BluetoothAdapter.LeScanCallback
-	{
-		private InternalLeScanCallback()
-		{
+	private class InternalLeScanCallback implements BluetoothAdapter.LeScanCallback {
+		private InternalLeScanCallback() {
 		
 		}
  
-		public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord)
-		{
+		public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
 			WiseAgent.this.checkNotOnUiThread();
 			Beacon beacon = Utils.beaconFromLeScan(device, rssi, scanRecord);
 			//if ((beacon == null) || (!EstimoteBeacons.isEstimoteBeacon(beacon))) {
@@ -343,18 +326,15 @@ public class WiseAgent extends Service {
 			//}
 			
 			WiseAgent.this.mBeaconsFoundInScanCycle.put(beacon, Long.valueOf(System.currentTimeMillis()));
-		}
+		}		
 	}
  
-	private class IncomingHandler extends Handler
-	{
-		private IncomingHandler()
-		{
+	private class IncomingHandler extends Handler {
+		private IncomingHandler() {
 		
 		}
  
-		public void handleMessage(Message msg)
-		{
+		public void handleMessage(Message msg) {
 			final int what = msg.what;
 			final Object obj = msg.obj;
 			final Messenger replyTo = msg.replyTo;
@@ -379,7 +359,7 @@ public class WiseAgent extends Service {
 							WiseAgent.this.stopMonitoring(monitoredRegionId);
 							break;
 						case 7:
-							WiseAgent.this.mErrorReplyTo = replyTo;
+							WiseAgent.this.mSendingMessenger = replyTo;
 							break;
 						case 9:
 							L.d("Setting foreground scan period: " + WiseAgent.this.mForegroundScanPeriod);
@@ -400,25 +380,19 @@ public class WiseAgent extends Service {
 		}
 	}
  
-	private class AfterScanCycleTask implements Runnable
-	{
-		private AfterScanCycleTask()
-		{
+	private class AfterScanCycleTask implements Runnable {
+		private AfterScanCycleTask() {
     
 		}
 
-		private void processRanging()
-		{
+		private void processRanging() {
 			for (RangingRegion rangedRegion : WiseAgent.this.mRangedRegions){
 				rangedRegion.processFoundBeacons(WiseAgent.this.mBeaconsFoundInScanCycle);
 			}
-			
 		}
 
-		private List<MonitoringRegion> findEnteredRegions(long currentTimeMillis)
-		{
-			List didEnterRegions = new ArrayList();
-			//for (Map.Entry entry : BeaconService.this.beaconsFoundInScanCycle.entrySet()) {
+		private List<MonitoringRegion> findEnteredRegions(long currentTimeMillis) {
+			List<MonitoringRegion> didEnterRegions = new ArrayList<MonitoringRegion>();
 			for (Entry<Beacon, Long> entry : WiseAgent.this.mBeaconsFoundInScanCycle.entrySet()) {
 				for (MonitoringRegion monitoringRegion : matchingMonitoredRegions((Beacon)entry.getKey())) {
 					monitoringRegion.processFoundBeacons(WiseAgent.this.mBeaconsFoundInScanCycle);
@@ -432,7 +406,7 @@ public class WiseAgent extends Service {
 		}
  
 		private List<MonitoringRegion> matchingMonitoredRegions(Beacon beacon) {
-			List results = new ArrayList();
+			List<MonitoringRegion> results = new ArrayList<MonitoringRegion>();
 			for (MonitoringRegion monitoredRegion : WiseAgent.this.mMonitoredRegions) {
 				if (Utils.isBeaconInRegion(beacon, monitoredRegion.region)) {
 					results.add(monitoredRegion);
@@ -454,7 +428,7 @@ public class WiseAgent extends Service {
  
 		private List<MonitoringRegion> findExitedRegions(long currentTimeMillis)
 		{	
-			List didExitMonitors = new ArrayList();
+			List<MonitoringRegion> didExitMonitors = new ArrayList<MonitoringRegion>();
 			for (MonitoringRegion monitoredRegion : WiseAgent.this.mMonitoredRegions) {
 				if (monitoredRegion.didJustExit(currentTimeMillis)) {
 					didExitMonitors.add(monitoredRegion);

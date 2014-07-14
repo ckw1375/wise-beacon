@@ -1,4 +1,4 @@
- package com.estimote.sdk;
+/* package com.estimote.sdk;
 
 import com.estimote.sdk.Beacon;
 
@@ -34,3 +34,4 @@ public class EstimoteBeacons
  
  }
 
+*/
