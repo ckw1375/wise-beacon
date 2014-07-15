@@ -26,7 +26,7 @@
         <activity android:name=".activities.GroupActivity" >
         </activity>
 
-        <service android:name="com.estimote.sdk.service.BeaconService" >
+        <service android:name="com.estimote.sdk.service.WiseAgent" >
         </service>
         <service
             android:name=".services.WiseService"

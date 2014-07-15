@@ -26,5 +26,4 @@ public class GroupAdapter extends BaseArrayAdapter<BeaconGroup> {
 		
 		return view;
 	}
-
 }

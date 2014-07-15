@@ -38,7 +38,7 @@ public abstract class BaseArrayAdapter<T> extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 	
-	public void replace(Collection<T> items) {
+	public void replaceWith(Collection<T> items) {
 		mItems.clear();
 		mItems.addAll(items);
 		notifyDataSetChanged();

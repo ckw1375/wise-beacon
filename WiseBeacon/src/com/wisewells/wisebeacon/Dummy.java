@@ -9,12 +9,11 @@ import com.wisewells.sdk.datas.group.UuidGroup;
 public class Dummy {
 	public static ArrayList<Beacon> getBeacons() {
 		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
-		beacons.add(new Beacon("A", "mac A", UUID.randomUUID().toString(), 1, 2, 10, 15, 20));
-		beacons.add(new Beacon("B", "mac B", UUID.randomUUID().toString(), 1, 2, 10, 15, 20));
-		beacons.add(new Beacon("C", "mac C", UUID.randomUUID().toString(), 1, 2, 10, 15, 20));
-		beacons.add(new Beacon("D", "mac D", UUID.randomUUID().toString(), 1, 2, 10, 15, 20));
-		beacons.add(new Beacon("E", "mac E", UUID.randomUUID().toString(), 1, 2, 10, 15, 20));
-		beacons.add(new Beacon("F", "mac F", UUID.randomUUID().toString(), 1, 2, 10, 15, 20));
+		for(int i=0; i<10; i++) {
+			Beacon beacon = new Beacon("3F-43-DE-FD", UUID.randomUUID().toString(), 1, 2, 3, 4);
+			beacon.setCode("code " + i);
+			beacons.add(beacon);
+		}
 		
 		return beacons;
 	}	
@@ -23,6 +22,4 @@ public class Dummy {
 		UuidGroup g = new UuidGroup("uuid A", "UuidGroup A", UUID.randomUUID().toString());
 		return g;
 	}
-	
-	
 }
