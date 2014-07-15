@@ -58,8 +58,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="7" language="java" name="com.estimote.sdk.service.WiseAgent.InternalLeScanCallback" project="WiseBeaconSDK" 
-    file="/WiseBeaconSDK/src/com/estimote/sdk/service/WiseAgent.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="7" language="java" name="com.wisewells.agent.WiseAgent.InternalLeScanCallback" project="WiseBeaconSDK" 
+    file="/WiseBeaconSDK/src/com/wisewells/agent/WiseAgent.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="99" width="228" x="320" y="826"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -67,8 +67,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="8" language="java" name="com.estimote.sdk.service.WiseAgent.IncomingHandler" project="WiseBeaconSDK" 
-    file="/WiseBeaconSDK/src/com/estimote/sdk/service/WiseAgent.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="8" language="java" name="com.wisewells.agent.WiseAgent.IncomingHandler" project="WiseBeaconSDK" 
+    file="/WiseBeaconSDK/src/com/wisewells/agent/WiseAgent.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="99" width="177" x="588" y="826"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -76,8 +76,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="9" language="java" name="com.estimote.sdk.service.WiseAgent.AfterScanCycleTask" project="WiseBeaconSDK" 
-    file="/WiseBeaconSDK/src/com/estimote/sdk/service/WiseAgent.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="9" language="java" name="com.wisewells.agent.WiseAgent.AfterScanCycleTask" project="WiseBeaconSDK" 
+    file="/WiseBeaconSDK/src/com/wisewells/agent/WiseAgent.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="207" width="359" x="805" y="826"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
@@ -85,34 +85,18 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <association id="10">    
-    <end type="SOURCE" refId="6" navigable="false">      
-      <attribute id="11" name="sectors"/>      
-      <multiplicity id="12" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="13">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="5"/>  
-  </generalization>  
-  <generalization id="14">    
+  <generalization id="10">    
     <end type="SOURCE" refId="3"/>    
     <end type="TARGET" refId="5"/>  
   </generalization>  
-  <generalization id="15">    
+  <generalization id="11">    
     <end type="SOURCE" refId="2"/>    
     <end type="TARGET" refId="5"/>  
   </generalization>  
-  <association id="16">    
-    <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="17" name="searchRanges"/>      
-      <multiplicity id="18" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="4" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
+  <generalization id="12">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="5"/>  
+  </generalization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    

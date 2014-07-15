@@ -1,8 +1,8 @@
-package com.estimote.sdk.service;
+package com.wisewells.agent;
  
 import android.os.Messenger;
 
-import com.estimote.sdk.Region;
+import com.wisewells.sdk.Region;
  
 class MonitoringRegion extends RangingRegion
 {

@@ -1,4 +1,4 @@
- package com.estimote.sdk;
+ package com.wisewells.sdk;
 
  
 import android.bluetooth.BluetoothAdapter;

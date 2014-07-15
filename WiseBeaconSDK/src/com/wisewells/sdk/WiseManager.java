@@ -1,4 +1,4 @@
-package com.estimote.sdk;
+package com.wisewells.sdk;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,10 +20,10 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.estimote.sdk.internal.Preconditions;
-import com.estimote.sdk.service.MonitoringResult;
-import com.estimote.sdk.service.RangingResult;
-import com.estimote.sdk.service.ScanPeriodData;
-import com.estimote.sdk.service.WiseAgent;
+import com.wisewells.agent.MonitoringResult;
+import com.wisewells.agent.RangingResult;
+import com.wisewells.agent.ScanPeriodData;
+import com.wisewells.agent.WiseAgent;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.utils.L;
 
@@ -281,13 +281,13 @@ public class WiseManager
 
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			case WiseAgent.MSG_RANGING_RESPONSE:
+			case MSG.RANGING_RESPONSE:
 				if (WiseManager.this.mRangingListener != null) {
 					RangingResult rangingResult = (RangingResult)msg.obj;
 					WiseManager.this.mRangingListener.onBeaconsDiscovered(rangingResult.region, rangingResult.beacons);
 				}
 				break;
-			case WiseAgent.MSG_MONITORING_RESPONSE:
+			case MSG.MONITORING_RESPONSE:
 				if (WiseManager.this.mMonitoringListener != null) {
 					MonitoringResult monitoringResult = (MonitoringResult)msg.obj;
 					if (monitoringResult.state == Region.State.INSIDE)
@@ -296,7 +296,7 @@ public class WiseManager
 						WiseManager.this.mMonitoringListener.onExitedRegion(monitoringResult.region);
 				}
 				break;
-			case WiseAgent.MSG_ERROR_RESPONSE:
+			case MSG.ERROR_RESPONSE:
 				if (WiseManager.this.mErrorListener != null) {
 					Integer errorId = (Integer)msg.obj;
 					WiseManager.this.mErrorListener.onError(errorId);
@@ -314,6 +314,7 @@ public class WiseManager
 
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			WiseManager.this.mSendingMessenger = new Messenger(service);
+			
 			if (WiseManager.this.mErrorListener != null) {
 				WiseManager.this.registerErrorListenerInService();
 			}

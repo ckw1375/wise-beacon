@@ -1,4 +1,4 @@
- package com.estimote.sdk.service;
+ package com.wisewells.agent;
  
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,24 +26,14 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.SystemClock;
 
-import com.estimote.sdk.Region;
-import com.estimote.sdk.Utils;
 import com.estimote.sdk.internal.Preconditions;
+import com.wisewells.sdk.MSG;
+import com.wisewells.sdk.Region;
+import com.wisewells.sdk.Utils;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.utils.L;
 
 public class WiseAgent extends Service {
-	public static final int MSG_START_RANGING = 1;
-	public static final int MSG_STOP_RANGING = 2;
-	public static final int MSG_RANGING_RESPONSE = 3;
-	public static final int MSG_START_MONITORING = 4;
-	public static final int MSG_STOP_MONITORING = 5;
-	public static final int MSG_MONITORING_RESPONSE = 6;
-	public static final int MSG_REGISTER_ERROR_LISTENER = 7;
-	public static final int MSG_ERROR_RESPONSE = 8;
-	public static final int MSG_SET_FOREGROUND_SCAN_PERIOD = 9;
-	public static final int MSG_SET_BACKGROUND_SCAN_PERIOD = 10;
-	public static final int ERROR_COULD_NOT_START_LOW_ENERGY_SCANNING = -1;
 	
 	static final long EXPIRATION_MILLIS = TimeUnit.SECONDS.toMillis(10L);
 	
@@ -342,30 +332,30 @@ public class WiseAgent extends Service {
 			{
 				public void run() {
 					switch (what) {
-						case 1:
+						case MSG.START_RANGING:
 							RangingRegion rangingRegion = new RangingRegion((Region)obj, replyTo);
 							WiseAgent.this.startRanging(rangingRegion);
 							break;
-						case 2:
+						case MSG.STOP_RANGING:
 							String rangingRegionId = (String)obj;
 							WiseAgent.this.stopRanging(rangingRegionId);
 							break;
-						case 4:
+						case MSG.START_MONITORING:
 							MonitoringRegion monitoringRegion = new MonitoringRegion((Region)obj, replyTo);
 							WiseAgent.this.startMonitoring(monitoringRegion);
 							break;
-						case 5:
+						case MSG.STOP_MONITORING:
 							String monitoredRegionId = (String)obj;
 							WiseAgent.this.stopMonitoring(monitoredRegionId);
 							break;
-						case 7:
+						case MSG.REGISTER_ERROR_LISTENER:
 							WiseAgent.this.mSendingMessenger = replyTo;
 							break;
-						case 9:
+						case MSG.SET_FOREGROUND_SCAN_PERIOD:
 							L.d("Setting foreground scan period: " + WiseAgent.this.mForegroundScanPeriod);
 							WiseAgent.this.mForegroundScanPeriod = ((ScanPeriodData)obj);
 							break;
-						case 10:
+						case MSG.SET_BACKGROUND_SCAN_PERIOD:
 							L.d("Setting background scan period: " + WiseAgent.this.mBackgroundScanPeriod);
 							WiseAgent.this.mBackgroundScanPeriod = ((ScanPeriodData)obj);
 							break;

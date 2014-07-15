@@ -1,11 +1,11 @@
-package com.estimote.sdk.service;
+package com.wisewells.agent;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.estimote.sdk.Region;
 import com.estimote.sdk.internal.Objects;
 import com.estimote.sdk.internal.Preconditions;
+import com.wisewells.sdk.Region;
 
 public class MonitoringResult implements Parcelable
 {

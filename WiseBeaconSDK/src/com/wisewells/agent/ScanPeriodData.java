@@ -1,4 +1,4 @@
-package com.estimote.sdk.service;
+package com.wisewells.agent;
 
 import android.os.Parcel;
 import android.os.Parcelable;
