@@ -10,6 +10,7 @@ import com.wisewells.sdk.datas.topology.Topology;
 public class Service implements Parcelable{
 	
 	private String name;
+	
 	private String code;
 	private String topologyCode;
 	private String parentCode;
@@ -28,10 +29,9 @@ public class Service implements Parcelable{
 		}
 	};
 
-	public Service(String name, String code) {
+	public Service(String name) {
 		init();
 		this.name = name;
-		this.code = code;
 	}
 	
 	public Service(Parcel p) {

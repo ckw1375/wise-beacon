@@ -1,13 +1,11 @@
 package com.wisewells.sdk.datas.group;
 
-import java.util.UUID;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
 
 public class UuidGroup extends BeaconGroup implements Parcelable {
-	private UUID uuid;
+	private String uuid;
 	
 	public static Parcelable.Creator<UuidGroup> CREATOR = new Creator<UuidGroup>() {
 
@@ -21,15 +19,14 @@ public class UuidGroup extends BeaconGroup implements Parcelable {
 			return new UuidGroup(source);
 		}
 	};
-
-	public UuidGroup(String code, String name, String uuid) {
-		super(code, name);
-		this.uuid = UUID.fromString(uuid);
+	
+	public UuidGroup(String name) {
+		super(name);
 	}
 
 	public UuidGroup(Parcel p) {
 		super(p);
-		uuid = (UUID) p.readSerializable();
+		uuid = p.readString();
 	}
 	
 	@Override
@@ -40,18 +37,18 @@ public class UuidGroup extends BeaconGroup implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		super.writeToParcel(dest, flags);
-		dest.writeSerializable(uuid);
+		dest.writeString(uuid);
 	}
 
 	/*
 	 * Getter, Setter
 	 */
 
-	public UUID getUuid() {
+	public String getUuid() {
 		return uuid;
 	}
 
-	public void setUuid(UUID uuid) {
+	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
 }

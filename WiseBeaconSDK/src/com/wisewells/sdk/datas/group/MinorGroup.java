@@ -26,9 +26,8 @@ public class MinorGroup extends BeaconGroup implements Parcelable{
 		}
 	};
 	
-	public MinorGroup(String code, String name, int minor) {		
-		super(code, name);
-		this.minor = minor;
+	public MinorGroup(String name) {
+		super(name);
 	}
 
 	private MinorGroup(Parcel p) {

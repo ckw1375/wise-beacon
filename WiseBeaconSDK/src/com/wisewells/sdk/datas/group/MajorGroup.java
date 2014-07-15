@@ -20,8 +20,8 @@ public class MajorGroup extends BeaconGroup implements Parcelable{
 		}
 	};
 	
-	public MajorGroup(String code, String name) {
-		super(code, name);
+	public MajorGroup(String name) {
+		super(name);
 	}
 	
 	private MajorGroup(Parcel p) {

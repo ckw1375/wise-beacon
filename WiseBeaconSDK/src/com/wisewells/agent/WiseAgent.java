@@ -30,7 +30,12 @@ import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.sdk.MSG;
 import com.wisewells.sdk.Region;
 import com.wisewells.sdk.Utils;
+import com.wisewells.sdk.WiseObjects;
 import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.datas.group.BeaconGroup;
+import com.wisewells.sdk.datas.group.MinorGroup;
+import com.wisewells.sdk.datas.group.UuidGroup;
+import com.wisewells.sdk.datas.topology.Topology;
 import com.wisewells.sdk.utils.L;
 
 public class WiseAgent extends Service {
@@ -44,6 +49,7 @@ public class WiseAgent extends Service {
 	private static final Intent INTENT_START_SCAN = new Intent(ACTION_NAME_START_SCAN);
 	private static final Intent INTENT_AFTER_SCAN = new Intent(ACTION_NAME_AFTER_SCAN);
 	
+	private final WiseObjects mWiseObjects;
 	private final Messenger mMessenger;
 	private final BluetoothAdapter.LeScanCallback mLeScanCallback;
 	private final ConcurrentHashMap<Beacon, Long> mBeaconsFoundInScanCycle;
@@ -65,6 +71,7 @@ public class WiseAgent extends Service {
 	private ScanPeriodData mBackgroundScanPeriod;
 
 	public WiseAgent() {
+		mWiseObjects = WiseObjects.getInstance();
 		mMessenger = new Messenger(new IncomingHandler());
 		mLeScanCallback = new InternalLeScanCallback();
 		mBeaconsFoundInScanCycle = new ConcurrentHashMap<Beacon, Long>();
@@ -301,6 +308,86 @@ public class WiseAgent extends Service {
 			}
 		};
 	}
+	
+	public void startTracking() {
+		
+	}
+
+	public void stopTracking() {
+
+	}
+	
+	/*
+	 *	Set, Delete 관련 메소드들은 모두 실제로는 
+	 *	1. 네트워크 통신 후 완료되면
+	 *	2. Local DB에 저장하고
+	 *	3. WiseObjects를 갱신하고
+	 *	4. Manager를 통해 App에 완료사항을 알려준다. 
+	 */	
+	public void addBeaconGroup(BeaconGroup group) {
+		String code = WiseServer.requestCode(BeaconGroup.class);
+		group.setCode(code);		
+		if(group instanceof UuidGroup) {
+			
+		}
+	}
+	
+	public void modifyBeaconGroup(BeaconGroup group) {
+		
+	}
+
+	public void deleteBeaconGroup(String code) {
+
+	}
+
+	public void addBeacon(Beacon beacon) {
+		// 1. 서버에 비콘 등록을 요청하고, 비콘의 코드와 minor값을 받아온다.
+		// 2. 받아온 minor값을 minor그룹을 하나 만들고 beacon에 코드와 부모코드 값을 modify 해준다.
+		// 3. 이런 정보를 DB에 저장하고 WiseObjects에도 추가
+		String code = WiseServer.requestCode(Beacon.class);
+		int minor = WiseServer.requestMinor();
+							
+		MinorGroup group = new MinorGroup("minor" + minor);
+		group.setMinor(minor);
+		group.setCode(String.valueOf(minor));		
+		
+		beacon.setCode(code);
+		beacon.setBeaconGroupCode(group.getCode());
+		
+		group.addBeacon(beacon);
+	}
+	
+	public void modifyBeacon(Beacon beacon) {
+		
+	}
+
+	public void deleteBeacon(String code) {
+
+	}
+	
+	public void addService(Service service) {
+		
+	}
+
+	public void modifyService(Service service) {
+
+	}
+
+	public void deleteService(String code) {
+
+	}
+
+	public void addTopology(Topology topology) {
+		
+	}
+	
+	public void modifyTopology(Topology topology) {
+		
+	}
+
+	public void deleteTopology(String code) {
+
+	}
  
 	private class InternalLeScanCallback implements BluetoothAdapter.LeScanCallback {
 		private InternalLeScanCallback() {
@@ -362,6 +449,22 @@ public class WiseAgent extends Service {
 						case 3:
 						case 6:
 						case 8:
+						case MSG.MESSENGER_REGISTER:						
+						case MSG.MESSENGER_UNREGISTER:
+						case MSG.TRACKING_START:
+						case MSG.TRACKING_STOP:
+						case MSG.BEACON_GROUP_ADD:
+						case MSG.BEACON_GROUP_MODIFY:
+						case MSG.BEACON_GROUP_DELETE:
+						case MSG.BEACON_ADD:
+						case MSG.BEACON_MODIFY:
+						case MSG.BEACON_DELETE:
+						case MSG.SERVICE_ADD:
+						case MSG.SERVICE_MODIFY:
+						case MSG.SERVICE_DELETE:
+						case MSG.TOPOLOGY_ADD:
+						case MSG.TOPOLOGY_MODIFY:
+						case MSG.TOPOLOGY_DELETE:
 						default:
 							L.d("Unknown message: what=" + what + " obj=" + obj);
 					}

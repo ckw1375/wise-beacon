@@ -24,7 +24,11 @@ import com.wisewells.agent.MonitoringResult;
 import com.wisewells.agent.RangingResult;
 import com.wisewells.agent.ScanPeriodData;
 import com.wisewells.agent.WiseAgent;
+import com.wisewells.agent.WiseServer;
 import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.datas.Service;
+import com.wisewells.sdk.datas.group.BeaconGroup;
+import com.wisewells.sdk.datas.topology.Topology;
 import com.wisewells.sdk.utils.L;
 
 public class WiseManager
@@ -42,7 +46,7 @@ public class WiseManager
 	private final Messenger mIncomingMessenger;
 	private final Set<String> mRangedRegionIds;
 	private final Set<String> mMonitoredRegionIds;
-	private Messenger mSendingMessenger;
+	private Messenger mErrorReplyTo;
 	private RangingListener mRangingListener;
 	private MonitoringListener mMonitoringListener;
 	private ErrorListener mErrorListener;
@@ -127,7 +131,7 @@ public class WiseManager
 		}
 
 		mContext.unbindService(mServiceConnection);
-		mSendingMessenger = null;
+		mErrorReplyTo = null;
 	}
 
 
@@ -163,7 +167,7 @@ public class WiseManager
 		Message scanPeriodMsg = Message.obtain(null, msgId);
 		scanPeriodMsg.obj = scanPeriodData;
 		try {
-			mSendingMessenger.send(scanPeriodMsg);
+			mErrorReplyTo.send(scanPeriodMsg);
 		} catch (RemoteException e) {
 			L.e("Error while setting scan periods: " + msgId);
 		}
@@ -173,7 +177,7 @@ public class WiseManager
 		Message registerMsg = Message.obtain(null, 7);
 		registerMsg.replyTo = mIncomingMessenger;
 		try {
-			mSendingMessenger.send(registerMsg);
+			mErrorReplyTo.send(registerMsg);
 		} catch (RemoteException e) {
 			L.e("Error while registering error listener");
 		}
@@ -195,7 +199,7 @@ public class WiseManager
 		startRangingMsg.obj = region;
 		startRangingMsg.replyTo = mIncomingMessenger;
 		try {
-			mSendingMessenger.send(startRangingMsg);
+			mErrorReplyTo.send(startRangingMsg);
 		} catch (RemoteException e) {
 			L.e("Error while starting ranging", e);
 			throw e;
@@ -217,7 +221,7 @@ public class WiseManager
 		Message stopRangingMsg = Message.obtain(null, 2);
 		stopRangingMsg.obj = regionId;
 		try {
-			mSendingMessenger.send(stopRangingMsg);
+			mErrorReplyTo.send(stopRangingMsg);
 		} catch (RemoteException e) {
 			L.e("Error while stopping ranging", e);
 			throw e;
@@ -241,7 +245,7 @@ public class WiseManager
 		startMonitoringMsg.obj = region;
 		startMonitoringMsg.replyTo = mIncomingMessenger;
 		try {
-			mSendingMessenger.send(startMonitoringMsg);
+			mErrorReplyTo.send(startMonitoringMsg);
 		} catch (RemoteException e) {
 			L.e("Error while starting monitoring", e);
 			throw e;
@@ -263,7 +267,7 @@ public class WiseManager
 		Message stopMonitoringMsg = Message.obtain(null, 5);
 		stopMonitoringMsg.obj = regionId;
 		try {
-			mSendingMessenger.send(stopMonitoringMsg);
+			mErrorReplyTo.send(stopMonitoringMsg);
 		} catch (RemoteException e) {
 			L.e("Error while stopping ranging");
 			throw e;
@@ -271,7 +275,63 @@ public class WiseManager
 	}
 
 	private boolean isConnectedToService() {
-		return mSendingMessenger != null;
+		return mErrorReplyTo != null;
+	}
+	
+	public void startTracking() {
+		
+	}
+	
+	public void stopTracking() {
+		
+	}
+	
+	public void addBeaconGroup(BeaconGroup group) {
+		
+	}
+	
+	public void modifyBeaconGroup(BeaconGroup group) {
+		
+	}
+
+	public void deleteBeaconGroup(String code) {
+
+	}
+
+	public void addBeacon(Beacon beacon) {
+		
+	}
+	
+	public void modifyBeacon(Beacon beacon) {
+		
+	}
+
+	public void deleteBeacon(String code) {
+
+	}
+	
+	public void addService(Service service) {
+		
+	}
+
+	public void modifyService(Service service) {
+
+	}
+
+	public void deleteService(String code) {
+
+	}
+
+	public void addTopology(Topology topology) {
+		
+	}
+	
+	public void modifyTopology(Topology topology) {
+		
+	}
+
+	public void deleteTopology(String code) {
+
 	}
 
 	private class IncomingHandler extends Handler {
@@ -313,7 +373,7 @@ public class WiseManager
 		}
 
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			WiseManager.this.mSendingMessenger = new Messenger(service);
+			WiseManager.this.mErrorReplyTo = new Messenger(service);
 			
 			if (WiseManager.this.mErrorListener != null) {
 				WiseManager.this.registerErrorListenerInService();
@@ -337,7 +397,7 @@ public class WiseManager
 
 		public void onServiceDisconnected(ComponentName name) {
 			L.e("Service disconnected, crashed? " + name);
-			WiseManager.this.mSendingMessenger = null;
+			WiseManager.this.mErrorReplyTo = null;
 		}
 	}
 

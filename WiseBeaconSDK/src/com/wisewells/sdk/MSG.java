@@ -7,24 +7,27 @@ public abstract class MSG {
 	 */
 	public static final int MESSENGER_REGISTER 		= 101;
 	public static final int MESSENGER_UNREGISTER 	= 102;
-	public static final int OBSERVING_START			= 103;
-	public static final int OBSERVING_STOP			= 104;
-	public static final int BEACON_GROUP_SET 		= 105;
-	public static final int BEACON_GROUP_DELETE 	= 106;
-	public static final int BEACON_SET 				= 107;
-	public static final int BEACON_DELETE 			= 108;
-	public static final int SERVICE_SET 			= 109;
-	public static final int SERVICE_DELETE			= 110;
-	public static final int TOPOLOGY_SET			= 111;
-	public static final int TOPOLOGY_DELETE			= 112;
+	public static final int TRACKING_START			= 111;
+	public static final int TRACKING_STOP			= 112;
+	public static final int BEACON_GROUP_ADD		= 120;
+	public static final int BEACON_GROUP_MODIFY 	= 121;
+	public static final int BEACON_GROUP_DELETE 	= 122;
+	public static final int BEACON_ADD				= 130;
+	public static final int BEACON_MODIFY 			= 131;
+	public static final int BEACON_DELETE 			= 132;
+	public static final int SERVICE_ADD				= 140;
+	public static final int SERVICE_MODIFY 			= 141;
+	public static final int SERVICE_DELETE			= 142;
+	public static final int TOPOLOGY_ADD			= 150;
+	public static final int TOPOLOGY_MODIFY			= 151;
+	public static final int TOPOLOGY_DELETE			= 152;
 	
 	/**
 	 *	WiseWells Constants
 	 *	Agent send these messages
 	 */
-	public static final int TEST 	= 201;
-	
-	
+	public static final int RESPONSE_OBJECT 		= 201;
+	public static final int RESPONSE_TRACKING		= 202;
 	
 	/**
 	 *	Estimote Constants 

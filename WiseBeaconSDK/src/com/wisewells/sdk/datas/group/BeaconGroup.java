@@ -13,8 +13,9 @@ import com.wisewells.sdk.datas.topology.Topology;
 
 public class BeaconGroup implements Parcelable{
 		
-	protected String code;
 	protected String name;
+	
+	protected String code;
 	protected String parentCode;	
 	protected HashSet<String> childCodes;
 	protected HashSet<String> topologyCodes;
@@ -32,9 +33,8 @@ public class BeaconGroup implements Parcelable{
 		}
 	};
 
-	public BeaconGroup(String code, String name) {
+	public BeaconGroup(String name) {
 		init();
-		this.code = code;
 		this.name = name;
 	}
 
@@ -85,9 +85,9 @@ public class BeaconGroup implements Parcelable{
 		return beacons;
 	}
 
-	public void addChild(BeaconGroup group) {
-		childCodes.add(group.getCode());
-		group.setParentCode(this.code);
+	public void addChild(BeaconGroup child) {
+		this.childCodes.add(child.getCode());
+		child.setParentCode(this.code);
 	}
 	
 	public void attachTo(Topology t) {
