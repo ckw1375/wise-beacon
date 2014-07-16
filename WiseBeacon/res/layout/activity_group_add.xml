@@ -4,7 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.wisewells.wisebeacon.activities.GroupAddActivity" >
+    tools:context="com.wisewells.wisebeacon.home.GroupAddActivity" >
+
+    <Button
+        android:id="@+id/group_btn_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add" />
 
     <TextView
         android:layout_width="wrap_content"

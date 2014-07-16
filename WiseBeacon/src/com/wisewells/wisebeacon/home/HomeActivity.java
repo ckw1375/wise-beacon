@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.activities;
+package com.wisewells.wisebeacon.home;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -18,7 +18,7 @@ import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.Dummy;
 import com.wisewells.wisebeacon.R;
 
-public class MainActivity extends Activity {
+public class HomeActivity extends Activity {
 
 	private Button mBeaconButton;
 	private Button mServiceButton;
@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_home);
         L.enableDebugLogging(true);
         
         mBeaconButton = (Button) findViewById(R.id.main_beacon_button);
@@ -78,7 +78,7 @@ public class MainActivity extends Activity {
 	}
 	
     private void onTopologyButtonClick() {
-    	Toast.makeText(this, "code : " + WiseServer.requestCode(MainActivity.class), Toast.LENGTH_SHORT).show();
+    	Toast.makeText(this, "code : " + WiseServer.requestCode(HomeActivity.class), Toast.LENGTH_SHORT).show();
 	}
 
 	private void onServiceButtonClick() {

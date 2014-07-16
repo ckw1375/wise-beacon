@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.group.UuidGroup;
+import com.wisewells.sdk.datas.UuidGroup;
 
 public class Dummy {
 	public static ArrayList<Beacon> getBeacons() {
@@ -19,7 +19,9 @@ public class Dummy {
 	}	
 	
 	public static UuidGroup getUUidGroup() {
-		UuidGroup g = new UuidGroup("uuid A", "UuidGroup A", UUID.randomUUID().toString());
+		UuidGroup g = new UuidGroup("지오다노");
+		g.setCode("uuid group A");
+		g.setUuid("DF-36-34-A3");
 		return g;
 	}
 }

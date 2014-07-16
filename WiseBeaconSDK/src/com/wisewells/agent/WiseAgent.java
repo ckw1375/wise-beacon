@@ -1,4 +1,4 @@
- package com.wisewells.agent;
+package com.wisewells.agent;
  
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,6 +11,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass.Device.Major;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
@@ -32,6 +33,7 @@ import com.wisewells.sdk.Region;
 import com.wisewells.sdk.WiseObjects;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
+import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.sdk.datas.MinorGroup;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.datas.UuidGroup;
@@ -61,7 +63,7 @@ public class WiseAgent extends Service {
 	private Handler mHandler;
 	private Runnable mAfterScanCycleTask;
 	private boolean mScanning;
-	private Messenger mSendingMessenger;
+	private Messenger mErrorReplyTo;
 	private BroadcastReceiver mBluetoothReceiver;
 	private BroadcastReceiver mStartScanReceiver;
 	private BroadcastReceiver mAfterScanReceiver;
@@ -213,12 +215,12 @@ public class WiseAgent extends Service {
 	}
  
 	private void sendError(Integer errorId) {
-		if (mSendingMessenger != null) {
+		if (mErrorReplyTo != null) {
 			Message errorMsg = Message.obtain(null, 8);
 			errorMsg.obj = errorId;
 			try {
 				
-				mSendingMessenger.send(errorMsg);
+				mErrorReplyTo.send(errorMsg);
 			} catch (RemoteException e) {
 				L.e("Error while reporting message, funny right?", e);
 			}
@@ -319,7 +321,7 @@ public class WiseAgent extends Service {
 	
 	/*
 	 *	Set, Delete 관련 메소드들은 모두 실제로는 
-	 *	1. 네트워크 통신 후 완료되면
+	 *	1. 네트워크 통신 후 완료되면 (서버에 저장 및 필요 속성들을 받아옴)
 	 *	2. Local DB에 저장하고
 	 *	3. WiseObjects를 갱신하고
 	 *	4. Manager를 통해 App에 완료사항을 알려준다. 
@@ -327,9 +329,8 @@ public class WiseAgent extends Service {
 	public void addBeaconGroup(BeaconGroup group) {
 		String code = WiseServer.requestCode(BeaconGroup.class);
 		group.setCode(code);		
-		if(group instanceof UuidGroup) {
-			
-		}
+		if(group instanceof MajorGroup)
+			((MajorGroup) group).setMajor(WiseServer.requestMajor());
 	}
 	
 	public void modifyBeaconGroup(BeaconGroup group) {
@@ -355,6 +356,9 @@ public class WiseAgent extends Service {
 		beacon.setBeaconGroupCode(group.getCode());
 		
 		group.addBeacon(beacon);
+		
+		mWiseObjects.putBeacon(beacon);
+		mWiseObjects.putBeaconGroup(group);
 	}
 	
 	public void modifyBeacon(Beacon beacon) {
@@ -436,7 +440,7 @@ public class WiseAgent extends Service {
 							WiseAgent.this.stopMonitoring(monitoredRegionId);
 							break;
 						case MSG.REGISTER_ERROR_LISTENER:
-							WiseAgent.this.mSendingMessenger = replyTo;
+							WiseAgent.this.mErrorReplyTo = replyTo;
 							break;
 						case MSG.SET_FOREGROUND_SCAN_PERIOD:
 							L.d("Setting foreground scan period: " + WiseAgent.this.mForegroundScanPeriod);

@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.views;
+package com.wisewells.wisebeacon.home;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.wisebeacon.R;
 
-public class BeaconRowView extends FrameLayout implements Checkable {
+public class GroupAddListRow extends FrameLayout implements Checkable {
 
 	private View mBackgroundView;
 	private TextView mUuidView;
@@ -20,7 +20,7 @@ public class BeaconRowView extends FrameLayout implements Checkable {
 	
 	private boolean mChecked;
 	
-	public BeaconRowView(Context context) {
+	public GroupAddListRow(Context context) {
 		super(context);
 		LayoutInflater.from(context).inflate(R.layout.row_beacon, this);
 		

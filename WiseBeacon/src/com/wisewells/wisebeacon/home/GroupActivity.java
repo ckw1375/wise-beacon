@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.activities;
+package com.wisewells.wisebeacon.home;
 
 import java.util.ArrayList;
 
@@ -13,9 +13,8 @@ import android.widget.ListView;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.WiseObjects;
-import com.wisewells.sdk.datas.group.BeaconGroup;
+import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.adapters.GroupAdapter;
 
 public class GroupActivity extends Activity {
 
@@ -31,7 +30,7 @@ public class GroupActivity extends Activity {
 		
 		mAdapter = new GroupAdapter(this);
 		
-		mListView = (ListView) findViewById(R.id.group_listview);
+		mListView = (ListView) findViewById(R.id.group_listview);		
 		mListView.setAdapter(mAdapter);
 		
 		mAddButton = (Button) findViewById(R.id.group_add_button);

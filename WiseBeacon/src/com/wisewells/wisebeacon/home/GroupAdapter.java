@@ -1,13 +1,11 @@
-package com.wisewells.wisebeacon.adapters;
+package com.wisewells.wisebeacon.home;
 
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.wisewells.sdk.datas.group.BeaconGroup;
+import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.wisebeacon.BaseArrayAdapter;
-import com.wisewells.wisebeacon.views.BeaconRowView;
-import com.wisewells.wisebeacon.views.GroupRowView;
 
 public class GroupAdapter extends BaseArrayAdapter<BeaconGroup> {
 	
