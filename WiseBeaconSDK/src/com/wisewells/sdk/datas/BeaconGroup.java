@@ -1,4 +1,4 @@
-package com.wisewells.sdk.datas.group;
+package com.wisewells.sdk.datas;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,8 +8,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.wisewells.sdk.WiseObjects;
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.topology.Topology;
 
 public class BeaconGroup implements Parcelable{
 		

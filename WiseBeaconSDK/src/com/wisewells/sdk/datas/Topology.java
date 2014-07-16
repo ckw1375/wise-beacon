@@ -1,9 +1,7 @@
-package com.wisewells.sdk.datas.topology;
+package com.wisewells.sdk.datas;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.wisewells.sdk.datas.group.BeaconGroup;
 
 public class Topology implements Parcelable {
 

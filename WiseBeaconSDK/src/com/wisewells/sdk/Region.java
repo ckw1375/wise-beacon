@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.estimote.sdk.internal.Objects;
 import com.estimote.sdk.internal.Preconditions;
+import com.wisewells.sdk.utils.BeaconUtils;
 
 public class Region implements Parcelable {
 	private final String identifier;
@@ -24,7 +25,7 @@ public class Region implements Parcelable {
 
 	public Region(String identifier, String uuid, Integer major, Integer minor) {
 		this.identifier = ((String) Preconditions.checkNotNull(identifier));
-		this.uuid = (uuid != null ? Utils.normalizeProximityUUID(uuid) : uuid);
+		this.uuid = (uuid != null ? BeaconUtils.normalizeProximityUUID(uuid) : uuid);
 		this.major = major;
 		this.minor = minor;
 	}

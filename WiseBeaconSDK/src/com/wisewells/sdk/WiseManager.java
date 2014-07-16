@@ -26,9 +26,9 @@ import com.wisewells.agent.ScanPeriodData;
 import com.wisewells.agent.WiseAgent;
 import com.wisewells.agent.WiseServer;
 import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.Service;
-import com.wisewells.sdk.datas.group.BeaconGroup;
-import com.wisewells.sdk.datas.topology.Topology;
+import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.utils.L;
 
 public class WiseManager

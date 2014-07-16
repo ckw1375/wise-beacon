@@ -1,12 +1,10 @@
-package com.wisewells.sdk.datas.topology;
+package com.wisewells.sdk.datas;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.wisewells.sdk.datas.RssiVector;
 
 public class SectorTopology extends Topology implements Parcelable {
 	private ArrayList<Sector> sectors;

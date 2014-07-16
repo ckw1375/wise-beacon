@@ -1,4 +1,4 @@
-package com.wisewells.sdk.datas.topology;
+package com.wisewells.sdk.datas;
 
 import java.util.HashMap;
 
@@ -7,8 +7,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wisewells.sdk.datas.RssiVector;
-import com.wisewells.sdk.utils.Utils;
+import com.wisewells.sdk.utils.ParcelUtils;
 
 public class LocationTopology extends Topology implements Parcelable {
 	private HashMap<String, Point> beaconLocations;
@@ -33,7 +32,7 @@ public class LocationTopology extends Topology implements Parcelable {
 
 	public LocationTopology(Parcel p) {
 		super(p);
-		beaconLocations = (HashMap<String, Point>) Utils.readMapFromParcel(p, Point.class.getClassLoader());
+		beaconLocations = (HashMap<String, Point>) ParcelUtils.readMapFromParcel(p, Point.class.getClassLoader());
 	}
 	
 	@Override
@@ -44,7 +43,7 @@ public class LocationTopology extends Topology implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		super.writeToParcel(dest, flags);
-		Utils.writeMapToParcel(dest, beaconLocations);
+		ParcelUtils.writeMapToParcel(dest, beaconLocations);
 	}
 	
 	public Point getCurrentPoint(RssiVector vector) {

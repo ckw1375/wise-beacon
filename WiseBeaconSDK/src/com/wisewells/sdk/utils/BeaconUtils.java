@@ -1,4 +1,4 @@
- package com.wisewells.sdk;
+ package com.wisewells.sdk.utils;
 
  
 import android.bluetooth.BluetoothAdapter;
@@ -11,11 +11,13 @@ import android.content.IntentFilter;
 
 import com.estimote.sdk.internal.HashCode;
 import com.estimote.sdk.internal.Preconditions;
+import com.wisewells.sdk.KalmanFilter;
+import com.wisewells.sdk.Region;
 import com.wisewells.sdk.datas.Beacon;
 
-public class Utils
+public class BeaconUtils
 {
-	private static final String TAG = Utils.class.getSimpleName();
+	private static final String TAG = BeaconUtils.class.getSimpleName();
     private static final int MANUFACTURER_SPECIFIC_DATA = 255;
 
     

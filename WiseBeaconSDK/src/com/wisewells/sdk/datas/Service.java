@@ -5,8 +5,6 @@ import java.util.HashSet;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wisewells.sdk.datas.topology.Topology;
-
 public class Service implements Parcelable{
 	
 	private String name;

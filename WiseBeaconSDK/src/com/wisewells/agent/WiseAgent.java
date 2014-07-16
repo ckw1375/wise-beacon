@@ -29,13 +29,13 @@ import android.os.SystemClock;
 import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.sdk.MSG;
 import com.wisewells.sdk.Region;
-import com.wisewells.sdk.Utils;
 import com.wisewells.sdk.WiseObjects;
 import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.group.BeaconGroup;
-import com.wisewells.sdk.datas.group.MinorGroup;
-import com.wisewells.sdk.datas.group.UuidGroup;
-import com.wisewells.sdk.datas.topology.Topology;
+import com.wisewells.sdk.datas.BeaconGroup;
+import com.wisewells.sdk.datas.MinorGroup;
+import com.wisewells.sdk.datas.Topology;
+import com.wisewells.sdk.datas.UuidGroup;
+import com.wisewells.sdk.utils.BeaconUtils;
 import com.wisewells.sdk.utils.L;
 
 public class WiseAgent extends Service {
@@ -396,7 +396,7 @@ public class WiseAgent extends Service {
  
 		public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
 			WiseAgent.this.checkNotOnUiThread();
-			Beacon beacon = Utils.beaconFromLeScan(device, rssi, scanRecord);
+			Beacon beacon = BeaconUtils.beaconFromLeScan(device, rssi, scanRecord);
 			//if ((beacon == null) || (!EstimoteBeacons.isEstimoteBeacon(beacon))) {
 			//	L.v("Device " + device + " is not an Estimote beacon");
 			//	return;
@@ -501,7 +501,7 @@ public class WiseAgent extends Service {
 		private List<MonitoringRegion> matchingMonitoredRegions(Beacon beacon) {
 			List<MonitoringRegion> results = new ArrayList<MonitoringRegion>();
 			for (MonitoringRegion monitoredRegion : WiseAgent.this.mMonitoredRegions) {
-				if (Utils.isBeaconInRegion(beacon, monitoredRegion.region)) {
+				if (BeaconUtils.isBeaconInRegion(beacon, monitoredRegion.region)) {
 					results.add(monitoredRegion);
 				}
 			}

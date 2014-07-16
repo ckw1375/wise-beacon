@@ -11,14 +11,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import android.os.Messenger;
 
 import com.wisewells.sdk.Region;
-import com.wisewells.sdk.Utils;
 import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.utils.BeaconUtils;
 import com.wisewells.sdk.utils.L;
 
 class RangingRegion {
 	private static final Comparator<Beacon> BEACON_ACCURACY_COMPARATOR = new Comparator<Beacon>() {
 		public int compare(Beacon lhs, Beacon rhs) {
-			return Double.compare(Utils.computeAccuracy(lhs), Utils.computeAccuracy(rhs));
+			return Double.compare(BeaconUtils.computeAccuracy(lhs), BeaconUtils.computeAccuracy(rhs));
 		}
 	};
 
@@ -44,7 +44,7 @@ class RangingRegion {
 	 */
 	public final void processFoundBeacons(Map<Beacon, Long> beaconsFoundInScanCycle) {
 		for (Map.Entry<Beacon, Long> entry : beaconsFoundInScanCycle.entrySet())
-			if (Utils.isBeaconInRegion((Beacon)entry.getKey(), this.region)) {
+			if (BeaconUtils.isBeaconInRegion((Beacon)entry.getKey(), this.region)) {
 				this.beacons.remove(entry.getKey());
 				this.beacons.put((Beacon)entry.getKey(), (Long)entry.getValue());
 			}
