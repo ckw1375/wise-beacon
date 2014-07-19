@@ -1,10 +1,9 @@
 package com.wisewells.wisebeacon.home;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,8 +11,9 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.WiseObjects;
-import com.wisewells.sdk.datas.BeaconGroup;
+import com.wisewells.sdk.protocols.ParcelableString;
+import com.wisewells.sdk.protocols.RangingResult;
+import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 
 public class GroupActivity extends Activity {
@@ -27,6 +27,9 @@ public class GroupActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_group);
+		
+		Message str = getIntent().getParcelableExtra("TEST");
+		
 		
 		mAdapter = new GroupAdapter(this);
 		
@@ -50,8 +53,6 @@ public class GroupActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		ArrayList<BeaconGroup> beaconGroups = WiseObjects.getInstance().getBeaconGroups();
-		mAdapter.replaceWith(beaconGroups);
 	}
 	
 	@Override

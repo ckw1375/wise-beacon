@@ -21,7 +21,7 @@ public class SplashActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash);
 		
-		manager = new WiseManager(this);
+		manager = WiseManager.getInstance(this);
 		if (!manager.hasBluetooth()) {
 			Toast.makeText(this, "Device does not have Bluetooth Low Energy", Toast.LENGTH_LONG).show();
 			return;
