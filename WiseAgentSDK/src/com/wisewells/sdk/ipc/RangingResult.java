@@ -1,4 +1,4 @@
- package com.wisewells.sdk.protocols;
+ package com.wisewells.sdk.ipc;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,5 +1,5 @@
-package com.wisewells.agent;
  
+package com.wisewells.agent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,7 +19,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -37,11 +36,11 @@ import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.sdk.datas.MinorGroup;
 import com.wisewells.sdk.datas.Topology;
-import com.wisewells.sdk.protocols.MSG;
-import com.wisewells.sdk.protocols.MonitoringResult;
-import com.wisewells.sdk.protocols.ParcelableString;
-import com.wisewells.sdk.protocols.RangingResult;
-import com.wisewells.sdk.protocols.ScanPeriodData;
+import com.wisewells.sdk.datas.UuidGroup;
+import com.wisewells.sdk.ipc.IPC;
+import com.wisewells.sdk.ipc.MonitoringResult;
+import com.wisewells.sdk.ipc.RangingResult;
+import com.wisewells.sdk.ipc.ScanPeriodData;
 import com.wisewells.sdk.utils.BeaconUtils;
 import com.wisewells.sdk.utils.L;
 
@@ -81,6 +80,8 @@ public class WiseAgent extends Service {
 	public WiseAgent() {
 		mConnectedMessengers = new HashMap<String, Messenger>();
 		mWiseObjects = WiseObjects.getInstance();
+		mWiseObjects.putBeaconGroup(Dummy.getUUidGroup());
+		mWiseObjects.putBeaconGroup(Dummy.getUUidGroup2());
 		mIncomingMessenger = new Messenger(new IncomingHandler());
 		mLeScanCallback = new InternalLeScanCallback();
 		mBeaconsFoundInScanCycle = new ConcurrentHashMap<Beacon, Long>();
@@ -92,6 +93,7 @@ public class WiseAgent extends Service {
 
 	public void onCreate() {
 		super.onCreate();
+		android.os.Debug.waitForDebugger();
 		L.i("Creating service");
  
 		mAlarmManager = ((AlarmManager)getSystemService("alarm"));
@@ -131,28 +133,20 @@ public class WiseAgent extends Service {
 	public IBinder onBind(Intent intent) {
 		return mIncomingMessenger.getBinder();
 	}
- 
-	private void startRanging(RangingRegion rangingRegion) {
-		checkNotOnUiThread();
-		L.v("Start ranging: " + rangingRegion.region);
-		Preconditions.checkNotNull(mAdapter, "Bluetooth adapter cannot be null");
-		mRangedRegions.add(rangingRegion);
-		startScanning();
-	}
 	
 	Handler dummyHandler = new Handler();
 	
 	private void testStartMakingDummy(String code) {
 		checkNotOnUiThread();
 		final Bundle data = new Bundle();
-		data.putParcelableArrayList("data", Dummy.getBeacons());
+		data.putParcelableArrayList(IPC.BUNDLE_DATA1, Dummy.getBeacons());
 		
 		final Messenger messenger = mConnectedMessengers.get(code);
 		dummyHandler.postDelayed(new Runnable() {
 			
 			@Override
 			public void run() {
-				Message message = Message.obtain(null, MSG.RESPONSE_DUMMY_BEACON);
+				Message message = Message.obtain(null, IPC.MSG_RESPONSE_DUMMY_BEACON);
 				message.setData(data);
 				try {
 					messenger.send(message);
@@ -161,6 +155,14 @@ public class WiseAgent extends Service {
 				}
 			}
 		}, 1000);
+	}
+
+	private void startRanging(RangingRegion rangingRegion) {
+		checkNotOnUiThread();
+		L.v("Start ranging: " + rangingRegion.region);
+		Preconditions.checkNotNull(mAdapter, "Bluetooth adapter cannot be null");
+		mRangedRegions.add(rangingRegion);
+		startScanning();
 	}
 
 	private void stopRanging(String regionId) {
@@ -356,11 +358,36 @@ public class WiseAgent extends Service {
 	 *	3. WiseObjects를 갱신하고
 	 *	4. Manager를 통해 App에 완료사항을 알려준다. 
 	 */	
-	public void addBeaconGroup(BeaconGroup group) {
-		String code = WiseServer.requestCode(BeaconGroup.class);
-		group.setCode(code);		
-		if(group instanceof MajorGroup)
-			((MajorGroup) group).setMajor(WiseServer.requestMajor());
+	private void addBeaconGroup(String name, String parentCode, ArrayList<Beacon> beacons) {
+		
+		int major = WiseServer.requestMajor();
+		
+		MajorGroup majorGroup = new MajorGroup(name);
+		majorGroup.setMajor(major);
+		majorGroup.setCode(WiseServer.requestCode());
+		
+		UuidGroup uuidGroup = (UuidGroup) mWiseObjects.getBeaconGroup(parentCode);
+		uuidGroup.addChild(majorGroup);
+		
+		L.i("name : " + name + " parent : " + parentCode + " " + majorGroup.toString() + " "  + uuidGroup.toString()); 
+		
+		for(Beacon beacon : beacons) {
+			int minor = WiseServer.requestMinor();
+			MinorGroup minorGroup = new MinorGroup("minor");
+			minorGroup.setMinor(minor);
+			minorGroup.setCode(WiseServer.requestCode());
+			minorGroup.addBeacon(beacon);		
+			
+			beacon.setAddress(((UuidGroup) mWiseObjects.getBeaconGroup(parentCode)).getUuid(), major, minor);
+			
+			majorGroup.addChild(minorGroup);
+			
+			mWiseObjects.putBeaconGroup(minorGroup);
+			mWiseObjects.putBeacon(beacon);
+		}
+		
+		mWiseObjects.putBeaconGroup(uuidGroup);
+		mWiseObjects.putBeaconGroup(majorGroup);
 	}
 	
 	public void modifyBeaconGroup(BeaconGroup group) {
@@ -375,7 +402,7 @@ public class WiseAgent extends Service {
 		// 1. 서버에 비콘 등록을 요청하고, 비콘의 코드와 minor값을 받아온다.
 		// 2. 받아온 minor값을 minor그룹을 하나 만들고 beacon에 코드와 부모코드 값을 modify 해준다.
 		// 3. 이런 정보를 DB에 저장하고 WiseObjects에도 추가
-		String code = WiseServer.requestCode(Beacon.class);
+		String code = WiseServer.requestCode();
 		int minor = WiseServer.requestMinor();
 							
 		MinorGroup group = new MinorGroup("minor" + minor);
@@ -422,6 +449,40 @@ public class WiseAgent extends Service {
 	public void deleteTopology(String code) {
 
 	}
+	
+	private void sendUuidGroups(Messenger replyTo) {
+		ArrayList<UuidGroup> groups = mWiseObjects.getUuidGroups();
+
+		Bundle data = new Bundle();
+		data.putParcelableArrayList(IPC.BUNDLE_DATA1, groups);
+
+		Message message = Message.obtain(null, IPC.MSG_RESPONSE_UUID_GROUP_LIST);
+		message.setData(data);
+
+		try {
+			replyTo.send(message);
+		} catch (RemoteException e) {
+			L.e("Error while sending Beacon Group List");
+			e.printStackTrace();
+		}
+	}
+	
+	private void sendMajorGroups(String uuidGroupCode, Messenger replyTo) {
+		ArrayList<MajorGroup> groups = mWiseObjects.getMajorGroups(uuidGroupCode);
+		
+		Bundle data = new Bundle();
+		data.putParcelableArrayList(IPC.BUNDLE_DATA1, groups);
+		
+		Message message = Message.obtain(null, IPC.MSG_RESPONSE_MAJOR_GROUP_LIST);
+		message.setData(data);
+		
+		try {
+			replyTo.send(message);
+		} catch (RemoteException e) {
+			L.e("Error while sending Beacon Group List");
+			e.printStackTrace();
+		}
+	}	
  
 	private class InternalLeScanCallback implements BluetoothAdapter.LeScanCallback {
 		private InternalLeScanCallback() {
@@ -449,60 +510,86 @@ public class WiseAgent extends Service {
 			WiseAgent.this.mHandler.post(new Runnable() {
 				public void run() {
 					switch (what) {
-						case MSG.START_RANGING:
+						case IPC.MSG_START_RANGING:
 							RangingRegion rangingRegion = new RangingRegion((Region)obj, replyTo);
 							WiseAgent.this.startRanging(rangingRegion);
 							break;
-						case MSG.STOP_RANGING:
+						case IPC.MSG_STOP_RANGING:
 							String rangingRegionId = (String)obj;
 							WiseAgent.this.stopRanging(rangingRegionId);
 							break;
-						case MSG.START_MONITORING:
+						case IPC.MSG_START_MONITORING:
 							MonitoringRegion monitoringRegion = new MonitoringRegion((Region)obj, replyTo);
 							WiseAgent.this.startMonitoring(monitoringRegion);
 							break;
-						case MSG.STOP_MONITORING:
+						case IPC.MSG_STOP_MONITORING:
 							String monitoredRegionId = (String)obj;
 							WiseAgent.this.stopMonitoring(monitoredRegionId);
 							break;
-						case MSG.REGISTER_ERROR_LISTENER:
+						case IPC.MSG_REGISTER_ERROR_LISTENER:
 							WiseAgent.this.mErrorReplyTo = replyTo;
 							break;
-						case MSG.SET_FOREGROUND_SCAN_PERIOD:
+						case IPC.MSG_SET_FOREGROUND_SCAN_PERIOD:
 							L.d("Setting foreground scan period: " + WiseAgent.this.mForegroundScanPeriod);
 							WiseAgent.this.mForegroundScanPeriod = ((ScanPeriodData)obj);
 							break;
-						case MSG.SET_BACKGROUND_SCAN_PERIOD:
+						case IPC.MSG_SET_BACKGROUND_SCAN_PERIOD:
 							L.d("Setting background scan period: " + WiseAgent.this.mBackgroundScanPeriod);
 							WiseAgent.this.mBackgroundScanPeriod = ((ScanPeriodData)obj);
 							break;
-						case MSG.DUMMY_BEACON_START:
-							testStartMakingDummy((String) data.get("data"));
+						case IPC.MSG_DUMMY_BEACON_START:
+							testStartMakingDummy((String) data.get(IPC.BUNDLE_DATA1));
 							break;
-						case MSG.DUMMY_BEACON_STOP:
+						case IPC.MSG_DUMMY_BEACON_STOP:
 							break;
-						case MSG.MESSENGER_REGISTER:
-							mConnectedMessengers.put(data.getString("data"), replyTo);
-							L.i("Register Messenger From " + data.getString("data"));
+						case IPC.MSG_MESSENGER_REGISTER:
+							mConnectedMessengers.put(data.getString(IPC.BUNDLE_DATA1), replyTo);
+							L.i("Register Messenger From " + data.getString(IPC.BUNDLE_DATA1));
 							break;
-						case MSG.MESSENGER_UNREGISTER:
-							mConnectedMessengers.remove(data.getString("data"));
-							L.i("Unregister Messenger From " + data.getString("data"));
+						case IPC.MSG_MESSENGER_UNREGISTER:
+							mConnectedMessengers.remove(data.getString(IPC.BUNDLE_DATA1));
+							L.i("Unregister Messenger From " + data.getString(IPC.BUNDLE_DATA1));
 							break;
-						case MSG.TRACKING_START:
-						case MSG.TRACKING_STOP:
-						case MSG.BEACON_GROUP_ADD:
-						case MSG.BEACON_GROUP_MODIFY:
-						case MSG.BEACON_GROUP_DELETE:
-						case MSG.BEACON_ADD:
-						case MSG.BEACON_MODIFY:
-						case MSG.BEACON_DELETE:
-						case MSG.SERVICE_ADD:
-						case MSG.SERVICE_MODIFY:
-						case MSG.SERVICE_DELETE:
-						case MSG.TOPOLOGY_ADD:
-						case MSG.TOPOLOGY_MODIFY:
-						case MSG.TOPOLOGY_DELETE:
+						case IPC.MSG_TRACKING_START:
+							break;
+						case IPC.MSG_TRACKING_STOP:
+							break;
+						case IPC.MSG_BEACON_GROUP_ADD:
+							data.setClassLoader(Beacon.class.getClassLoader());
+							String name = data.getString(IPC.BUNDLE_DATA1);
+							String parentCode = data.getString(IPC.BUNDLE_DATA2);
+							ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA3);							
+							WiseAgent.this.addBeaconGroup(name, parentCode, beacons);
+							break;
+						case IPC.MSG_BEACON_GROUP_MODIFY:
+							break;
+						case IPC.MSG_BEACON_GROUP_DELETE:
+							break;
+						case IPC.MSG_UUID_GROUP_LIST_GET:
+							sendUuidGroups(replyTo);
+							break;
+						case IPC.MSG_MAJOR_GROUP_LIST_GET:
+							String code = data.getString(IPC.BUNDLE_DATA1);
+							sendMajorGroups(code, replyTo);
+							break;
+						case IPC.MSG_BEACON_ADD:
+							break;
+						case IPC.MSG_BEACON_MODIFY:
+							break;
+						case IPC.MSG_BEACON_DELETE:
+							break;
+						case IPC.MSG_SERVICE_ADD:
+							break;
+						case IPC.MSG_SERVICE_MODIFY:
+							break;
+						case IPC.MSG_SERVICE_DELETE:
+							break;
+						case IPC.MSG_TOPOLOGY_ADD:
+							break;
+						case IPC.MSG_TOPOLOGY_MODIFY:
+							break;
+						case IPC.MSG_TOPOLOGY_DELETE:
+							break;						
 
 						case 3:
 						case 6:

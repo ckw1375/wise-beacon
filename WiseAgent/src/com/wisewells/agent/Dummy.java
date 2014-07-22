@@ -20,8 +20,15 @@ public class Dummy {
 	
 	public static UuidGroup getUUidGroup() {
 		UuidGroup g = new UuidGroup("지오다노");
-		g.setCode("uuid group A");
+		g.setCode("wise");
 		g.setUuid("DF-36-34-A3");
+		return g;
+	}
+	
+	public static UuidGroup getUUidGroup2() {
+		UuidGroup g = new UuidGroup("교보문고");
+		g.setCode("wise2");
+		g.setUuid("AC-36-11-A3");
 		return g;
 	}
 }

@@ -20,8 +20,6 @@ import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.wisebeacon.R;
 
 public class GroupAddActivity extends Activity {
-
-	private static final Region TEST_REGION = new Region("wisewells", null, null, null);
 	
 	private WiseManager mWiseManager;
 	
@@ -81,6 +79,7 @@ public class GroupAddActivity extends Activity {
 	}
 	
 	private void saveBeaconGroup() {
+		String uuidGroupCode = getIntent().getStringExtra(GroupActivity.EXTRA_UUID_GROUP_CODE);
 		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
 		
 		SparseBooleanArray sb = mListView.getCheckedItemPositions();
@@ -91,6 +90,10 @@ public class GroupAddActivity extends Activity {
 		}
 		
 		WiseManager manager = WiseManager.getInstance(this);		
-		manager.addBeaconGroup(mNameView.getText().toString(), beacons);
+		try {
+			manager.addBeaconGroup(mNameView.getText().toString(), uuidGroupCode, beacons);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

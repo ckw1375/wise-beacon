@@ -1,18 +1,12 @@
 package com.wisewells.wisebeacon.home;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Message;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 
-import com.wisewells.sdk.Region;
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.protocols.RangingResult;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 
@@ -76,11 +70,6 @@ public class HomeActivity extends Activity {
 	}
 
 	private void onServiceButtonClick() {
-		Intent intent = new Intent(this, GroupActivity.class);
-		Message msg = Message.obtain();
-		msg.obj = new RangingResult(new Region("rdi", null, null, null), new ArrayList<Beacon>());
-		intent.putExtra("TEST", msg);
-    	startActivity(intent);
 	}
 
 	private void onBeaconButtonClick() {

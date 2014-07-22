@@ -1,4 +1,4 @@
-package com.wisewells.sdk.protocols;
+package com.wisewells.sdk.ipc;
 
 import android.os.Parcel;
 import android.os.Parcelable;

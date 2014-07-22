@@ -2,15 +2,17 @@ package com.wisewells.agent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
+import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
+import com.wisewells.sdk.datas.UuidGroup;
 import com.wisewells.sdk.utils.ParcelUtils;
 
 /**
@@ -97,13 +99,34 @@ public class WiseObjects implements Parcelable {
 	}
 	
 	public ArrayList<Beacon> getBeacons() {
-		ArrayList<Beacon> b = new ArrayList<Beacon>(this.beacons.values());
-		return b;
+		ArrayList<Beacon> beacons = new ArrayList<Beacon>(this.beacons.values());
+		return beacons;
 	}
 	
 	public ArrayList<BeaconGroup> getBeaconGroups() {
-		ArrayList<BeaconGroup> bg = new ArrayList<BeaconGroup>(this.beaconGroups.values());
-		return bg;
+		ArrayList<BeaconGroup> beaconGroups = new ArrayList<BeaconGroup>(this.beaconGroups.values());
+		return beaconGroups;
+	}
+	
+	public ArrayList<UuidGroup> getUuidGroups() {
+		ArrayList<UuidGroup> uuidGroups = new ArrayList<UuidGroup>();
+		ArrayList<BeaconGroup> beaconGroups = getBeaconGroups();
+		for(BeaconGroup beaconGroup : beaconGroups) {
+			if(beaconGroup instanceof UuidGroup) uuidGroups.add((UuidGroup) beaconGroup);
+		}
+		
+		return uuidGroups;
+	}
+	
+	public ArrayList<MajorGroup> getMajorGroups(String uuidGroupCode) {	
+		Set<String> majorCodes = this.beaconGroups.get(uuidGroupCode).getChildCodes();
+		
+		ArrayList<MajorGroup> majorGroups = new ArrayList<MajorGroup>();
+		
+		for(String code : majorCodes) {
+			majorGroups.add((MajorGroup) this.beaconGroups.get(code));
+		}
+		return majorGroups;
 	}
 	
 	public ArrayList<Service> getServices() {
@@ -121,7 +144,7 @@ public class WiseObjects implements Parcelable {
 	}
 	
 	public void putBeaconGroup(BeaconGroup beaconGroup) {
-		beaconGroups.put(beaconGroup.getCode(), beaconGroup);
+		beaconGroups.put(beaconGroup.getCode(), beaconGroup);		
 	}
 	
 	public void putService(Service service) {
