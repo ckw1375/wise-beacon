@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.home;
+package com.wisewells.wisebeacon.beacongroup;
 
 import com.wisewells.sdk.datas.UuidGroup;
 

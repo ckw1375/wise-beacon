@@ -483,6 +483,23 @@ public class WiseAgent extends Service {
 			e.printStackTrace();
 		}
 	}	
+	
+	private void sendBeacons(String groupCode, Messenger replyTo) {
+		ArrayList<Beacon> beacons = mWiseObjects.getBeaconsInGroup(groupCode);
+		
+		Bundle data = new Bundle();
+		data.putParcelableArrayList(IPC.BUNDLE_DATA1, beacons);
+		
+		Message message = Message.obtain(null, IPC.MSG_RESPONSE_BEACON_LIST);
+		message.setData(data);
+		
+		try {
+			replyTo.send(message);
+		} catch (RemoteException e) {
+			L.e("Error while sending Beacon List");
+			e.printStackTrace();
+		}
+	}
  
 	private class InternalLeScanCallback implements BluetoothAdapter.LeScanCallback {
 		private InternalLeScanCallback() {
@@ -569,14 +586,22 @@ public class WiseAgent extends Service {
 							sendUuidGroups(replyTo);
 							break;
 						case IPC.MSG_MAJOR_GROUP_LIST_GET:
+						{
 							String code = data.getString(IPC.BUNDLE_DATA1);
 							sendMajorGroups(code, replyTo);
+						}
 							break;
 						case IPC.MSG_BEACON_ADD:
 							break;
 						case IPC.MSG_BEACON_MODIFY:
 							break;
 						case IPC.MSG_BEACON_DELETE:
+							break;
+						case IPC.MSG_BEACON_LIST_GET:
+						{
+							String code = data.getString(IPC.BUNDLE_DATA1);
+							sendBeacons(code, replyTo);
+						}
 							break;
 						case IPC.MSG_SERVICE_ADD:
 							break;

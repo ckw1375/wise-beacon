@@ -31,47 +31,78 @@ public final class R {
     }
     public static final class id {
         public static final int LinearLayout1=0x7f080000;
-        public static final int action_settings=0x7f080014;
-        public static final int done=0x7f080015;
-        public static final int group_add_beacon_list=0x7f080007;
-        public static final int group_add_button=0x7f080002;
-        public static final int group_add_name=0x7f080005;
-        public static final int group_btn_add=0x7f080004;
-        public static final int group_listview=0x7f080003;
-        public static final int group_spin_uuigroup=0x7f080001;
-        public static final int group_txt_child_count=0x7f080013;
-        public static final int group_txt_name=0x7f080012;
-        public static final int main_beacon_button=0x7f080008;
-        public static final int main_history_button=0x7f08000b;
-        public static final int main_service_button=0x7f080009;
-        public static final int main_topology_button=0x7f08000a;
-        public static final int row_background=0x7f08000c;
-        public static final int row_major=0x7f08000f;
-        public static final int row_minor=0x7f080011;
-        public static final int row_uuid=0x7f08000d;
-        public static final int textView1=0x7f080006;
-        public static final int textView2=0x7f08000e;
-        public static final int textView3=0x7f080010;
+        public static final int action_settings=0x7f080025;
+        public static final int add_topology_btn_done=0x7f08000e;
+        public static final int add_topology_edit_name=0x7f08000b;
+        public static final int add_topology_listview=0x7f08000d;
+        public static final int add_topology_row_background=0x7f08000f;
+        public static final int add_topology_spinner=0x7f08000c;
+        public static final int add_topology_txt_child_number=0x7f080011;
+        public static final int add_topology_txt_group_name=0x7f080010;
+        public static final int btn_add_topology=0x7f080022;
+        public static final int done=0x7f080026;
+        public static final int group_add_beacon_list=0x7f080004;
+        public static final int group_add_button=0x7f080013;
+        public static final int group_add_name=0x7f080002;
+        public static final int group_btn_add=0x7f080001;
+        public static final int group_listview=0x7f080014;
+        public static final int group_spin_uuigroup=0x7f080012;
+        public static final int group_txt_child_count=0x7f080016;
+        public static final int group_txt_name=0x7f080015;
+        public static final int list_topology=0x7f080023;
+        public static final int location_edit_x_coordinate=0x7f08001d;
+        public static final int location_edit_y_coordinate=0x7f08001e;
+        public static final int location_listview=0x7f08001b;
+        public static final int location_txt_name=0x7f08001c;
+        public static final int main_beacon_button=0x7f080017;
+        public static final int main_history_button=0x7f08001a;
+        public static final int main_service_button=0x7f080018;
+        public static final int main_topology_button=0x7f080019;
+        public static final int row_background=0x7f080005;
+        public static final int row_major=0x7f080008;
+        public static final int row_minor=0x7f08000a;
+        public static final int row_uuid=0x7f080006;
+        public static final int service_btn_add=0x7f08001f;
+        public static final int service_listview=0x7f080020;
+        public static final int service_txt_name=0x7f080021;
+        public static final int textView1=0x7f080003;
+        public static final int textView2=0x7f080007;
+        public static final int textView3=0x7f080009;
+        public static final int txt_topology_name=0x7f080024;
     }
     public static final class layout {
-        public static final int activity_group=0x7f030000;
-        public static final int activity_group_add=0x7f030001;
-        public static final int activity_home=0x7f030002;
-        public static final int activity_splash=0x7f030003;
-        public static final int row_beacon=0x7f030004;
-        public static final int row_group=0x7f030005;
+        public static final int add_group_activity=0x7f030000;
+        public static final int add_group_list_row=0x7f030001;
+        public static final int add_topology_activity=0x7f030002;
+        public static final int add_topology_list_row=0x7f030003;
+        public static final int group_activity=0x7f030004;
+        public static final int group_list_row=0x7f030005;
+        public static final int home_activity=0x7f030006;
+        public static final int location_topology_activity=0x7f030007;
+        public static final int location_topology_list_row=0x7f030008;
+        public static final int service_activity=0x7f030009;
+        public static final int service_list_row=0x7f03000a;
+        public static final int splash_activity=0x7f03000b;
+        public static final int topology_activity=0x7f03000c;
+        public static final int topology_list_row=0x7f03000d;
     }
     public static final class menu {
-        public static final int beacon=0x7f070000;
-        public static final int group_add=0x7f070001;
-        public static final int main=0x7f070002;
-        public static final int splash=0x7f070003;
+        public static final int add_topology=0x7f070000;
+        public static final int beacon=0x7f070001;
+        public static final int group_add=0x7f070002;
+        public static final int location_topology=0x7f070003;
+        public static final int main=0x7f070004;
+        public static final int splash=0x7f070005;
+        public static final int topology=0x7f070006;
     }
     public static final class string {
         public static final int action_settings=0x7f040001;
         public static final int app_name=0x7f040000;
         public static final int hello_world=0x7f040002;
+        public static final int title_activity_add_topology=0x7f040005;
+        public static final int title_activity_location_topology=0x7f040006;
         public static final int title_activity_splash=0x7f040003;
+        public static final int title_activity_topology=0x7f040004;
     }
     public static final class style {
         /** 

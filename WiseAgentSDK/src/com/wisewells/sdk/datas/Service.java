@@ -32,13 +32,13 @@ public class Service implements Parcelable{
 		this.name = name;
 	}
 	
-	public Service(Parcel p) {
+	private Service(Parcel in) {
 		init();
-		name = p.readString();
-		code = p.readString();
-		topologyCode = p.readString();
-		parentCode = p.readString();		
-		childCodes = (HashSet<String>) p.readSerializable();
+		name = in.readString();
+		code = in.readString();
+		topologyCode = in.readString();
+		parentCode = in.readString();		
+		childCodes = (HashSet<String>) in.readSerializable();
 	}
 	
 	private void init() {

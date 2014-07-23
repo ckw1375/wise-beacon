@@ -10,6 +10,7 @@ import android.os.Parcelable;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.MajorGroup;
+import com.wisewells.sdk.datas.MinorGroup;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.datas.UuidGroup;
@@ -100,6 +101,21 @@ public class WiseObjects implements Parcelable {
 	
 	public ArrayList<Beacon> getBeacons() {
 		ArrayList<Beacon> beacons = new ArrayList<Beacon>(this.beacons.values());
+		return beacons;
+	}
+	
+	public ArrayList<Beacon> getBeaconsInGroup(String groupCode) {
+		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
+		BeaconGroup group = this.beaconGroups.get(groupCode);
+		if( !(group instanceof MajorGroup) ) {
+			throw new RuntimeException("Group code is must MajorGroup's Code");
+		}
+		
+		for(String childCode : group.getChildCodes()) {
+			MinorGroup minor = (MinorGroup) this.beaconGroups.get(childCode);
+			beacons.addAll(minor.getBeacons());
+		}
+		
 		return beacons;
 	}
 	

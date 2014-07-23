@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.home;
+package com.wisewells.wisebeacon.beacongroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,20 +19,20 @@ import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.wisebeacon.R;
 
-public class GroupAddActivity extends Activity {
+public class AddGroupActivity extends Activity {
 	
 	private WiseManager mWiseManager;
 	
 	private EditText mNameView;
 	private ListView mListView;;
-	private GroupAddListAdapter mAdapter;
+	private AddGroupListAdapter mAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_group_add);
+		setContentView(R.layout.add_group_activity);
 		
-		mAdapter = new GroupAddListAdapter(this);
+		mAdapter = new AddGroupListAdapter(this);
 		
 		mListView = (ListView) findViewById(R.id.group_add_beacon_list);
 		mListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);

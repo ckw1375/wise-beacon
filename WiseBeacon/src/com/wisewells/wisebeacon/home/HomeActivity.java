@@ -9,6 +9,8 @@ import android.widget.Button;
 
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
+import com.wisewells.wisebeacon.beacongroup.GroupActivity;
+import com.wisewells.wisebeacon.service.ServiceActivity;
 
 public class HomeActivity extends Activity {
 
@@ -20,7 +22,7 @@ public class HomeActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.home_activity);
         L.enableDebugLogging(true);
         
         mBeaconButton = (Button) findViewById(R.id.main_beacon_button);
@@ -70,6 +72,8 @@ public class HomeActivity extends Activity {
 	}
 
 	private void onServiceButtonClick() {
+		Intent intent = new Intent(this, ServiceActivity.class);
+    	startActivity(intent);
 	}
 
 	private void onBeaconButtonClick() {

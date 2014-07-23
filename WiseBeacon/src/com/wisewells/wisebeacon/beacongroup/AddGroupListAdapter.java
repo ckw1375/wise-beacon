@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.home;
+package com.wisewells.wisebeacon.beacongroup;
 
 import java.util.ArrayList;
 
@@ -9,22 +9,22 @@ import android.view.ViewGroup;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.wisebeacon.BaseArrayAdapter;
 
-public class GroupAddListAdapter extends BaseArrayAdapter<Beacon> {
+public class AddGroupListAdapter extends BaseArrayAdapter<Beacon> {
 
-	public GroupAddListAdapter(Context context) {
+	public AddGroupListAdapter(Context context) {
 		super(context);
 	}
 	
-	public GroupAddListAdapter(Context context, ArrayList<Beacon> items) {
+	public AddGroupListAdapter(Context context, ArrayList<Beacon> items) {
 		super(context, items);
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		GroupAddListRow view = null;
+		AddGroupListRow view = null;
 		
-		if(convertView != null) view = (GroupAddListRow) convertView;
-		else view = new GroupAddListRow(mContext);
+		if(convertView != null) view = (AddGroupListRow) convertView;
+		else view = new AddGroupListRow(mContext);
 			
 		view.setData(getItem(position));		
 		

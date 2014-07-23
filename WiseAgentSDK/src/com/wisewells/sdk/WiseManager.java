@@ -59,6 +59,7 @@ public class WiseManager {
 	private ScanPeriodData mBackgroundScanPeriod;	
 	private GetBeaconGroupListener mUuidGroupListener;
 	private GetBeaconGroupListener mMajorGroupListener;	
+	private GetBeaconListener mBeaconListener;
 	
 	private static WiseManager sInstance;
 	
@@ -447,6 +448,23 @@ public class WiseManager {
 			e.printStackTrace();
 		}
 	}
+	
+	public void getBeacons(String groupCode, GetBeaconListener listener) {
+		mBeaconListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
+		
+		Bundle data = new Bundle();
+		data.putString(IPC.BUNDLE_DATA1, groupCode);
+		
+		Message message = Message.obtain(null, IPC.MSG_BEACON_LIST_GET);
+		message.setData(data);
+		message.replyTo = mIncomingMessenger;
+		
+		try {
+			mSendingMessenger.send(message);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
 
 	private class IncomingHandler extends Handler {
 		private IncomingHandler() {
@@ -499,6 +517,14 @@ public class WiseManager {
 					WiseManager.this.mMajorGroupListener.onResponseBeaconGroup(groups);
 				}
 				break;
+			case IPC.MSG_RESPONSE_BEACON_LIST:
+				if (WiseManager.this.mBeaconListener != null) {
+					Bundle data = msg.getData();
+					data.setClassLoader(Beacon.class.getClassLoader());
+					ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
+					WiseManager.this.mBeaconListener.onResponseBeacon(beacons);
+				}
+				break;	
 			default:
 				L.d("Unknown message: " + msg);
 			}
@@ -570,5 +596,9 @@ public class WiseManager {
 	
 	public interface GetBeaconGroupListener {
 		public void onResponseBeaconGroup(List<BeaconGroup> groups);
+	}
+	
+	public interface GetBeaconListener {
+		public void onResponseBeacon(List<Beacon> beacons);
 	}
 }

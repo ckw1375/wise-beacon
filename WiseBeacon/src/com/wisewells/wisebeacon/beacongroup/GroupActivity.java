@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.home;
+package com.wisewells.wisebeacon.beacongroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class GroupActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_group);
+		setContentView(R.layout.group_activity);
 		
 		mWiseManager = WiseManager.getInstance(this);
 		
@@ -100,7 +100,7 @@ public class GroupActivity extends Activity {
 	}
 
 	private void onAddButtonClicked() {
-		Intent intent = new Intent(this, GroupAddActivity.class);
+		Intent intent = new Intent(this, AddGroupActivity.class);
 		intent.putExtra(EXTRA_UUID_GROUP_CODE, mUuidGroupCode);
 		startActivity(intent);
 	}

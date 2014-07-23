@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.home;
+package com.wisewells.wisebeacon.beacongroup;
 
 import android.content.Context;
 import android.view.View;
@@ -15,10 +15,10 @@ public class GroupAdapter extends BaseArrayAdapter<BeaconGroup> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		GroupRowView view = null;
+		GroupListRow view = null;
 		
-		if(convertView != null) view = (GroupRowView) convertView;
-		else view = new GroupRowView(mContext);
+		if(convertView != null) view = (GroupListRow) convertView;
+		else view = new GroupListRow(mContext);
 			
 		view.setData(getItem(position));		
 		
