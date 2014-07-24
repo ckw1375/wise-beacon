@@ -45,6 +45,8 @@ import com.wisewells.sdk.utils.BeaconUtils;
 import com.wisewells.sdk.utils.L;
 
 public class WiseAgent extends Service {
+
+	static final boolean DEBUG_MODE = false;
 	
 	static final long EXPIRATION_MILLIS = TimeUnit.SECONDS.toMillis(10L);
 	
@@ -92,8 +94,8 @@ public class WiseAgent extends Service {
 	}
 
 	public void onCreate() {
-		super.onCreate();
-		android.os.Debug.waitForDebugger();
+		super.onCreate();		
+		if(DEBUG_MODE) android.os.Debug.waitForDebugger();
 		L.i("Creating service");
  
 		mAlarmManager = ((AlarmManager)getSystemService("alarm"));
@@ -390,6 +392,20 @@ public class WiseAgent extends Service {
 		mWiseObjects.putBeaconGroup(majorGroup);
 	}
 	
+	private void addBeaconGroup(String name, String parentCode) {
+		int major = WiseServer.requestMajor();
+
+		MajorGroup majorGroup = new MajorGroup(name);
+		majorGroup.setMajor(major);
+		majorGroup.setCode(WiseServer.requestCode());
+
+		UuidGroup uuidGroup = (UuidGroup) mWiseObjects.getBeaconGroup(parentCode);
+		uuidGroup.addChild(majorGroup);
+
+		mWiseObjects.putBeaconGroup(uuidGroup);
+		mWiseObjects.putBeaconGroup(majorGroup);
+	}
+	
 	public void modifyBeaconGroup(BeaconGroup group) {
 		
 	}
@@ -528,11 +544,13 @@ public class WiseAgent extends Service {
 				public void run() {
 					switch (what) {
 						case IPC.MSG_START_RANGING:
-							RangingRegion rangingRegion = new RangingRegion((Region)obj, replyTo);
+							data.setClassLoader(Region.class.getClassLoader());							
+							RangingRegion rangingRegion = 
+									new RangingRegion((Region)data.getParcelable(IPC.BUNDLE_DATA1), replyTo);
 							WiseAgent.this.startRanging(rangingRegion);
 							break;
-						case IPC.MSG_STOP_RANGING:
-							String rangingRegionId = (String)obj;
+						case IPC.MSG_STOP_RANGING:							
+							String rangingRegionId = data.getString(IPC.BUNDLE_DATA1);
 							WiseAgent.this.stopRanging(rangingRegionId);
 							break;
 						case IPC.MSG_START_MONITORING:
@@ -572,11 +590,12 @@ public class WiseAgent extends Service {
 						case IPC.MSG_TRACKING_STOP:
 							break;
 						case IPC.MSG_BEACON_GROUP_ADD:
-							data.setClassLoader(Beacon.class.getClassLoader());
+//							data.setClassLoader(Beacon.class.getClassLoader());
 							String name = data.getString(IPC.BUNDLE_DATA1);
 							String parentCode = data.getString(IPC.BUNDLE_DATA2);
-							ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA3);							
-							WiseAgent.this.addBeaconGroup(name, parentCode, beacons);
+//							ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA3);							
+//							WiseAgent.this.addBeaconGroup(name, parentCode, beacons);
+							WiseAgent.this.addBeaconGroup(name, parentCode);
 							break;
 						case IPC.MSG_BEACON_GROUP_MODIFY:
 							break;
@@ -688,8 +707,11 @@ public class WiseAgent extends Service {
 		private void invokeCallbacks(List<MonitoringRegion> enteredMonitors, List<MonitoringRegion> exitedMonitors) {
 			for (RangingRegion rangingRegion : WiseAgent.this.mRangedRegions) {
 				try {
-					Message rangingResponseMsg = Message.obtain(null, 3);
-					rangingResponseMsg.obj = new RangingResult(rangingRegion.region, rangingRegion.getSortedBeacons());
+					Bundle data = new Bundle();
+					data.putParcelable(IPC.BUNDLE_DATA1, new RangingResult(rangingRegion.region, rangingRegion.getSortedBeacons()));
+
+					Message rangingResponseMsg = Message.obtain(null, IPC.MSG_RANGING_RESPONSE);
+					rangingResponseMsg.setData(data);
 					rangingRegion.replyTo.send(rangingResponseMsg);
 				} catch (RemoteException e) {
 					L.e("Error while delivering responses", e);
@@ -697,7 +719,7 @@ public class WiseAgent extends Service {
 			}
        
 			for (MonitoringRegion didEnterMonitor : enteredMonitors) {
-				Message monitoringResponseMsg = Message.obtain(null, 6);
+				Message monitoringResponseMsg = Message.obtain(null, IPC.MSG_MONITORING_RESPONSE);
 				monitoringResponseMsg.obj = new MonitoringResult(didEnterMonitor.region, Region.State.INSIDE);
 				try
 				{
@@ -708,7 +730,7 @@ public class WiseAgent extends Service {
 			}
 			
 			for (MonitoringRegion didEnterMonitor : exitedMonitors) {
-				Message monitoringResponseMsg = Message.obtain(null, 6);
+				Message monitoringResponseMsg = Message.obtain(null, IPC.MSG_MONITORING_RESPONSE);
 				monitoringResponseMsg.obj = new MonitoringResult(didEnterMonitor.region, Region.State.OUTSIDE);
 				try
 				{

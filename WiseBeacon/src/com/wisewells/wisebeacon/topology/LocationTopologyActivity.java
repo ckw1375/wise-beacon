@@ -22,7 +22,7 @@ public class LocationTopologyActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.location_topology_activity);
+		setContentView(R.layout.activity_location_topology);
 		
 		String groupCode = getIntent().getStringExtra(AddTopologyActivity.EXTRA_BEACON_GROUP_CODE);
 		WiseManager.getInstance(this).getBeacons(groupCode, new GetBeaconListener() {

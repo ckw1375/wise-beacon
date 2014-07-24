@@ -20,7 +20,7 @@ public class TopologyActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.topology_activity);
+		setContentView(R.layout.activity_topology);
 		
 		mAddButton = (Button) findViewById(R.id.btn_add_topology);
 		mAddButton.setOnClickListener(new View.OnClickListener() {

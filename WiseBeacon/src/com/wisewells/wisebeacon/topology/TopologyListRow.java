@@ -14,7 +14,7 @@ public class TopologyListRow extends FrameLayout {
 	
 	public TopologyListRow(Context context) {
 		super(context);
-		LayoutInflater.from(context).inflate(R.layout.topology_list_row, this);
+		LayoutInflater.from(context).inflate(R.layout.list_row_topology, this);
 		mTopologyNameView = (TextView) findViewById(R.id.txt_topology_name);
 	}
 	

@@ -38,11 +38,7 @@ public class WiseManager {
 	private static final String ACTION_NAME_WISE_AGENT = "com.wisewells.agent.WiseAgent";
 	private static final String ANDROID_MANIFEST_CONDITIONS_MSG = 
 			"AndroidManifest.xml does not contain android.permission.BLUETOOTH or "
-			+ "android.permission.BLUETOOTH_ADMIN permissions. "
-			+ "WiseAgent(Service) may be also not declared in AndroidManifest.xml.";
-	private static final String ANDROID_MANIFEST_AGENT_MSG = 
-			"Could not bind service: make sure that com.wisewells.sdk.WiseAgent."
-			+ "BeaconService is declared in AndroidManifest.xml";
+			+ "android.permission.BLUETOOTH_ADMIN permissions. ";			
 	
 	private final Context mContext;
 	private final InternalServiceConnection mServiceConnection;
@@ -125,7 +121,7 @@ public class WiseManager {
 		boolean bound = mContext.bindService(new Intent(ACTION_NAME_WISE_AGENT), mServiceConnection, 1);
 
 		if (!bound)
-			L.w(ANDROID_MANIFEST_AGENT_MSG);
+			L.w("Fail to bind service");
 	}
 
 
@@ -217,9 +213,12 @@ public class WiseManager {
 			L.i("Region already ranged but that's OK: " + region);
 		}
 		mRangedRegionIds.add(region.getIdentifier());
+		
+		Bundle data = new Bundle();
+		data.putParcelable(IPC.BUNDLE_DATA1, region);
 
-		Message startRangingMsg = Message.obtain(null, 1);
-		startRangingMsg.obj = region;
+		Message startRangingMsg = Message.obtain(null, IPC.MSG_START_RANGING);
+		startRangingMsg.setData(data);
 		startRangingMsg.replyTo = mIncomingMessenger;
 		try {
 			mSendingMessenger.send(startRangingMsg);
@@ -241,8 +240,12 @@ public class WiseManager {
 
 	private void internalStopRanging(String regionId) throws RemoteException {
 		mRangedRegionIds.remove(regionId);
-		Message stopRangingMsg = Message.obtain(null, 2);
-		stopRangingMsg.obj = regionId;
+		
+		Bundle data = new Bundle();
+		data.putString(IPC.BUNDLE_DATA1, regionId);
+		
+		Message stopRangingMsg = Message.obtain(null, IPC.MSG_STOP_RANGING);
+		stopRangingMsg.setData(data);
 		try {
 			mSendingMessenger.send(stopRangingMsg);
 		} catch (RemoteException e) {
@@ -353,11 +356,27 @@ public class WiseManager {
 		
 	}
 	
-	public void addBeaconGroup(String name, String parentCode, ArrayList<Beacon> beacons) throws RemoteException {
+	/*public void addBeaconGroup(String name, String parentCode, ArrayList<Beacon> beacons) throws RemoteException {
 		Bundle data = new Bundle();
 		data.putString(IPC.BUNDLE_DATA1, name);
 		data.putString(IPC.BUNDLE_DATA2, parentCode);
 		data.putParcelableArrayList(IPC.BUNDLE_DATA3, beacons);
+		
+		Message msg = Message.obtain(null, IPC.MSG_BEACON_GROUP_ADD);
+		msg.setData(data);
+		
+		try {
+			mSendingMessenger.send(msg);
+		} catch (RemoteException e) {
+			L.e("Error while adding Beacon Group");
+			throw e;
+		}
+	}*/
+	
+	public void addBeaconGroup(String name, String parentCode) throws RemoteException {
+		Bundle data = new Bundle();
+		data.putString(IPC.BUNDLE_DATA1, name);
+		data.putString(IPC.BUNDLE_DATA2, parentCode);
 		
 		Message msg = Message.obtain(null, IPC.MSG_BEACON_GROUP_ADD);
 		msg.setData(data);
@@ -472,10 +491,15 @@ public class WiseManager {
 		}
 
 		public void handleMessage(Message msg) {
+			
+			Bundle data = msg.getData();
+			
 			switch (msg.what) {
 			case IPC.MSG_RANGING_RESPONSE:
 				if (WiseManager.this.mRangingListener != null) {
-					RangingResult rangingResult = (RangingResult)msg.obj;
+					data.setClassLoader(RangingResult.class.getClassLoader());
+					RangingResult rangingResult = (RangingResult) data.getParcelable(IPC.BUNDLE_DATA1);
+					mRangingListener.onBeaconsDiscovered(rangingResult.region, rangingResult.beacons);
 				}
 				break;
 			case IPC.MSG_MONITORING_RESPONSE:
@@ -495,7 +519,6 @@ public class WiseManager {
 				break;
 			case IPC.MSG_RESPONSE_DUMMY_BEACON:
 				if (WiseManager.this.mDummyListener != null) {
-					Bundle data = msg.getData();
 					data.setClassLoader(Beacon.class.getClassLoader());
 					List<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
 					mDummyListener.onDummyBeacon(beacons);
@@ -503,7 +526,6 @@ public class WiseManager {
 				break;
 			case IPC.MSG_RESPONSE_UUID_GROUP_LIST:
 				if (WiseManager.this.mUuidGroupListener != null) {
-					Bundle data = msg.getData();
 					data.setClassLoader(UuidGroup.class.getClassLoader());
 					ArrayList<BeaconGroup> groups = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
 					WiseManager.this.mUuidGroupListener.onResponseBeaconGroup(groups);					
@@ -511,7 +533,6 @@ public class WiseManager {
 				break;
 			case IPC.MSG_RESPONSE_MAJOR_GROUP_LIST:
 				if (WiseManager.this.mMajorGroupListener != null) {
-					Bundle data = msg.getData();
 					data.setClassLoader(MajorGroup.class.getClassLoader());
 					ArrayList<BeaconGroup> groups = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
 					WiseManager.this.mMajorGroupListener.onResponseBeaconGroup(groups);
@@ -519,7 +540,6 @@ public class WiseManager {
 				break;
 			case IPC.MSG_RESPONSE_BEACON_LIST:
 				if (WiseManager.this.mBeaconListener != null) {
-					Bundle data = msg.getData();
 					data.setClassLoader(Beacon.class.getClassLoader());
 					ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
 					WiseManager.this.mBeaconListener.onResponseBeacon(beacons);

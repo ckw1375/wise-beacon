@@ -2,11 +2,11 @@ package com.wisewells.wisebeacon.beacongroup;
 
 import com.wisewells.sdk.datas.UuidGroup;
 
-public class GroupSpinnerData {
+public class BeaconGroupSpinnerData {
 	private String code;
 	private String name;
 	
-	public GroupSpinnerData(UuidGroup group) {
+	public BeaconGroupSpinnerData(UuidGroup group) {
 		this.code = group.getCode();
 		this.name = group.getName();
 	}

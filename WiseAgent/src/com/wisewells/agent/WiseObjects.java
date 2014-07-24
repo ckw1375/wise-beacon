@@ -2,6 +2,7 @@ package com.wisewells.agent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import android.os.Parcel;
@@ -105,7 +106,7 @@ public class WiseObjects implements Parcelable {
 	}
 	
 	public ArrayList<Beacon> getBeaconsInGroup(String groupCode) {
-		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
+		ArrayList<Beacon> beaconsInGroup = new ArrayList<Beacon>();
 		BeaconGroup group = this.beaconGroups.get(groupCode);
 		if( !(group instanceof MajorGroup) ) {
 			throw new RuntimeException("Group code is must MajorGroup's Code");
@@ -113,10 +114,13 @@ public class WiseObjects implements Parcelable {
 		
 		for(String childCode : group.getChildCodes()) {
 			MinorGroup minor = (MinorGroup) this.beaconGroups.get(childCode);
-			beacons.addAll(minor.getBeacons());
+			Set<String> beaconCodes = minor.getChildCodes();
+			for(String beaconCode : beaconCodes) {
+				beaconsInGroup.add(this.beacons.get(beaconCode));
+			}
 		}
 		
-		return beacons;
+		return beaconsInGroup;
 	}
 	
 	public ArrayList<BeaconGroup> getBeaconGroups() {

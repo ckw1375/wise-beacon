@@ -19,7 +19,7 @@ public class SplashActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.splash_activity);
+		setContentView(R.layout.activity_splash);
 		
 		manager = WiseManager.getInstance(this);
 		if (!manager.hasBluetooth()) {

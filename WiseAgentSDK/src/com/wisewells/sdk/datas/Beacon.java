@@ -47,7 +47,7 @@ public class Beacon implements Parcelable {
 		beaconGroupCode = in.readString();
 		interval = in.readDouble();
 		macAddress = in.readString();
-		uuid = (String) in.readSerializable();
+		uuid = in.readString();
 		major = in.readInt();
 		minor = in.readInt();
 		txPower = in.readDouble();		
@@ -82,10 +82,10 @@ public class Beacon implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(code);		
-		dest.writeSerializable(beaconGroupCode);
+		dest.writeString(beaconGroupCode);
 		dest.writeDouble(interval);
 		dest.writeString(macAddress);
-		dest.writeSerializable(uuid);
+		dest.writeString(uuid);
 		dest.writeInt(major);
 		dest.writeInt(minor);
 		dest.writeDouble(txPower);		

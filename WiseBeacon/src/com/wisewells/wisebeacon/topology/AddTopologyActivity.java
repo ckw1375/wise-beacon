@@ -43,7 +43,7 @@ public class AddTopologyActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.add_topology_activity);
+		setContentView(R.layout.activity_add_topology);
 		mWiseManager = WiseManager.getInstance(this);
 		
 		mNameView = (EditText) findViewById(R.id.add_topology_edit_name);

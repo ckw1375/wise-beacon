@@ -22,7 +22,7 @@ public class AddGroupListRow extends FrameLayout implements Checkable {
 	
 	public AddGroupListRow(Context context) {
 		super(context);
-		LayoutInflater.from(context).inflate(R.layout.add_group_list_row, this);
+		LayoutInflater.from(context).inflate(R.layout.list_row_add_group, this);
 		
 		mBackgroundView = findViewById(R.id.row_background);
 		mUuidView = (TextView) findViewById(R.id.row_uuid);

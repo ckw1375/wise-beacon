@@ -47,15 +47,18 @@ public class MinorGroup extends BeaconGroup implements Parcelable{
 		b.setBeaconGroupCode(this.code);
 	}
 
+	
 	public ArrayList<Beacon> getBeacons() {
-		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
+		throw new RuntimeException("getBeacons is not completed method");
 		
-		/*for(String beaconCode : childCodes) {
-			Beacon b = WiseObjects.getInstance().getBeacon(beaconCode);
-			beacons.add(b);
-		}*/
-		
-		return beacons;
+//		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
+//		
+//		/*for(String beaconCode : childCodes) {
+//			Beacon b = WiseObjects.getInstance().getBeacon(beaconCode);
+//			beacons.add(b);
+//		}*/
+//		
+//		return beacons;
 	}
 	
 	public int getMinor() {

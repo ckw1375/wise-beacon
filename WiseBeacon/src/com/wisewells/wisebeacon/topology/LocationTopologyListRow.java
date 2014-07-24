@@ -17,7 +17,7 @@ public class LocationTopologyListRow extends FrameLayout {
 	
 	public LocationTopologyListRow(Context context) {
 		super(context);
-		LayoutInflater.from(context).inflate(R.layout.location_topology_list_row, this);
+		LayoutInflater.from(context).inflate(R.layout.list_row_location_topology, this);
 		mTopologyNameView = (TextView) findViewById(R.id.location_txt_name);
 		mXCoordinateView = (EditText) findViewById(R.id.location_edit_x_coordinate);
 		mYCorrdinateView = (EditText) findViewById(R.id.location_edit_y_coordinate);

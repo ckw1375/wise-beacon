@@ -15,7 +15,7 @@ public class ServiceListRow extends FrameLayout {
 	public ServiceListRow(Context context) {
 		super(context);
 		
-		LayoutInflater.from(context).inflate(R.layout.service_list_row, this);
+		LayoutInflater.from(context).inflate(R.layout.list_row_service, this);
 		mNameView = (TextView) findViewById(R.id.service_txt_name);
 	}
 	

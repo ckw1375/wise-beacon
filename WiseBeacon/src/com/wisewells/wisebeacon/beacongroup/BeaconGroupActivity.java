@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,10 +20,10 @@ import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.WiseManager.GetBeaconGroupListener;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.UuidGroup;
-import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
+import com.wisewells.wisebeacon.beacongroup.BeaconGroupDialog.ConfirmListener;
 
-public class GroupActivity extends Activity {
+public class BeaconGroupActivity extends Activity {
 
 	public static final String EXTRA_UUID_GROUP_CODE = "uuidcode";
 
@@ -31,19 +31,19 @@ public class GroupActivity extends Activity {
 	
 	private WiseManager mWiseManager;
 	private ListView mListView;
-	private GroupAdapter mListAdapter;
+	private BeaconGroupListAdapter mListAdapter;
 	private Button mAddButton;
 	private Spinner mSpinner;
-	private ArrayAdapter<GroupSpinnerData> mSpinnerAdapter;
+	private ArrayAdapter<BeaconGroupSpinnerData> mSpinnerAdapter;
 		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.group_activity);
+		setContentView(R.layout.activity_beacon_group);
 		
 		mWiseManager = WiseManager.getInstance(this);
 		
-		mListAdapter = new GroupAdapter(this);
+		mListAdapter = new BeaconGroupListAdapter(this);
 		
 		mListView = (ListView) findViewById(R.id.group_listview);		
 		mListView.setAdapter(mListAdapter);
@@ -55,8 +55,8 @@ public class GroupActivity extends Activity {
 				onAddButtonClicked();
 			}
 		});
-		
-		mSpinnerAdapter = new ArrayAdapter<GroupSpinnerData>(this, android.R.layout.simple_spinner_dropdown_item);		
+
+		mSpinnerAdapter = new ArrayAdapter<BeaconGroupSpinnerData>(this, android.R.layout.simple_spinner_dropdown_item);		
 		
 		mSpinner = (Spinner) findViewById(R.id.group_spin_uuigroup);
 		mSpinner.setAdapter(mSpinnerAdapter);
@@ -100,9 +100,24 @@ public class GroupActivity extends Activity {
 	}
 
 	private void onAddButtonClicked() {
-		Intent intent = new Intent(this, AddGroupActivity.class);
+		BeaconGroupDialog dialog = new BeaconGroupDialog();
+		dialog.setConfirmListener(new ConfirmListener() {
+			@Override
+			public void onConfirmButtonClicked(String str) {
+				try {
+					mWiseManager.addBeaconGroup(str, mUuidGroupCode);
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+
+		dialog.show(getFragmentManager(), "dialog");
+		
+		/*Intent intent = new Intent(this, AddGroupActivity.class);
 		intent.putExtra(EXTRA_UUID_GROUP_CODE, mUuidGroupCode);
-		startActivity(intent);
+		startActivity(intent);*/
 	}
 
 	private void onSpinnerItemSelected(int position) {
@@ -123,9 +138,9 @@ public class GroupActivity extends Activity {
 		mWiseManager.getUuidGroups(new GetBeaconGroupListener() {
 			@Override
 			public void onResponseBeaconGroup(List<BeaconGroup> groups) {
-				ArrayList<GroupSpinnerData> datas = new ArrayList<GroupSpinnerData>();
+				ArrayList<BeaconGroupSpinnerData> datas = new ArrayList<BeaconGroupSpinnerData>();
 				for(BeaconGroup group: groups) {
-					datas.add(new GroupSpinnerData((UuidGroup) group));
+					datas.add(new BeaconGroupSpinnerData((UuidGroup) group));
 				}
 				
 				mSpinnerAdapter.clear();

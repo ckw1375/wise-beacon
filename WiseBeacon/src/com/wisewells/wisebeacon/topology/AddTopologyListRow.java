@@ -21,7 +21,7 @@ public class AddTopologyListRow extends FrameLayout implements Checkable {
 	
 	public AddTopologyListRow(Context context) {
 		super(context);
-		LayoutInflater.from(context).inflate(R.layout.add_topology_list_row, this);
+		LayoutInflater.from(context).inflate(R.layout.list_row_add_topology, this);
 		mBackgroundView = findViewById(R.id.add_topology_row_background);
 		mNameView = (TextView) findViewById(R.id.add_topology_txt_group_name);
 		mNumberView = (TextView) findViewById(R.id.add_topology_txt_child_number);
