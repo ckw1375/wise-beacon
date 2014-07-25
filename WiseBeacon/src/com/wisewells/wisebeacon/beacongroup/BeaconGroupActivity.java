@@ -4,20 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.WiseManager.GetBeaconGroupListener;
+import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.UuidGroup;
 import com.wisewells.wisebeacon.R;
@@ -25,9 +29,10 @@ import com.wisewells.wisebeacon.beacongroup.BeaconGroupDialog.ConfirmListener;
 
 public class BeaconGroupActivity extends Activity {
 
-	public static final String EXTRA_UUID_GROUP_CODE = "uuidcode";
+	public static final String EXTRA_UUID_GROUP_NAME = "uuid group name";
+	public static final String EXTRA_MAJOR_GROUP = "major group";
 
-	private String mUuidGroupCode;
+	private UuidGroup mSelectedUuidGroup;
 	
 	private WiseManager mWiseManager;
 	private ListView mListView;
@@ -47,6 +52,12 @@ public class BeaconGroupActivity extends Activity {
 		
 		mListView = (ListView) findViewById(R.id.group_listview);		
 		mListView.setAdapter(mListAdapter);
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+				onBeaconGroupListClicked(position);
+			}
+		});
 		
 		mAddButton = (Button) findViewById(R.id.group_add_button);
 		mAddButton.setOnClickListener(new View.OnClickListener() {
@@ -76,7 +87,7 @@ public class BeaconGroupActivity extends Activity {
 	protected void onStart() {
 		super.onStart();
 		displayUuidGroupsInSpinner();		
-		if(mUuidGroupCode != null) displayMajorGroupsInListView(mUuidGroupCode);
+		if(mSelectedUuidGroup != null) displayMajorGroupsInListView(mSelectedUuidGroup);
 	}
 	
 	@Override
@@ -99,13 +110,14 @@ public class BeaconGroupActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	private void onAddButtonClicked() {
+	private void onAddButtonClicked() {		
 		BeaconGroupDialog dialog = new BeaconGroupDialog();
 		dialog.setConfirmListener(new ConfirmListener() {
 			@Override
 			public void onConfirmButtonClicked(String str) {
 				try {
-					mWiseManager.addBeaconGroup(str, mUuidGroupCode);
+					Toast.makeText(BeaconGroupActivity.this, "clicke", Toast.LENGTH_SHORT).show();
+					mWiseManager.addBeaconGroup(str, mSelectedUuidGroup.getCode());
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -119,14 +131,21 @@ public class BeaconGroupActivity extends Activity {
 		intent.putExtra(EXTRA_UUID_GROUP_CODE, mUuidGroupCode);
 		startActivity(intent);*/
 	}
+	
+	private void onBeaconGroupListClicked(int position) {
+		Intent intent = new Intent(this, DetailBeaconGroupActivity.class);
+		intent.putExtra(EXTRA_UUID_GROUP_NAME, mSelectedUuidGroup.getName());
+		intent.putExtra(EXTRA_MAJOR_GROUP, mListAdapter.getItem(position));
+		startActivity(intent);
+	}
 
 	private void onSpinnerItemSelected(int position) {
-		mUuidGroupCode = mSpinnerAdapter.getItem(position).getCode();		
-		displayMajorGroupsInListView(mUuidGroupCode);
+		mSelectedUuidGroup = mSpinnerAdapter.getItem(position).getUuidGroup();		
+		displayMajorGroupsInListView(mSelectedUuidGroup);
 	}
 	
-	private void displayMajorGroupsInListView(String uuidGroupCode) {
-		mWiseManager.getMajorGroups(mUuidGroupCode, new GetBeaconGroupListener() {
+	private void displayMajorGroupsInListView(UuidGroup uuidGroup) {
+		mWiseManager.getMajorGroups(uuidGroup.getCode(), new GetBeaconGroupListener() {
 			@Override
 			public void onResponseBeaconGroup(List<BeaconGroup> groups) {
 				mListAdapter.replaceWith(groups);

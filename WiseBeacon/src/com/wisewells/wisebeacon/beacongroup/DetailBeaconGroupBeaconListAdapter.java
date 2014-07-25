@@ -9,22 +9,22 @@ import android.view.ViewGroup;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.wisebeacon.BaseArrayAdapter;
 
-public class AddGroupListAdapter extends BaseArrayAdapter<Beacon> {
+public class DetailBeaconGroupBeaconListAdapter extends BaseArrayAdapter<Beacon> {
 
-	public AddGroupListAdapter(Context context) {
+	public DetailBeaconGroupBeaconListAdapter(Context context) {
 		super(context);
 	}
 	
-	public AddGroupListAdapter(Context context, ArrayList<Beacon> items) {
+	public DetailBeaconGroupBeaconListAdapter(Context context, ArrayList<Beacon> items) {
 		super(context, items);
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		AddGroupListRow view = null;
+		DetailBeaconGroupBeaconListRow view = null;
 		
-		if(convertView != null) view = (AddGroupListRow) convertView;
-		else view = new AddGroupListRow(mContext);
+		if(convertView != null) view = (DetailBeaconGroupBeaconListRow) convertView;
+		else view = new DetailBeaconGroupBeaconListRow(mContext);
 			
 		view.setData(getItem(position));		
 		

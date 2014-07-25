@@ -356,7 +356,7 @@ public class WiseManager {
 		
 	}
 	
-	/*public void addBeaconGroup(String name, String parentCode, ArrayList<Beacon> beacons) throws RemoteException {
+	public void addBeaconGroup(String name, String parentCode, ArrayList<Beacon> beacons) throws RemoteException {
 		Bundle data = new Bundle();
 		data.putString(IPC.BUNDLE_DATA1, name);
 		data.putString(IPC.BUNDLE_DATA2, parentCode);
@@ -371,7 +371,7 @@ public class WiseManager {
 			L.e("Error while adding Beacon Group");
 			throw e;
 		}
-	}*/
+	}
 	
 	public void addBeaconGroup(String name, String parentCode) throws RemoteException {
 		Bundle data = new Bundle();
@@ -389,8 +389,35 @@ public class WiseManager {
 		}
 	}
 	
-	public void modifyBeaconGroup(BeaconGroup group) {
+	public void addBeaconsToBeaconGroup(String groupCode, ArrayList<Beacon> beacons) throws RemoteException {
+		Bundle data = new Bundle();
+		data.putString(IPC.BUNDLE_DATA1, groupCode);
+		data.putParcelableArrayList(IPC.BUNDLE_DATA2, beacons);
 		
+		Message msg = Message.obtain(null, IPC.MSG_ADD_BEACON_TO_BEACON_GROUP);
+		msg.setData(data);
+		
+		try {
+			mSendingMessenger.send(msg);
+		} catch (RemoteException e) {
+			L.e("Error while addBeaconsToBeaconGroup");
+			throw e;
+		}
+	}
+	
+	public void modifyBeaconGroup(BeaconGroup group) throws RemoteException {
+		Bundle data = new Bundle();
+		data.putParcelable(IPC.BUNDLE_DATA1, group);
+		
+		Message msg = Message.obtain(null, IPC.MSG_BEACON_GROUP_MODIFY);
+		msg.setData(data);
+		
+		try {
+			mSendingMessenger.send(msg);
+		} catch (RemoteException e) {
+			L.e("Error while modifying Beacon Group");
+			throw e;
+		}
 	}
 
 	public void deleteBeaconGroup(String code) {

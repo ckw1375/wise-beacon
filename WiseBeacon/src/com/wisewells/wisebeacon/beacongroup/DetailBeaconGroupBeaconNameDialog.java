@@ -10,7 +10,7 @@ import android.widget.EditText;
 
 import com.wisewells.wisebeacon.R;
 
-public class BeaconGroupDialog extends DialogFragment {
+public class DetailBeaconGroupBeaconNameDialog extends DialogFragment {
 
 	private EditText mEditText;
 	private Button mConfirmButton;

@@ -405,9 +405,30 @@ public class WiseAgent extends Service {
 		mWiseObjects.putBeaconGroup(uuidGroup);
 		mWiseObjects.putBeaconGroup(majorGroup);
 	}
+
+	private void addBeaconToBeaconGroup(String groupCode, ArrayList<Beacon> beacons) {
+		BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
+		
+		for(Beacon beacon : beacons) {
+			int minor = WiseServer.requestMinor();
+			MinorGroup minorGroup = new MinorGroup("minor");
+			minorGroup.setMinor(minor);
+			minorGroup.setCode(WiseServer.requestCode());
+			minorGroup.addBeacon(beacon);		
+			
+//			beacon.setAddress(((UuidGroup) mWiseObjects.getBeaconGroup(parentCode)).getUuid(), major, minor);
+			
+			group.addChild(minorGroup);
+			
+			mWiseObjects.putBeaconGroup(minorGroup);
+			mWiseObjects.putBeacon(beacon);
+		}
+		
+		mWiseObjects.putBeaconGroup(group);
+	}
 	
 	public void modifyBeaconGroup(BeaconGroup group) {
-		
+		mWiseObjects.putBeaconGroup(group);
 	}
 
 	public void deleteBeaconGroup(String code) {
@@ -590,14 +611,27 @@ public class WiseAgent extends Service {
 						case IPC.MSG_TRACKING_STOP:
 							break;
 						case IPC.MSG_BEACON_GROUP_ADD:
-//							data.setClassLoader(Beacon.class.getClassLoader());
+						{
+							data.setClassLoader(Beacon.class.getClassLoader());
 							String name = data.getString(IPC.BUNDLE_DATA1);
 							String parentCode = data.getString(IPC.BUNDLE_DATA2);
 //							ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA3);							
 //							WiseAgent.this.addBeaconGroup(name, parentCode, beacons);
 							WiseAgent.this.addBeaconGroup(name, parentCode);
+						}
+							break;
+						case IPC.MSG_ADD_BEACON_TO_BEACON_GROUP:
+						{
+							data.setClassLoader(Beacon.class.getClassLoader());
+							String groupCode = data.getString(IPC.BUNDLE_DATA1);
+							ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA2);
+							WiseAgent.this.addBeaconToBeaconGroup(groupCode, beacons);
+						}
 							break;
 						case IPC.MSG_BEACON_GROUP_MODIFY:
+						{
+							BeaconGroup beaconGroup = data.getParcelable(IPC.BUNDLE_DATA1);
+						}
 							break;
 						case IPC.MSG_BEACON_GROUP_DELETE:
 							break;

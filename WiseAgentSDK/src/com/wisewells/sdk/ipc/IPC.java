@@ -8,20 +8,26 @@ public abstract class IPC {
 	 */
 	public static final int MSG_MESSENGER_REGISTER 		= 101;
 	public static final int MSG_MESSENGER_UNREGISTER 	= 102;
+	
 	public static final int MSG_TRACKING_START			= 111;
 	public static final int MSG_TRACKING_STOP			= 112;
+	
 	public static final int MSG_BEACON_GROUP_ADD		= 120;
 	public static final int MSG_BEACON_GROUP_MODIFY 	= 121;
 	public static final int MSG_BEACON_GROUP_DELETE 	= 122;
-	public static final int MSG_UUID_GROUP_LIST_GET		= 123;
-	public static final int MSG_MAJOR_GROUP_LIST_GET	= 124;
+	public static final int MSG_ADD_BEACON_TO_BEACON_GROUP	= 123;
+	public static final int MSG_UUID_GROUP_LIST_GET		= 124;
+	public static final int MSG_MAJOR_GROUP_LIST_GET	= 125;
+	
 	public static final int MSG_BEACON_ADD				= 130;
 	public static final int MSG_BEACON_MODIFY 			= 131;
 	public static final int MSG_BEACON_DELETE 			= 132;
 	public static final int MSG_BEACON_LIST_GET			= 133;
+	
 	public static final int MSG_SERVICE_ADD				= 140;
 	public static final int MSG_SERVICE_MODIFY 			= 141;
 	public static final int MSG_SERVICE_DELETE			= 142;
+	
 	public static final int MSG_TOPOLOGY_ADD			= 150;
 	public static final int MSG_TOPOLOGY_MODIFY			= 151;
 	public static final int MSG_TOPOLOGY_DELETE			= 152;		

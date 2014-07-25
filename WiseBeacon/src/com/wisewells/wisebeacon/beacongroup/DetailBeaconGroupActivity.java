@@ -12,36 +12,43 @@ import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.wisewells.sdk.Region;
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.WiseManager.DummyListener;
 import com.wisewells.sdk.WiseManager.RangingListener;
 import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.datas.BeaconGroup;
+import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.wisebeacon.R;
 
-public class AddGroupActivity extends Activity {
+public class DetailBeaconGroupActivity extends Activity {
 	
 	private static final Region RANGING_REGION = new Region("beacons", null, null, null);
 	
 	private WiseManager mWiseManager;
+	private MajorGroup mSelectedBeaconGroup;
 	
-	private EditText mNameView;
+	private TextView mNameView;
 	private ListView mListView;;
-	private AddGroupListAdapter mAdapter;
+	private DetailBeaconGroupBeaconListAdapter mAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_add_group);
+		setContentView(R.layout.activity_detail_beacon_group);
 		
-		mAdapter = new AddGroupListAdapter(this);
+		String uuidGroupName = getIntent().getStringExtra(BeaconGroupActivity.EXTRA_UUID_GROUP_NAME);
+		mSelectedBeaconGroup = getIntent().getParcelableExtra(BeaconGroupActivity.EXTRA_MAJOR_GROUP);
+		
+		mAdapter = new DetailBeaconGroupBeaconListAdapter(this);
 		
 		mListView = (ListView) findViewById(R.id.group_add_beacon_list);
 		mListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 		mListView.setAdapter(mAdapter);
 		
-		mNameView = (EditText) findViewById(R.id.group_add_name);
+		mNameView = (TextView) findViewById(R.id.txt_major_group_name);
+		mNameView.setText(mSelectedBeaconGroup.getName());
 		
 		mWiseManager = WiseManager.getInstance(this);
 //		mWiseManager.setDummyListener(new DummyListener() {
@@ -88,7 +95,6 @@ public class AddGroupActivity extends Activity {
 	}
 	
 	private void saveBeaconGroup() {
-		String uuidGroupCode = getIntent().getStringExtra(BeaconGroupActivity.EXTRA_UUID_GROUP_CODE);
 		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
 		
 		SparseBooleanArray sb = mListView.getCheckedItemPositions();
@@ -100,7 +106,7 @@ public class AddGroupActivity extends Activity {
 		
 		WiseManager manager = WiseManager.getInstance(this);		
 		try {
-//			manager.addBeaconGroup(mNameView.getText().toString(), uuidGroupCode, beacons);
+			manager.addBeaconsToBeaconGroup(mSelectedBeaconGroup.getCode(), beacons);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
