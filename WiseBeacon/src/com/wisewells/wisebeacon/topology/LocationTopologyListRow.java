@@ -24,6 +24,6 @@ public class LocationTopologyListRow extends FrameLayout {
 	}
 	
 	public void setData(LocationTopologyListData data) {
-		mTopologyNameView.setText(data.getBeaconCode());
+		mTopologyNameView.setText(data.getBeaconName());
 	}
 }

@@ -107,7 +107,7 @@ public class BeaconGroup implements Parcelable{
 		return parentCode;
 	}
 
-	public void setParentCode(String parent) {
+	private void setParentCode(String parent) {
 		this.parentCode = parent;
 	}
 	
@@ -115,7 +115,7 @@ public class BeaconGroup implements Parcelable{
 		return this.childCodes;
 	}
 	
-	public void setChildCodes(HashSet<String> codes) {
+	private void setChildCodes(HashSet<String> codes) {
 		this.childCodes = codes;
 	}
 	

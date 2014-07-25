@@ -69,6 +69,7 @@ public class AddTopologyActivity extends Activity {
 		});
 		
 		displayMajorGroupsInListView("wise");
+		displayMajorGroupsInListView("wise2");
 	}
 
 	@Override
@@ -90,7 +91,7 @@ public class AddTopologyActivity extends Activity {
 		mWiseManager.getMajorGroups(uuidGroupCode, new GetBeaconGroupListener() {
 			@Override
 			public void onResponseBeaconGroup(List<BeaconGroup> groups) {
-				mListAdapter.replaceWith(groups);
+				mListAdapter.addAll(groups);
 			}
 		});		
 	}

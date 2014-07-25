@@ -1,24 +1,21 @@
 package com.wisewells.wisebeacon.beacongroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.RemoteException;
-import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AbsListView;
-import android.widget.EditText;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wisewells.sdk.Region;
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.WiseManager.RangingListener;
+import com.wisewells.sdk.WiseManager.GetBeaconListener;
 import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.wisebeacon.R;
 
@@ -26,10 +23,16 @@ public class DetailBeaconGroupActivity extends Activity {
 	
 	private static final Region RANGING_REGION = new Region("beacons", null, null, null);
 	
+	public static final String EXTRA_UUID_GROUP_NAME = "uuid";
+	public static final String EXTRA_MAJOR_GROUP = "major";
+	
 	private WiseManager mWiseManager;
 	private MajorGroup mSelectedBeaconGroup;
 	
-	private TextView mNameView;
+	private TextView mUuidGroupNameView;
+	private TextView mMajorGroupNameView;
+	private TextView mBeaconNumberInGroupView;
+	private Button mAddBeaconButton;
 	private ListView mListView;;
 	private DetailBeaconGroupBeaconListAdapter mAdapter;
 	
@@ -38,45 +41,43 @@ public class DetailBeaconGroupActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_detail_beacon_group);
 		
-		String uuidGroupName = getIntent().getStringExtra(BeaconGroupActivity.EXTRA_UUID_GROUP_NAME);
+		final String uuidGroupName = getIntent().getStringExtra(BeaconGroupActivity.EXTRA_UUID_GROUP_NAME);
 		mSelectedBeaconGroup = getIntent().getParcelableExtra(BeaconGroupActivity.EXTRA_MAJOR_GROUP);
+		
+		mUuidGroupNameView = (TextView) findViewById(R.id.txt_uuid_group_name);
+		mUuidGroupNameView.setText(uuidGroupName);
+		
+		mMajorGroupNameView = (TextView) findViewById(R.id.txt_major_group_name);
+		mMajorGroupNameView.setText(mSelectedBeaconGroup.getName());
+		
+		mBeaconNumberInGroupView = (TextView) findViewById(R.id.txt_beacon_number_in_group);
+		mBeaconNumberInGroupView.setText(String.valueOf(mSelectedBeaconGroup.getChildCodes().size()));
+		
+		mAddBeaconButton = (Button) findViewById(R.id.btn_add_beacon_to_group);
+		mAddBeaconButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(DetailBeaconGroupActivity.this, AddBeaconToGroupActivity.class);
+				intent.putExtra(EXTRA_UUID_GROUP_NAME, uuidGroupName);
+				intent.putExtra(EXTRA_MAJOR_GROUP, mSelectedBeaconGroup);
+				startActivity(intent);
+			}
+		});
 		
 		mAdapter = new DetailBeaconGroupBeaconListAdapter(this);
 		
-		mListView = (ListView) findViewById(R.id.group_add_beacon_list);
-		mListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+		mListView = (ListView) findViewById(R.id.list_beacons_in_group);
 		mListView.setAdapter(mAdapter);
 		
-		mNameView = (TextView) findViewById(R.id.txt_major_group_name);
-		mNameView.setText(mSelectedBeaconGroup.getName());
-		
 		mWiseManager = WiseManager.getInstance(this);
-//		mWiseManager.setDummyListener(new DummyListener() {
-//			
-//			@Override
-//			public void onDummyBeacon(List<Beacon> beacons) {
-//				mAdapter.replaceWith(beacons);
-//			}
-//		});
 	}
 	
 	@Override
-	protected void onResume() {
-		super.onResume();
-		receiveAroundBeaconInformation();
-//		mWiseManager.testStartMakingDummy();
-	}	
-	
-	@Override
-	protected void onPause() {
-		super.onPause();
-		try {
-			mWiseManager.stopRanging(RANGING_REGION);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+	protected void onStart() {
+		super.onStart();
+		displayBeaconsInGroup();
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.group_add, menu);
@@ -87,43 +88,19 @@ public class DetailBeaconGroupActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.done) {
-			saveBeaconGroup();
 			finish();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 	
-	private void saveBeaconGroup() {
-		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
+	private void displayBeaconsInGroup() {
 		
-		SparseBooleanArray sb = mListView.getCheckedItemPositions();
-		for(int i=0; i<mAdapter.getCount(); i++) { 
-			if(sb.get(i)) {
-				beacons.add(mAdapter.getItem(i));
-			}
-		}
-		
-		WiseManager manager = WiseManager.getInstance(this);		
-		try {
-			manager.addBeaconsToBeaconGroup(mSelectedBeaconGroup.getCode(), beacons);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void receiveAroundBeaconInformation() {
-		mWiseManager.setRangingListener(new RangingListener() {
+		mWiseManager.getBeacons(mSelectedBeaconGroup.getCode(), new GetBeaconListener() {
 			@Override
-			public void onBeaconsDiscovered(Region region, List<Beacon> beacons) {
+			public void onResponseBeacon(List<Beacon> beacons) {
 				mAdapter.replaceWith(beacons);
 			}
 		});
-		
-		try {
-			mWiseManager.startRanging(RANGING_REGION);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
 	}
 }

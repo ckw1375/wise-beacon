@@ -78,12 +78,19 @@ public class WiseAgent extends Service {
 	private PendingIntent mAfterScanPendingIntent;
 	private ScanPeriodData mForegroundScanPeriod;
 	private ScanPeriodData mBackgroundScanPeriod;
-
-	public WiseAgent() {
-		mConnectedMessengers = new HashMap<String, Messenger>();
-		mWiseObjects = WiseObjects.getInstance();
+	
+	private void makeDummyData() {
 		mWiseObjects.putBeaconGroup(Dummy.getUUidGroup());
 		mWiseObjects.putBeaconGroup(Dummy.getUUidGroup2());
+		mWiseObjects.putService(Dummy.getRootService());
+		mWiseObjects.putService(Dummy.getRootService2());
+	}
+
+	public WiseAgent() {
+		makeDummyData();
+		
+		mConnectedMessengers = new HashMap<String, Messenger>();
+		mWiseObjects = WiseObjects.getInstance();
 		mIncomingMessenger = new Messenger(new IncomingHandler());
 		mLeScanCallback = new InternalLeScanCallback();
 		mBeaconsFoundInScanCycle = new ConcurrentHashMap<Beacon, Long>();
@@ -427,6 +434,23 @@ public class WiseAgent extends Service {
 		mWiseObjects.putBeaconGroup(group);
 	}
 	
+	private void addBeaconToBeaconGroup(String groupCode, Beacon beacon) {
+		BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
+		
+		beacon.setCode(WiseServer.requestCode());
+		
+		int minor = WiseServer.requestMinor();
+		MinorGroup minorGroup = new MinorGroup("minor");
+		minorGroup.setMinor(minor);
+		minorGroup.setCode(WiseServer.requestCode());
+		minorGroup.addBeacon(beacon);	
+		
+		group.addChild(minorGroup);
+		
+		mWiseObjects.putBeaconGroup(minorGroup);
+		mWiseObjects.putBeacon(beacon);
+	}
+	
 	public void modifyBeaconGroup(BeaconGroup group) {
 		mWiseObjects.putBeaconGroup(group);
 	}
@@ -622,10 +646,15 @@ public class WiseAgent extends Service {
 							break;
 						case IPC.MSG_ADD_BEACON_TO_BEACON_GROUP:
 						{
+//							data.setClassLoader(Beacon.class.getClassLoader());
+//							String groupCode = data.getString(IPC.BUNDLE_DATA1);
+//							ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA2);
+//							WiseAgent.this.addBeaconToBeaconGroup(groupCode, beacons);
+							
 							data.setClassLoader(Beacon.class.getClassLoader());
 							String groupCode = data.getString(IPC.BUNDLE_DATA1);
-							ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA2);
-							WiseAgent.this.addBeaconToBeaconGroup(groupCode, beacons);
+							Beacon beacon = data.getParcelable(IPC.BUNDLE_DATA2);
+							WiseAgent.this.addBeaconToBeaconGroup(groupCode, beacon);
 						}
 							break;
 						case IPC.MSG_BEACON_GROUP_MODIFY:

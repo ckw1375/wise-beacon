@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.UuidGroup;
 
 public class Dummy {
@@ -30,5 +31,19 @@ public class Dummy {
 		g.setCode("wise2");
 		g.setUuid("AC-36-11-A3");
 		return g;
+	}
+	
+	public static Service getRootService() {
+		Service s = new Service("지오다노");
+		s.setCode("giodarno");
+		
+		return s;
+	}
+	
+	public static Service getRootService2() {
+		Service s = new Service("교보문고");
+		s.setCode("kyobo");
+		
+		return s;
 	}
 }

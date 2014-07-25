@@ -7,12 +7,20 @@ import android.os.Parcelable;
 
 public class Service implements Parcelable{
 	
+	public static final int SERVICE_TREE_ROOT = 0;
+	public static final int SERVICE_TREE_NODE_1 = 1;
+//	public static final int SERVICE_TREE_NODE_2 = 2;
+	
 	private String name;
 	
 	private String code;
 	private String topologyCode;
 	private String parentCode;
 	private HashSet<String> childCodes;
+	/**
+	 * Zero is root node in tree data structure.
+	 */
+	private int treeLevel;
 	
 	public static final Parcelable.Creator<Service> CREATOR = new Creator<Service>() {
 		
@@ -39,10 +47,12 @@ public class Service implements Parcelable{
 		topologyCode = in.readString();
 		parentCode = in.readString();		
 		childCodes = (HashSet<String>) in.readSerializable();
+		treeLevel = in.readInt();
 	}
 	
 	private void init() {
 		childCodes = new HashSet<String>();
+		treeLevel = SERVICE_TREE_ROOT;
 	}
 	
 	@Override
@@ -57,6 +67,7 @@ public class Service implements Parcelable{
 		dest.writeString(topologyCode);
 		dest.writeString(parentCode);
 		dest.writeSerializable(childCodes);
+		dest.writeInt(treeLevel);
 	}
 	
 	public void attachTo(Topology t) {
@@ -66,6 +77,8 @@ public class Service implements Parcelable{
 	
 	public void addChild(Service s) {
 		childCodes.add(s.getCode());
+		
+		s.setTreeLevel(treeLevel + 1);
 		s.setParentCode(this.code);
 	}
 
@@ -97,7 +110,7 @@ public class Service implements Parcelable{
 		return parentCode;
 	}
 
-	public void setParentCode(String parentCode) {
+	private void setParentCode(String parentCode) {
 		this.parentCode = parentCode;
 	}
 
@@ -105,7 +118,15 @@ public class Service implements Parcelable{
 		return childCodes;
 	}
 
-	public void setChildCodes(HashSet<String> childCodes) {
+	private void setChildCodes(HashSet<String> childCodes) {
 		this.childCodes = childCodes;
+	}
+	
+	public int getTreeLevel() {
+		return this.treeLevel;
+	}
+	
+	private void setTreeLevel(int level) {
+		this.treeLevel = level;
 	}
 }

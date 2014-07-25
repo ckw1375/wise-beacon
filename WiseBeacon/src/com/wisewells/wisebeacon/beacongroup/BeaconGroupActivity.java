@@ -116,8 +116,13 @@ public class BeaconGroupActivity extends Activity {
 			@Override
 			public void onConfirmButtonClicked(String str) {
 				try {
-					Toast.makeText(BeaconGroupActivity.this, "clicke", Toast.LENGTH_SHORT).show();
 					mWiseManager.addBeaconGroup(str, mSelectedUuidGroup.getCode());
+					
+					/*
+					 * 
+					 * 이렇게 하면 안됨! 리스터 달아서 하자!!
+					 */
+					displayMajorGroupsInListView(mSelectedUuidGroup);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

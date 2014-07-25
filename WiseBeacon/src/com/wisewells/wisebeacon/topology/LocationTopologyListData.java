@@ -2,12 +2,16 @@ package com.wisewells.wisebeacon.topology;
 
 import android.graphics.Point;
 
+import com.wisewells.sdk.datas.Beacon;
+
 public class LocationTopologyListData {
 	private String beaconCode;
+	private String beaconName;
 	private Point point;
 	
-	public LocationTopologyListData(String beaconCode) {
-		this.beaconCode = beaconCode;		
+	public LocationTopologyListData(Beacon beacon) {
+		this.beaconCode = beacon.getCode();
+		this.beaconName = beacon.getName();
 	}
 	
 	public void setPoint(Point point) {
@@ -20,5 +24,9 @@ public class LocationTopologyListData {
 	
 	public Point getPoint() {
 		return this.point;
+	}
+	
+	public String getBeaconName() {
+		return this.beaconName;
 	}
 }

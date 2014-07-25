@@ -27,6 +27,7 @@ public abstract class IPC {
 	public static final int MSG_SERVICE_ADD				= 140;
 	public static final int MSG_SERVICE_MODIFY 			= 141;
 	public static final int MSG_SERVICE_DELETE			= 142;
+	public static final int MSG_SERVICE_GET				= 143;
 	
 	public static final int MSG_TOPOLOGY_ADD			= 150;
 	public static final int MSG_TOPOLOGY_MODIFY			= 151;
@@ -54,6 +55,9 @@ public abstract class IPC {
 	public static final String BUNDLE_DATA1	= "data1";
 	public static final String BUNDLE_DATA2	= "data2";			
 	public static final String BUNDLE_DATA3	= "data3";
+	public static final String[] BUNDLE_KEYS = {
+		"data1", "data2", "data3", "data4", "data5"
+	};
 	
 	/**
 	 *	Estimote Constants 

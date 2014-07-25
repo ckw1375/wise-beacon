@@ -7,6 +7,7 @@ public class Beacon implements Parcelable {
 
 	private String code;	
 	private String beaconGroupCode;
+	private String name;
 	private double interval;
 	
 	/**
@@ -45,6 +46,7 @@ public class Beacon implements Parcelable {
 	private Beacon(Parcel in) {
 		code = in.readString();		
 		beaconGroupCode = in.readString();
+		name = in.readString();
 		interval = in.readDouble();
 		macAddress = in.readString();
 		uuid = in.readString();
@@ -83,6 +85,7 @@ public class Beacon implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(code);		
 		dest.writeString(beaconGroupCode);
+		dest.writeString(name);
 		dest.writeDouble(interval);
 		dest.writeString(macAddress);
 		dest.writeString(uuid);
@@ -101,9 +104,17 @@ public class Beacon implements Parcelable {
 		 * 실제 Beacon의 Address 값을 바꿔주는 동작 추가
 		 */
 	}
+	
+	public String getName() {
+		return this.name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public String getCode() {
-		return code;
+		return this.code;
 	}
 
 	public void setCode(String code) {

@@ -27,6 +27,10 @@ public abstract class BaseArrayAdapter<T> extends BaseAdapter {
 		mItems.add(item);
 		notifyDataSetChanged();
 	}
+	
+	public void addAll(Collection<T> collection) {
+		mItems.addAll(collection);
+	}
 
 	public void remove(int index) {
 		mItems.remove(index);

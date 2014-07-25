@@ -10,8 +10,14 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.wisewells.wisebeacon.topology.LocationTopologyActivity" >
 
+    <Button
+        android:id="@+id/btn_complete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="완 료" />
+
     <ListView
-        android:id="@+id/location_listview"
+        android:id="@+id/list_beacons_in_topology_activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ListView>
