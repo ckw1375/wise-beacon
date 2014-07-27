@@ -31,7 +31,7 @@ public final class R {
     }
     public static final class id {
         public static final int LinearLayout1=0x7f080000;
-        public static final int action_settings=0x7f080031;
+        public static final int action_settings=0x7f080032;
         public static final int add_topology_btn_done=0x7f08000b;
         public static final int add_topology_edit_name=0x7f080008;
         public static final int add_topology_listview=0x7f08000a;
@@ -45,7 +45,7 @@ public final class R {
         public static final int btn_cancel=0x7f080020;
         public static final int btn_complete=0x7f080016;
         public static final int btn_confirm=0x7f08001f;
-        public static final int done=0x7f080032;
+        public static final int done=0x7f080033;
         public static final int edit_1=0x7f08001e;
         public static final int group_add_button=0x7f08000d;
         public static final int group_listview=0x7f08000e;
@@ -68,18 +68,19 @@ public final class R {
         public static final int row_major=0x7f080028;
         public static final int row_minor=0x7f080029;
         public static final int row_uuid=0x7f080027;
-        public static final int service_txt_name=0x7f08002f;
         public static final int spinner_root_service=0x7f080018;
-        public static final int textView1=0x7f080005;
         public static final int textView2=0x7f080001;
         public static final int textView3=0x7f080003;
         public static final int textView4=0x7f08000f;
         public static final int txt_beacon_distance=0x7f080025;
         public static final int txt_beacon_name=0x7f080024;
         public static final int txt_beacon_number_in_group=0x7f080010;
+        public static final int txt_beacongroup_name=0x7f08002f;
         public static final int txt_edit_1_title=0x7f08001d;
         public static final int txt_major_group_name=0x7f080004;
-        public static final int txt_topology_name=0x7f080030;
+        public static final int txt_service_name=0x7f080005;
+        public static final int txt_topology_name=0x7f080031;
+        public static final int txt_topology_type=0x7f080030;
         public static final int txt_uuid_group_name=0x7f080002;
     }
     public static final class layout {

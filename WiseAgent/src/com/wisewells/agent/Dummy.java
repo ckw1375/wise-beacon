@@ -20,28 +20,28 @@ public class Dummy {
 	}	
 	
 	public static UuidGroup getUUidGroup() {
-		UuidGroup g = new UuidGroup("Áö¿À´Ù³ë");
+		UuidGroup g = new UuidGroup("ì§€ì˜¤ë‹¤ë…¸");
 		g.setCode("wise");
 		g.setUuid("DF-36-34-A3");
 		return g;
 	}
 	
 	public static UuidGroup getUUidGroup2() {
-		UuidGroup g = new UuidGroup("±³º¸¹®°í");
+		UuidGroup g = new UuidGroup("êµë³´ë¬¸ê³ ");
 		g.setCode("wise2");
 		g.setUuid("AC-36-11-A3");
 		return g;
 	}
 	
 	public static Service getRootService() {
-		Service s = new Service("Áö¿À´Ù³ë");
+		Service s = new Service("ì§€ì˜¤ë‹¤ë…¸");
 		s.setCode("giodarno");
 		
 		return s;
 	}
 	
 	public static Service getRootService2() {
-		Service s = new Service("±³º¸¹®°í");
+		Service s = new Service("êµë³´ë¬¸ê³ ");
 		s.setCode("kyobo");
 		
 		return s;

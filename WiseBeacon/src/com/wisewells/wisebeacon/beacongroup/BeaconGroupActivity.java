@@ -24,6 +24,7 @@ import com.wisewells.sdk.WiseManager.GetBeaconGroupListener;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.UuidGroup;
+import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.beacongroup.BeaconGroupDialog.ConfirmListener;
 
@@ -78,7 +79,6 @@ public class BeaconGroupActivity extends Activity {
 			}
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
-				
 			}
 		});
 	}
@@ -120,7 +120,7 @@ public class BeaconGroupActivity extends Activity {
 					
 					/*
 					 * 
-					 * ÀÌ·¸°Ô ÇÏ¸é ¾ÈµÊ! ¸®½ºÅÍ ´Ş¾Æ¼­ ÇÏÀÚ!!
+					 * add beaconì´ ì™„ë£Œëœê²ƒì´ í™•ì¸ë˜ë©´! (ë¦¬ìŠ¤í„° ì´ìš©) display í•´ì¤˜ì•¼ í•œë‹¤!!
 					 */
 					displayMajorGroupsInListView(mSelectedUuidGroup);
 				} catch (RemoteException e) {

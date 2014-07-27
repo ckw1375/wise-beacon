@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -25,6 +26,7 @@ public class ServiceActivity extends Activity {
 	public static final String EXTRA_SERVICE_OBJECT = "service";
 	
 	private WiseManager mWiseManager;
+	private Service mSelectedRootService;
 	
 	private Button mAddButton;
 	private Spinner mSpinner;
@@ -51,6 +53,16 @@ public class ServiceActivity extends Activity {
 		
 		mSpinner = (Spinner) findViewById(R.id.spinner_root_service);
 		mSpinner.setAdapter(mSpinnerAdapter);
+		mSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				onRootServiceSelected(position);
+			}
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				
+			}
+		});
 		
 		mListAdapter = new ServiceListAdapter(this);		
 		
@@ -67,7 +79,38 @@ public class ServiceActivity extends Activity {
 	}
 
 	private void onAddButtonClicked() {
+		ServiceDialog dialog = new ServiceDialog();
+		dialog.show(getFragmentManager(), "dialog");
+		dialog.setConfirmListener(new ServiceDialog.ConfirmListener() {
+			
+			@Override
+			public void onConfirmButtonClicked(String str) {
+				
+				/*
+				 * add beacon이 완료된것이 확인되면! (리스터 이용) display 해줘야 한다!!
+				 */
+				mWiseManager.addService(str);
+				
+				
+			}
+		});
+	}
+	
+	private void onRootServiceSelected(int position) {
+		Service service = mSpinnerAdapter.getItem(position).getService();
+		if(service == null) {
+			mListAdapter.clear();
+			mSelectedRootService = null;
+			return;
+		}
 		
+		mSelectedRootService = service;
+		mWiseManager.getService(mSelectedRootService.getCode(), new GetServiceListener() {
+			@Override
+			public void onResponseService(List<Service> services) {
+				mListAdapter.replaceWith(services);
+			}
+		});
 	}
 	
 	private void onListItemClicked(int position) {
@@ -79,7 +122,7 @@ public class ServiceActivity extends Activity {
 	}
 	
 	private void readySpinnerDatas() {
-		mWiseManager.getService(Service.SERVICE_TREE_ROOT, new GetServiceListener() {
+		mWiseManager.getService(null, new GetServiceListener() {
 			@Override
 			public void onResponseService(List<Service> services) {
 				ArrayList<ServiceSpinnerData> datas = new ArrayList<ServiceSpinnerData>();
@@ -92,5 +135,9 @@ public class ServiceActivity extends Activity {
 				mSpinnerAdapter.addAll(datas);
 			}
 		});
+	}
+	
+	private void readyListDatas() {
+		
 	}
 }

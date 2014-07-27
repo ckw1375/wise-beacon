@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.sdk.ipc.IPC;
 
 import android.os.Bundle;
@@ -43,15 +44,32 @@ public class IpcUtils {
 		return map;
 	}
 	
-	public static void sendDataWithMessenger(int messageType, Messenger from, Messenger to, Object... datas) {
+	
+	
+	public static void sendMessage(int messageType, Messenger sender, Messenger receiver, Object... datas) throws RemoteException {
+		Preconditions.checkNotNull(messageType, "Message Type must be not null");
+		Preconditions.checkNotNull(receiver, "to parameter must be not null");
+		
+		Message message = Message.obtain(null, messageType);		
+		if(sender != null) message.replyTo = sender;		
+		if(datas != null && datas.length > 0) message.setData(__getBundleForMessage(datas));
+		
+		try {
+			receiver.send(message);
+		} catch (RemoteException e) {
+			L.e("Error in sendMessage");
+			throw e;
+		}
+	}
+	
+	private static Bundle __getBundleForMessage(Object... datas) {
 		Bundle bundle = new Bundle();
 		int key = 0;
 		for(Object data : datas) {
 			if(data instanceof Integer) bundle.putInt(IPC.BUNDLE_KEYS[key], (Integer) data);			
 			else if(data instanceof String) bundle.putString(IPC.BUNDLE_KEYS[key], (String) data);
 			else if(data instanceof List<?>) {
-				
-				Object obj = ((ArrayList<Object>) data).get(0);				
+				Object obj = ((ArrayList<Object>) data).get(0);
 				if(obj instanceof String) 
 					bundle.putStringArrayList(IPC.BUNDLE_KEYS[key], (ArrayList<String>)data);
 				else if(obj instanceof Parcelable) 
@@ -64,18 +82,10 @@ public class IpcUtils {
 			key++;
 		}
 		
-		Message message = Message.obtain(null, messageType);
-		message.setData(bundle);
-		message.replyTo = from;
-		
-		try {
-			to.send(message);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		return bundle;
 	}
 	
-	public static void sendDataWithMessenger(int messageType, Messenger from, Messenger to) {
+	/*public static void sendMessage(int messageType, Messenger from, Messenger to) {
 		Message message = Message.obtain(null, messageType);
 		message.replyTo = from;
 		
@@ -84,5 +94,5 @@ public class IpcUtils {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 }

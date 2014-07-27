@@ -460,8 +460,12 @@ public class WiseManager {
 
 	}
 	
-	public void addService(Service service) {
-		
+	public void addService(String name) {
+		try {
+			IpcUtils.sendMessage(IPC.MSG_SERVICE_ADD, null, mSendingMessenger, name);
+		} catch (RemoteException e) {
+			L.e("Error in addService");
+		}
 	}
 
 	public void modifyService(Service service) {
@@ -484,20 +488,23 @@ public class WiseManager {
 		
 	}
 	
-	public void getService(int treeLevel, GetServiceListener listener) {
+//	public void getService(int treeLevel, GetServiceListener listener) {
+//		mServiceListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
+//		
+//		try {
+//			IpcUtils.sendMessage(IPC.MSG_SERVICE_LIST_GET, mIncomingMessenger, mSendingMessenger, treeLevel);
+//		} catch (RemoteException e) {
+//			L.i("Error in getService");
+//		}
+//	}
+	
+	public void getService(String parentCode, GetServiceListener listener) {
 		mServiceListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
-
-		Bundle data = new Bundle();
-		data.putInt(IPC.BUNDLE_DATA1, treeLevel);
-		
-		Message message = Message.obtain(null, IPC.MSG_UUID_GROUP_LIST_GET);
-		message.setData(data);
-		message.replyTo = mIncomingMessenger;
 		
 		try {
-			mSendingMessenger.send(message);
+			IpcUtils.sendMessage(IPC.MSG_SERVICE_LIST_GET, mIncomingMessenger, mSendingMessenger, parentCode);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			L.i("Error in getService");
 		}
 	}
 	
@@ -530,7 +537,11 @@ public class WiseManager {
 			e.printStackTrace();
 		}*/
 		
-		IpcUtils.sendDataWithMessenger(IPC.MSG_MAJOR_GROUP_LIST_GET, mIncomingMessenger, mSendingMessenger, uuidGroupCode);
+		try {
+			IpcUtils.sendMessage(IPC.MSG_MAJOR_GROUP_LIST_GET, mIncomingMessenger, mSendingMessenger, uuidGroupCode);
+		} catch (RemoteException e) {
+			L.e("Error in getMajorGroups");
+		}
 	}
 	
 	public void getBeacons(String groupCode, GetBeaconListener listener) {
@@ -610,6 +621,12 @@ public class WiseManager {
 					WiseManager.this.mBeaconListener.onResponseBeacon(beacons);
 				}
 				break;	
+			case IPC.MSG_RESPONSE_SERVICE_LIST:
+				if (WiseManager.this.mServiceListener != null) {
+					data.setClassLoader(Service.class.getClassLoader());
+					ArrayList<Service> services = data.getParcelableArrayList(IPC.BUNDLE_KEYS[0]);
+					WiseManager.this.mServiceListener.onResponseService(services);
+				}
 			default:
 				L.d("Unknown message: " + msg);
 			}

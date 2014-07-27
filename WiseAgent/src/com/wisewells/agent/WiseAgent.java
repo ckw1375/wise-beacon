@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -35,6 +34,7 @@ import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.sdk.datas.MinorGroup;
+import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.datas.UuidGroup;
 import com.wisewells.sdk.ipc.IPC;
@@ -42,9 +42,10 @@ import com.wisewells.sdk.ipc.MonitoringResult;
 import com.wisewells.sdk.ipc.RangingResult;
 import com.wisewells.sdk.ipc.ScanPeriodData;
 import com.wisewells.sdk.utils.BeaconUtils;
+import com.wisewells.sdk.utils.IpcUtils;
 import com.wisewells.sdk.utils.L;
 
-public class WiseAgent extends Service {
+public class WiseAgent extends android.app.Service {
 
 	static final boolean DEBUG_MODE = false;
 	
@@ -87,8 +88,6 @@ public class WiseAgent extends Service {
 	}
 
 	public WiseAgent() {
-		makeDummyData();
-		
 		mConnectedMessengers = new HashMap<String, Messenger>();
 		mWiseObjects = WiseObjects.getInstance();
 		mIncomingMessenger = new Messenger(new IncomingHandler());
@@ -98,6 +97,8 @@ public class WiseAgent extends Service {
 		mMonitoredRegions = new ArrayList<MonitoringRegion>();
 		mForegroundScanPeriod = new ScanPeriodData(TimeUnit.SECONDS.toMillis(1L), TimeUnit.SECONDS.toMillis(0L));
 		mBackgroundScanPeriod = new ScanPeriodData(TimeUnit.SECONDS.toMillis(5L), TimeUnit.SECONDS.toMillis(30L));
+		
+		makeDummyData();
 	}
 
 	public void onCreate() {
@@ -361,11 +362,11 @@ public class WiseAgent extends Service {
 	}
 	
 	/*
-	 *	Set, Delete °ü·Ã ¸Þ¼ÒµåµéÀº ¸ðµÎ ½ÇÁ¦·Î´Â 
-	 *	1. ³×Æ®¿öÅ© Åë½Å ÈÄ ¿Ï·áµÇ¸é (¼­¹ö¿¡ ÀúÀå ¹× ÇÊ¿ä ¼Ó¼ºµéÀ» ¹Þ¾Æ¿È)
-	 *	2. Local DB¿¡ ÀúÀåÇÏ°í
-	 *	3. WiseObjects¸¦ °»½ÅÇÏ°í
-	 *	4. Manager¸¦ ÅëÇØ App¿¡ ¿Ï·á»çÇ×À» ¾Ë·ÁÁØ´Ù. 
+	 *	Set, Delete ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼Òµï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Î´ï¿½ 
+	 *	1. ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ï·ï¿½Ç¸ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ê¿ï¿½ ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¾Æ¿ï¿½)
+	 *	2. Local DBï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½
+	 *	3. WiseObjectsï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½
+	 *	4. Managerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Appï¿½ï¿½ ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë·ï¿½ï¿½Ø´ï¿½. 
 	 */	
 	private void addBeaconGroup(String name, String parentCode, ArrayList<Beacon> beacons) {
 		
@@ -460,9 +461,6 @@ public class WiseAgent extends Service {
 	}
 
 	public void addBeacon(Beacon beacon) {
-		// 1. ¼­¹ö¿¡ ºñÄÜ µî·ÏÀ» ¿äÃ»ÇÏ°í, ºñÄÜÀÇ ÄÚµå¿Í minor°ªÀ» ¹Þ¾Æ¿Â´Ù.
-		// 2. ¹Þ¾Æ¿Â minor°ªÀ» minor±×·ìÀ» ÇÏ³ª ¸¸µé°í beacon¿¡ ÄÚµå¿Í ºÎ¸ðÄÚµå °ªÀ» modify ÇØÁØ´Ù.
-		// 3. ÀÌ·± Á¤º¸¸¦ DB¿¡ ÀúÀåÇÏ°í WiseObjects¿¡µµ Ãß°¡
 		String code = WiseServer.requestCode();
 		int minor = WiseServer.requestMinor();
 							
@@ -559,6 +557,37 @@ public class WiseAgent extends Service {
 		} catch (RemoteException e) {
 			L.e("Error while sending Beacon List");
 			e.printStackTrace();
+		}
+	}
+
+	/*private void sendServices(int treeLevel, Messenger replyTo) {
+		ArrayList<Service> services = mWiseObjects.getServices();
+		ArrayList<Service> willSend = new ArrayList<Service>();
+		
+		for(Service service : services) {
+			if(service.getTreeLevel() == treeLevel) willSend.add(service);
+		}
+		
+		try {
+			IpcUtils.sendMessage(IPC.MSG_RESPONSE_SERVICE_LIST, null, replyTo, willSend);
+		} catch (RemoteException e) {
+			L.e("Error in sendService");
+		}
+	}*/
+	
+	private void sendServices(String parentCode, Messenger replyTo) {
+		ArrayList<Service> services = mWiseObjects.getServices();
+		ArrayList<Service> willSend = new ArrayList<Service>();
+		
+		for(Service service : services) {
+			if(parentCode == null && service.getParentCode() == null) willSend.add(service);
+			else if(service.getParentCode() != null && service.getParentCode().equals(parentCode)) willSend.add(service);
+		}
+		
+		try {
+			IpcUtils.sendMessage(IPC.MSG_RESPONSE_SERVICE_LIST, null, replyTo, new ArrayList<Service>());
+		} catch (RemoteException e) {
+			L.e("Error in sendService");
 		}
 	}
  
@@ -690,6 +719,14 @@ public class WiseAgent extends Service {
 						case IPC.MSG_SERVICE_MODIFY:
 							break;
 						case IPC.MSG_SERVICE_DELETE:
+							break;
+						case IPC.MSG_SERVICE_LIST_GET: 
+						{
+//							int treeLevel = data.getInt(IPC.BUNDLE_KEYS[0]);
+//							sendServices(treeLevel, replyTo);
+							String parentCode = data.getString(IPC.BUNDLE_KEYS[0]);
+							sendServices(parentCode, replyTo);
+						}
 							break;
 						case IPC.MSG_TOPOLOGY_ADD:
 							break;

@@ -27,7 +27,7 @@ public abstract class IPC {
 	public static final int MSG_SERVICE_ADD				= 140;
 	public static final int MSG_SERVICE_MODIFY 			= 141;
 	public static final int MSG_SERVICE_DELETE			= 142;
-	public static final int MSG_SERVICE_GET				= 143;
+	public static final int MSG_SERVICE_LIST_GET		= 143;
 	
 	public static final int MSG_TOPOLOGY_ADD			= 150;
 	public static final int MSG_TOPOLOGY_MODIFY			= 151;
@@ -48,6 +48,7 @@ public abstract class IPC {
 	public static final int MSG_RESPONSE_UUID_GROUP_LIST	= 203;
 	public static final int MSG_RESPONSE_MAJOR_GROUP_LIST	= 204;
 	public static final int MSG_RESPONSE_BEACON_LIST		= 205;
+	public static final int MSG_RESPONSE_SERVICE_LIST		= 206;
 	
 	/**
 	 * Bundle Data in Message Object
