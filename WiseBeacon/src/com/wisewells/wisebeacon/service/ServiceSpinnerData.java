@@ -3,18 +3,28 @@ package com.wisewells.wisebeacon.service;
 import com.wisewells.sdk.datas.Service;
 
 public class ServiceSpinnerData {
+	private String spinnerContent;
 	private Service service;
+
+	public ServiceSpinnerData(String spinnerContent) {
+		this.spinnerContent = spinnerContent; 
+	}
 	
 	public ServiceSpinnerData(Service service) {
 		this.service  = service;
-	}
-	
-	@Override
-	public String toString() {
-		return this.service.getName();
+		this.spinnerContent = service.getName();
 	}
 	
 	public Service getService() {
 		return this.service;
+	}
+	
+	public void setSpinnerContent(String str) {
+		this.spinnerContent = str;
+	}
+	
+	@Override
+	public String toString() {
+		return this.spinnerContent;
 	}
 }

@@ -1,5 +1,6 @@
 package com.wisewells.wisebeacon.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -27,10 +28,9 @@ public class ServiceActivity extends Activity {
 	
 	private Button mAddButton;
 	private Spinner mSpinner;
-	private ArrayAdapter<String> mSpinnerAdapter;
+	private ArrayAdapter<ServiceSpinnerData> mSpinnerAdapter;
 	private ListView mListView;
 	private ServiceListAdapter mListAdapter;
-	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +47,7 @@ public class ServiceActivity extends Activity {
 			}
 		});
 		
-		mSpinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item);
+		mSpinnerAdapter = new ArrayAdapter<ServiceSpinnerData>(this, android.R.layout.simple_spinner_dropdown_item);
 		
 		mSpinner = (Spinner) findViewById(R.id.spinner_root_service);
 		mSpinner.setAdapter(mSpinnerAdapter);
@@ -62,6 +62,8 @@ public class ServiceActivity extends Activity {
 				onListItemClicked(position);
 			}
 		});
+		
+		readySpinnerDatas();
 	}
 
 	private void onAddButtonClicked() {
@@ -76,11 +78,18 @@ public class ServiceActivity extends Activity {
 		startActivity(intent);
 	}
 	
-	private void displayRootService() {
+	private void readySpinnerDatas() {
 		mWiseManager.getService(Service.SERVICE_TREE_ROOT, new GetServiceListener() {
 			@Override
 			public void onResponseService(List<Service> services) {
+				ArrayList<ServiceSpinnerData> datas = new ArrayList<ServiceSpinnerData>();
+				datas.add(new ServiceSpinnerData("선택하세요."));
 				
+				for(Service service : services) {
+					datas.add(new ServiceSpinnerData(service));
+				}
+				
+				mSpinnerAdapter.addAll(datas);
 			}
 		});
 	}
