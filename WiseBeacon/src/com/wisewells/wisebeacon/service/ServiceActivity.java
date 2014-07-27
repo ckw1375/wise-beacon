@@ -1,5 +1,7 @@
 package com.wisewells.wisebeacon.service;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.WiseManager.GetServiceListener;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.topology.TopologyActivity;
@@ -59,8 +62,6 @@ public class ServiceActivity extends Activity {
 				onListItemClicked(position);
 			}
 		});
-		
-		receiveRootService();
 	}
 
 	private void onAddButtonClicked() {
@@ -75,13 +76,12 @@ public class ServiceActivity extends Activity {
 		startActivity(intent);
 	}
 	
-	private void receiveRootService() {
-	}
-	
-	private void dummy() {
-		Service service = new Service("지오다노");
-		service.setCode("giodarno");
-		
-		mListAdapter.add(service);
+	private void displayRootService() {
+		mWiseManager.getService(Service.SERVICE_TREE_ROOT, new GetServiceListener() {
+			@Override
+			public void onResponseService(List<Service> services) {
+				
+			}
+		});
 	}
 }

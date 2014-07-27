@@ -10,16 +10,20 @@ import android.widget.TextView;
 
 public class ServiceListRow extends FrameLayout {
 
-	private TextView mNameView;
+	private TextView mServiceName;
+	private TextView mBeaconGroupName;
+	private TextView mTopologyType;
 	
 	public ServiceListRow(Context context) {
 		super(context);
 		
 		LayoutInflater.from(context).inflate(R.layout.list_row_service, this);
-		mNameView = (TextView) findViewById(R.id.service_txt_name);
+		mServiceName = (TextView) findViewById(R.id.txt_service_name);
+		mBeaconGroupName = (TextView) findViewById(R.id.txt_beacongroup_name);
+		mTopologyType = (TextView) findViewById(R.id.txt_topology_type);
 	}
 	
 	public void setData(Service service) {
-		mNameView.setText(service.getName());
+		
 	}
 }

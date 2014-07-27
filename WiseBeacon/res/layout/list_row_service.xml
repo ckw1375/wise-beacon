@@ -2,14 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="10dp"
-    android:background="@android:color/holo_blue_bright"
-    android:orientation="vertical" >
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+    android:orientation="horizontal" >
 
     <TextView
-        android:id="@+id/service_txt_name"
-        android:layout_width="wrap_content"
+        android:id="@+id/txt_service_name"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:layout_weight="2"
+        android:text="Service" />
+
+    <TextView
+        android:id="@+id/txt_beacongroup_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:text="BeaconGroup" />
+
+    <TextView
+        android:id="@+id/txt_topology_type"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Type" />
 
 </LinearLayout>
