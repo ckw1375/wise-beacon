@@ -1,10 +1,9 @@
 package com.wisewells.wisebeacon.beacongroup;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,8 +13,6 @@ import android.widget.TextView;
 
 import com.wisewells.sdk.Region;
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.WiseManager.GetBeaconListener;
-import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.wisebeacon.R;
 
@@ -95,12 +92,10 @@ public class DetailBeaconGroupActivity extends Activity {
 	}
 	
 	private void displayBeaconsInGroup() {
-		
-		mWiseManager.getBeacons(mSelectedBeaconGroup.getCode(), new GetBeaconListener() {
-			@Override
-			public void onResponseBeacon(List<Beacon> beacons) {
-				mAdapter.replaceWith(beacons);
-			}
-		});
+		try {
+			mAdapter.replaceWith(mWiseManager.getBeacons(mSelectedBeaconGroup.getCode()));
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,14 +18,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.WiseManager.GetBeaconGroupListener;
-import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
+import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.sdk.datas.UuidGroup;
-import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.beacongroup.BeaconGroupDialog.ConfirmListener;
 
@@ -145,31 +143,37 @@ public class BeaconGroupActivity extends Activity {
 	}
 
 	private void onSpinnerItemSelected(int position) {
-		mSelectedUuidGroup = mSpinnerAdapter.getItem(position).getUuidGroup();		
+		mSelectedUuidGroup = (UuidGroup) mSpinnerAdapter.getItem(position).getUuidGroup();		
 		displayMajorGroupsInListView(mSelectedUuidGroup);
 	}
 	
 	private void displayMajorGroupsInListView(UuidGroup uuidGroup) {
-		mWiseManager.getMajorGroups(uuidGroup.getCode(), new GetBeaconGroupListener() {
-			@Override
-			public void onResponseBeaconGroup(List<BeaconGroup> groups) {
-				mListAdapter.replaceWith(groups);
-			}
-		});		
+		List<MajorGroup> groups = new ArrayList<MajorGroup>();
+		try {
+			groups = mWiseManager.getMajorGroups(uuidGroup.getCode());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		List<BeaconGroup> param = new ArrayList<BeaconGroup>(groups);
+		mListAdapter.replaceWith(param);
 	}
 	
 	private void displayUuidGroupsInSpinner() {
-		mWiseManager.getUuidGroups(new GetBeaconGroupListener() {
-			@Override
-			public void onResponseBeaconGroup(List<BeaconGroup> groups) {
-				ArrayList<BeaconGroupSpinnerData> datas = new ArrayList<BeaconGroupSpinnerData>();
-				for(BeaconGroup group: groups) {
-					datas.add(new BeaconGroupSpinnerData((UuidGroup) group));
-				}
-				
-				mSpinnerAdapter.clear();
-				mSpinnerAdapter.addAll(datas);
-			}
-		});
+		List<UuidGroup> groups = new ArrayList<UuidGroup>();
+		
+		try {
+			groups = mWiseManager.getUuidGroups();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		ArrayList<BeaconGroupSpinnerData> datas = new ArrayList<BeaconGroupSpinnerData>();
+		for(BeaconGroup group: groups) {
+			datas.add(new BeaconGroupSpinnerData(group));
+		}
+		
+		mSpinnerAdapter.clear();
+		mSpinnerAdapter.addAll(datas);
 	}
 }

@@ -10,8 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import android.os.Messenger;
 
-import com.wisewells.sdk.Region;
 import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.ibeacon.Region;
 import com.wisewells.sdk.utils.BeaconUtils;
 import com.wisewells.sdk.utils.L;
 
@@ -40,7 +40,7 @@ class RangingRegion {
 
 	/**
 	 * @param beaconsFoundInScanCycle
-	 * Scan Sycle µ¿¾È Ã£Àº BeaconÀÌ ÀÌ Region¿¡ ¼ÓÇÏ´Â BeaconÀÎÁö ±¸º°ÇØ¼­ ÀúÀå. 
+	 * Scan Sycle ï¿½ï¿½ï¿½ï¿½ Ã£ï¿½ï¿½ Beaconï¿½ï¿½ ï¿½ï¿½ Regionï¿½ï¿½ ï¿½ï¿½ï¿½Ï´ï¿½ Beaconï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ ï¿½ï¿½ï¿½ï¿½. 
 	 */
 	public final void processFoundBeacons(Map<Beacon, Long> beaconsFoundInScanCycle) {
 		for (Map.Entry<Beacon, Long> entry : beaconsFoundInScanCycle.entrySet())

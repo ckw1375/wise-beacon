@@ -1,7 +1,5 @@
 package com.wisewells.wisebeacon.topology;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +14,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.WiseManager.GetBeaconGroupListener;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
@@ -68,8 +65,8 @@ public class AddTopologyActivity extends Activity {
 			}
 		});
 		
-		displayMajorGroupsInListView("wise");
-		displayMajorGroupsInListView("wise2");
+//		displayMajorGroupsInListView("wise");
+//		displayMajorGroupsInListView("wise2");
 	}
 
 	@Override
@@ -87,14 +84,14 @@ public class AddTopologyActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	private void displayMajorGroupsInListView(String uuidGroupCode) {
-		mWiseManager.getMajorGroups(uuidGroupCode, new GetBeaconGroupListener() {
-			@Override
-			public void onResponseBeaconGroup(List<BeaconGroup> groups) {
-				mListAdapter.addAll(groups);
-			}
-		});		
-	}
+//	private void displayMajorGroupsInListView(String uuidGroupCode) {
+//		mWiseManager.getMajorGroups(uuidGroupCode, new GetBeaconGroupListener() {
+//			@Override
+//			public void onResponseBeaconGroup(List<BeaconGroup> groups) {
+//				mListAdapter.addAll(groups);
+//			}
+//		});		
+//	}
 	
 	private void onDoneButtonClicked() {
 		int type = mSpinner.getSelectedItemPosition();

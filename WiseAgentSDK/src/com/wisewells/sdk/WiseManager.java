@@ -21,17 +21,17 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.estimote.sdk.internal.Preconditions;
+import com.wisewells.sdk.aidl.IWiseAgent;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.datas.UuidGroup;
-import com.wisewells.sdk.ipc.IPC;
-import com.wisewells.sdk.ipc.MonitoringResult;
-import com.wisewells.sdk.ipc.RangingResult;
-import com.wisewells.sdk.ipc.ScanPeriodData;
-import com.wisewells.sdk.utils.IpcUtils;
+import com.wisewells.sdk.ibeacon.MonitoringResult;
+import com.wisewells.sdk.ibeacon.RangingResult;
+import com.wisewells.sdk.ibeacon.Region;
+import com.wisewells.sdk.ibeacon.ScanPeriodData;
 import com.wisewells.sdk.utils.L;
 
 public class WiseManager {
@@ -54,13 +54,6 @@ public class WiseManager {
 	private ServiceReadyCallback mReadyCallback;
 	private ScanPeriodData mForegroundScanPeriod;
 	private ScanPeriodData mBackgroundScanPeriod;	
-	
-	private GetBeaconGroupListener mUuidGroupListener;
-	private GetBeaconGroupListener mMajorGroupListener;
-	private GetBeaconGroupListener mBeaconGroupWithCodeListener;
-	private GetBeaconListener mBeaconListener;
-	private GetServiceListener mServiceListener;
-	private GetTopologyListener mTopologyListener;
 	
 	private static WiseManager sInstance;
 	
@@ -344,7 +337,7 @@ public class WiseManager {
 		
 	}
 	
-	public void addBeaconGroup(String name, String parentCode, ArrayList<Beacon> beacons) throws RemoteException {
+	/*public void addBeaconGroup(String name, String parentCode, ArrayList<Beacon> beacons) throws RemoteException {
 		Bundle data = new Bundle();
 		data.putString(IPC.BUNDLE_DATA1, name);
 		data.putString(IPC.BUNDLE_DATA2, parentCode);
@@ -359,54 +352,18 @@ public class WiseManager {
 			L.e("Error while adding Beacon Group");
 			throw e;
 		}
-	}
+	}*/
 	
 	public void addBeaconGroup(String name, String parentCode) throws RemoteException {
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, name);
-		data.putString(IPC.BUNDLE_DATA2, parentCode);
-		
-		Message msg = Message.obtain(null, IPC.MSG_BEACON_GROUP_ADD);
-		msg.setData(data);
-		
-		try {
-			mSendingMessenger.send(msg);
-		} catch (RemoteException e) {
-			L.e("Error while adding Beacon Group");
-			throw e;
-		}
+		mAgent.addBeaconGroup(name, parentCode);
 	}
 	
 	public void addBeaconsToBeaconGroup(String groupCode, ArrayList<Beacon> beacons) throws RemoteException {
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, groupCode);
-		data.putParcelableArrayList(IPC.BUNDLE_DATA2, beacons);
-		
-		Message msg = Message.obtain(null, IPC.MSG_ADD_BEACON_TO_BEACON_GROUP);
-		msg.setData(data);
-		
-		try {
-			mSendingMessenger.send(msg);
-		} catch (RemoteException e) {
-			L.e("Error while addBeaconsToBeaconGroup");
-			throw e;
-		}
+		mAgent.addBeaconsToBeaconGroup(groupCode, beacons);
 	}
 	
 	public void addBeaconToBeaconGroup(String groupCode, Beacon beacon) throws RemoteException {
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, groupCode);
-		data.putParcelable(IPC.BUNDLE_DATA2, beacon);
-		
-		Message msg = Message.obtain(null, IPC.MSG_ADD_BEACON_TO_BEACON_GROUP);
-		msg.setData(data);
-		
-		try {
-			mSendingMessenger.send(msg);
-		} catch (RemoteException e) {
-			L.e("Error while addBeaconsToBeaconGroup");
-			throw e;
-		}
+		mAgent.addBeaconToBeaconGroup(groupCode, beacon);
 	}
 	
 	public void modifyBeaconGroup(BeaconGroup group) throws RemoteException {
@@ -421,7 +378,7 @@ public class WiseManager {
 		} catch (RemoteException e) {
 			L.e("Error while modifying Beacon Group");
 			throw e;
-		}
+		}		
 	}
 
 	public void deleteBeaconGroup(String code) {
@@ -445,21 +402,8 @@ public class WiseManager {
 
 	}
 	
-	public void addService(String name, String parentCode) {
-		
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, name);
-		data.putString(IPC.BUNDLE_DATA2, parentCode);
-		
-		Message message = Message.obtain(null, IPC.MSG_SERVICE_ADD);
-		message.setData(data);
-		message.replyTo = mIncomingMessenger;
-		
-		try {
-			mSendingMessenger.send(message);
-		} catch (RemoteException e) {
-			L.i("Error in getService");
-		}
+	public void addService(String name, String parentCode) throws RemoteException {
+		mAgent.addService(name, parentCode);
 	}
 
 	public void modifyService(Service service) {
@@ -482,102 +426,28 @@ public class WiseManager {
 		
 	}
 	
-	public void getServices(String parentCode, GetServiceListener listener) {
-		mServiceListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
-		
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, parentCode);
-		
-		Message message = Message.obtain(null, IPC.MSG_SERVICE_LIST_GET);
-		message.setData(data);
-		message.replyTo = mIncomingMessenger;
-		
-		try {
-			mSendingMessenger.send(message);
-		} catch (RemoteException e) {
-			L.i("Error in getService");
-		}
+	public List<Service> getServices(String parentCode) throws RemoteException {
+		return mAgent.getServices(parentCode);
 	}
 	
-	public void getUuidGroups(GetBeaconGroupListener listener) {
-		mUuidGroupListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
-		
-		Message message = Message.obtain(null, IPC.MSG_UUID_GROUP_LIST_GET);		
-		message.replyTo = mIncomingMessenger;
-		
-		try {
-			mSendingMessenger.send(message);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+	public List<UuidGroup> getUuidGroups() throws RemoteException {
+		return mAgent.getUuidGroups();
 	}
-	
-	public void getMajorGroups(String uuidGroupCode, GetBeaconGroupListener listener) {
-		mMajorGroupListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
 
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, uuidGroupCode);
-		
-		Message message = Message.obtain(null, IPC.MSG_MAJOR_GROUP_LIST_GET);
-		message.setData(data);
-		message.replyTo = mIncomingMessenger;
-		
-		try {
-			mSendingMessenger.send(message);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+	public List<MajorGroup> getMajorGroups(String uuidGroupCode) throws RemoteException {
+		return mAgent.getMajorGroups(uuidGroupCode);
 	}
 	
-	public void getBeaconGroups(ArrayList<String> codes, GetBeaconGroupListener listener) {
-		mBeaconGroupWithCodeListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
-
-		Bundle data = new Bundle();
-		data.putStringArrayList(IPC.BUNDLE_DATA1, codes);
-		
-		Message message = Message.obtain(null, IPC.MSG_BEACON_GROUP_LIST_GET_WITH_CODE);
-		message.setData(data);
-		message.replyTo = mIncomingMessenger;
-		
-		try {
-			mSendingMessenger.send(message);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+	public List<BeaconGroup> getBeaconGroups(ArrayList<String> codes) throws RemoteException {
+		return  mAgent.getBeaconGroups(codes);
 	}
 	
-	public void getBeacons(String groupCode, GetBeaconListener listener) {
-		mBeaconListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
-		
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, groupCode);
-		
-		Message message = Message.obtain(null, IPC.MSG_BEACON_LIST_GET);
-		message.setData(data);
-		message.replyTo = mIncomingMessenger;
-		
-		try {
-			mSendingMessenger.send(message);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+	public List<Beacon> getBeacons(String groupCode) throws RemoteException {
+		return mAgent.getBeacons(groupCode);
 	}
 	
-	public void getTopologies(ArrayList<String> codes, GetTopologyListener listener) {
-		mTopologyListener = Preconditions.checkNotNull(listener, "Listener must be not null");
-		
-		Bundle data = new Bundle();
-		data.putStringArrayList(IPC.BUNDLE_DATA1, codes);
-		
-		Message message = Message.obtain(null, IPC.MSG_TOPOLOGY_LIST_GET_WITH_CODE);
-		message.setData(data);
-		message.replyTo = mIncomingMessenger;
-		
-		try {
-			mSendingMessenger.send(message);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+	public List<Topology> getTopologies(ArrayList<String> codes) throws RemoteException {
+		return mAgent.getTopologies(codes);
 	}
 
 	private class IncomingHandler extends Handler {
@@ -612,63 +482,21 @@ public class WiseManager {
 					WiseManager.this.mErrorListener.onError(errorId);
 				}
 				break;
-			case IPC.MSG_RESPONSE_DUMMY_BEACON:
-				if (WiseManager.this.mDummyListener != null) {
-					data.setClassLoader(Beacon.class.getClassLoader());
-					List<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
-					mDummyListener.onDummyBeacon(beacons);
-				}
-				break;
-			case IPC.MSG_RESPONSE_UUID_GROUP_LIST:
-				if (WiseManager.this.mUuidGroupListener != null) {
-					data.setClassLoader(UuidGroup.class.getClassLoader());
-					ArrayList<BeaconGroup> groups = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
-					WiseManager.this.mUuidGroupListener.onResponseBeaconGroup(groups);					
-				}
-				break;
-			case IPC.MSG_RESPONSE_MAJOR_GROUP_LIST:
-				if (WiseManager.this.mMajorGroupListener != null) {
-					data.setClassLoader(MajorGroup.class.getClassLoader());
-					ArrayList<BeaconGroup> groups = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
-					WiseManager.this.mMajorGroupListener.onResponseBeaconGroup(groups);
-				}
-				break;
-			case IPC.MSG_RESPONSE_BEACON_LIST:
-				if (WiseManager.this.mBeaconListener != null) {
-					data.setClassLoader(Beacon.class.getClassLoader());
-					ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
-					WiseManager.this.mBeaconListener.onResponseBeacon(beacons);
-				}
-				break;	
-			case IPC.MSG_RESPONSE_SERVICE_LIST:
-				if (WiseManager.this.mServiceListener != null) {
-					data.setClassLoader(Service.class.getClassLoader());
-					ArrayList<Service> services = data.getParcelableArrayList(IPC.BUNDLE_KEYS[0]);
-					WiseManager.this.mServiceListener.onResponseService(services);
-				}
-			case IPC.MSG_RESPONSE_BEACON_GROUP_LIST_WITH_CODE:
-				if (WiseManager.this.mBeaconGroupWithCodeListener != null) {
-					data.setClassLoader(BeaconGroup.class.getClassLoader());
-					ArrayList<BeaconGroup> groups = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
-					WiseManager.this.mBeaconGroupWithCodeListener.onResponseBeaconGroup(groups);
-				}
-			case IPC.MSG_RESPONSE_TOPOLOGY_LIST_WITH_CODE:
-				if (WiseManager.this.mTopologyListener != null) {
-					data.setClassLoader(Topology.class.getClassLoader());
-					ArrayList<Topology> topologies = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
-					WiseManager.this.mTopologyListener.onResponseTopology(topologies);
-				}
 			default:
 				L.d("Unknown message: " + msg);
 			}
 		}
 	}
 
+	IWiseAgent mAgent;
+	
 	private class InternalServiceConnection implements ServiceConnection {
 		private InternalServiceConnection() {
 		}
 
 		public void onServiceConnected(ComponentName name, IBinder service) {
+			mAgent = IWiseAgent.Stub.asInterface(service);
+			
 			WiseManager.this.mSendingMessenger = new Messenger(service);
 			
 			registerMessenger();
@@ -715,31 +543,5 @@ public class WiseManager {
 
 	public static abstract interface ServiceReadyCallback {
 		public abstract void onServiceReady();
-	}
-	
-	
-	private DummyListener mDummyListener;
-	public void setDummyListener(DummyListener listener) {
-		mDummyListener = listener;
-	}
-	
-	public interface DummyListener {
-		public void onDummyBeacon(List<Beacon> beacons);
-	}
-	
-	public interface GetBeaconGroupListener {
-		public void onResponseBeaconGroup(List<BeaconGroup> groups);
-	}
-	
-	public interface GetBeaconListener {
-		public void onResponseBeacon(List<Beacon> beacons);
-	}
-	
-	public interface GetServiceListener {
-		public void onResponseService(List<Service> services);
-	}
-	
-	public interface GetTopologyListener {
-		public void onResponseTopology(List<Topology> topologies);
 	}
 }

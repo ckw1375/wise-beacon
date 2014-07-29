@@ -1,4 +1,4 @@
-package com.wisewells.sdk;
+package com.wisewells.sdk.utils;
 
 
 public class KalmanFilter {

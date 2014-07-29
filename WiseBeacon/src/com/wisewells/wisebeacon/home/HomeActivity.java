@@ -7,10 +7,13 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 
+import com.wisewells.sdk.datas.BeaconGroup;
+import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.beacongroup.BeaconGroupActivity;
 import com.wisewells.wisebeacon.service.ServiceActivity;
+import com.wisewells.wisebeacon.topology.TopologyActivity;
 
 public class HomeActivity extends Activity {
 

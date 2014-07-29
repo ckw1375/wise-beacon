@@ -1,8 +1,5 @@
 package com.wisewells.wisebeacon.topology;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,10 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.WiseManager.GetBeaconListener;
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.LocationTopology;
 import com.wisewells.wisebeacon.R;
 
 public class LocationTopologyActivity extends Activity {
@@ -64,18 +57,18 @@ public class LocationTopologyActivity extends Activity {
 	
 	private void displayBeaconsInGroup() {
 
-		String groupCode = getIntent().getStringExtra(AddTopologyActivity.EXTRA_BEACON_GROUP_CODE);
-		WiseManager.getInstance(this).getBeacons(groupCode, new GetBeaconListener() {
-			@Override
-			public void onResponseBeacon(List<Beacon> beacons) {
-				ArrayList<LocationTopologyListData> datas = new ArrayList<LocationTopologyListData>();
-				
-				for(Beacon beacon : beacons) {
-					datas.add(new LocationTopologyListData(beacon));
-				}
-				
-				mAdapter.replaceWith(datas);
-			}
-		});
+//		String groupCode = getIntent().getStringExtra(AddTopologyActivity.EXTRA_BEACON_GROUP_CODE);
+//		WiseManager.getInstance(this).getBeacons(groupCode, new GetBeaconListener() {
+//			@Override
+//			public void onResponseBeacon(List<Beacon> beacons) {
+//				ArrayList<LocationTopologyListData> datas = new ArrayList<LocationTopologyListData>();
+//				
+//				for(Beacon beacon : beacons) {
+//					datas.add(new LocationTopologyListData(beacon));
+//				}
+//				
+//				mAdapter.replaceWith(datas);
+//			}
+//		});
 	}
 }

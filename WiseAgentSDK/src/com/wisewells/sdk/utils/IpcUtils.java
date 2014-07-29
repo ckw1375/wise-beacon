@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.estimote.sdk.internal.Preconditions;
-import com.wisewells.sdk.ipc.IPC;
+import com.wisewells.sdk.IPC;
 
 import android.os.Bundle;
 import android.os.Message;

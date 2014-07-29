@@ -1,11 +1,10 @@
-package com.wisewells.sdk.ipc;
+package com.wisewells.sdk.ibeacon;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.estimote.sdk.internal.Objects;
 import com.estimote.sdk.internal.Preconditions;
-import com.wisewells.sdk.Region;
 
 public class MonitoringResult implements Parcelable
 {

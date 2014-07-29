@@ -1,20 +1,12 @@
 package com.wisewells.wisebeacon.beacongroup;
 
-import com.wisewells.sdk.datas.UuidGroup;
-
-/**
- * @file	BeaconGroupSpinnerData.java
- * @author 	Mingook
- * @date	2014. 7. 24.
- * @description
- * UuidGroup의 toString을 위한 클래스
- */
+import com.wisewells.sdk.datas.BeaconGroup;
 
 public class BeaconGroupSpinnerData {
-	private UuidGroup uuidGroup;
+	private BeaconGroup uuidGroup;
 	
-	public BeaconGroupSpinnerData(UuidGroup group) {
-		this.uuidGroup  = group;
+	public BeaconGroupSpinnerData(BeaconGroup uuidGroup) {
+		this.uuidGroup  = uuidGroup;
 	}
 	
 	@Override
@@ -22,7 +14,7 @@ public class BeaconGroupSpinnerData {
 		return this.uuidGroup.getName();
 	}
 	
-	public UuidGroup getUuidGroup() {
+	public BeaconGroup getUuidGroup() {
 		return this.uuidGroup;
 	}
 }

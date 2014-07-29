@@ -29,7 +29,9 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 
 import com.estimote.sdk.internal.Preconditions;
-import com.wisewells.sdk.Region;
+import com.wisewells.sdk.IPC;
+import com.wisewells.sdk.aidl.IWiseAgent;
+import com.wisewells.sdk.aidl.IWiseAgent.Stub;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.MajorGroup;
@@ -37,12 +39,11 @@ import com.wisewells.sdk.datas.MinorGroup;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.datas.UuidGroup;
-import com.wisewells.sdk.ipc.IPC;
-import com.wisewells.sdk.ipc.MonitoringResult;
-import com.wisewells.sdk.ipc.RangingResult;
-import com.wisewells.sdk.ipc.ScanPeriodData;
+import com.wisewells.sdk.ibeacon.MonitoringResult;
+import com.wisewells.sdk.ibeacon.RangingResult;
+import com.wisewells.sdk.ibeacon.Region;
+import com.wisewells.sdk.ibeacon.ScanPeriodData;
 import com.wisewells.sdk.utils.BeaconUtils;
-import com.wisewells.sdk.utils.IpcUtils;
 import com.wisewells.sdk.utils.L;
 
 public class WiseAgent extends android.app.Service {
@@ -141,30 +142,8 @@ public class WiseAgent extends android.app.Service {
 	}
  
 	public IBinder onBind(Intent intent) {
-		return mIncomingMessenger.getBinder();
-	}
-	
-	Handler dummyHandler = new Handler();
-	
-	private void testStartMakingDummy(String code) {
-		checkNotOnUiThread();
-		final Bundle data = new Bundle();
-		data.putParcelableArrayList(IPC.BUNDLE_DATA1, Dummy.getBeacons());
-		
-		final Messenger messenger = mConnectedMessengers.get(code);
-		dummyHandler.postDelayed(new Runnable() {
-			
-			@Override
-			public void run() {
-				Message message = Message.obtain(null, IPC.MSG_RESPONSE_DUMMY_BEACON);
-				message.setData(data);
-				try {
-					messenger.send(message);
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				}
-			}
-		}, 1000);
+		return mBinder;
+//		return mIncomingMessenger.getBinder();
 	}
 
 	private void startRanging(RangingRegion rangingRegion) {
@@ -509,8 +488,8 @@ public class WiseAgent extends android.app.Service {
 	}
 	
 	private void sendUuidGroups(Messenger replyTo) {
-		ArrayList<UuidGroup> groups = mWiseObjects.getUuidGroups();
 
+		ArrayList<UuidGroup> groups = mWiseObjects.getUuidGroups();
 		Bundle data = new Bundle();
 		data.putParcelableArrayList(IPC.BUNDLE_DATA1, groups);
 
@@ -694,11 +673,6 @@ public class WiseAgent extends android.app.Service {
 							L.d("Setting background scan period: " + WiseAgent.this.mBackgroundScanPeriod);
 							WiseAgent.this.mBackgroundScanPeriod = ((ScanPeriodData)obj);
 							break;
-						case IPC.MSG_DUMMY_BEACON_START:
-							testStartMakingDummy((String) data.get(IPC.BUNDLE_DATA1));
-							break;
-						case IPC.MSG_DUMMY_BEACON_STOP:
-							break;
 						case IPC.MSG_MESSENGER_REGISTER:
 							mConnectedMessengers.put(data.getString(IPC.BUNDLE_DATA1), replyTo);
 							L.i("Register Messenger From " + data.getString(IPC.BUNDLE_DATA1));
@@ -711,29 +685,6 @@ public class WiseAgent extends android.app.Service {
 							break;
 						case IPC.MSG_TRACKING_STOP:
 							break;
-						case IPC.MSG_BEACON_GROUP_ADD:
-						{
-							data.setClassLoader(Beacon.class.getClassLoader());
-							String name = data.getString(IPC.BUNDLE_DATA1);
-							String parentCode = data.getString(IPC.BUNDLE_DATA2);
-//							ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA3);							
-//							WiseAgent.this.addBeaconGroup(name, parentCode, beacons);
-							WiseAgent.this.addBeaconGroup(name, parentCode);
-						}
-							break;
-						case IPC.MSG_ADD_BEACON_TO_BEACON_GROUP:
-						{
-//							data.setClassLoader(Beacon.class.getClassLoader());
-//							String groupCode = data.getString(IPC.BUNDLE_DATA1);
-//							ArrayList<Beacon> beacons = data.getParcelableArrayList(IPC.BUNDLE_DATA2);
-//							WiseAgent.this.addBeaconToBeaconGroup(groupCode, beacons);
-							
-							data.setClassLoader(Beacon.class.getClassLoader());
-							String groupCode = data.getString(IPC.BUNDLE_DATA1);
-							Beacon beacon = data.getParcelable(IPC.BUNDLE_DATA2);
-							WiseAgent.this.addBeaconToBeaconGroup(groupCode, beacon);
-						}
-							break;
 						case IPC.MSG_BEACON_GROUP_MODIFY:
 						{
 							BeaconGroup beaconGroup = data.getParcelable(IPC.BUNDLE_DATA1);
@@ -741,51 +692,15 @@ public class WiseAgent extends android.app.Service {
 							break;
 						case IPC.MSG_BEACON_GROUP_DELETE:
 							break;
-						case IPC.MSG_UUID_GROUP_LIST_GET:
-							sendUuidGroups(replyTo);
-							break;
-						case IPC.MSG_MAJOR_GROUP_LIST_GET:
-						{
-							String code = data.getString(IPC.BUNDLE_DATA1);
-							sendMajorGroups(code, replyTo);
-						}
-							break;
-						case IPC.MSG_BEACON_GROUP_LIST_GET_WITH_CODE:
-						{
-							ArrayList<String> codes = data.getStringArrayList(IPC.BUNDLE_DATA1);
-							sendBeaconGroups(codes, replyTo);
-							
-						}
 						case IPC.MSG_BEACON_ADD:
 							break;
 						case IPC.MSG_BEACON_MODIFY:
 							break;
 						case IPC.MSG_BEACON_DELETE:
 							break;
-						case IPC.MSG_BEACON_LIST_GET:
-						{
-							String code = data.getString(IPC.BUNDLE_DATA1);
-							sendBeacons(code, replyTo);
-						}
-							break;
-						case IPC.MSG_SERVICE_ADD:
-						{
-							String name = data.getString(IPC.BUNDLE_DATA1);
-							String parentCode = data.getString(IPC.BUNDLE_DATA2);
-							addService(name, parentCode);
-						}
-							break;
 						case IPC.MSG_SERVICE_MODIFY:
 							break;
 						case IPC.MSG_SERVICE_DELETE:
-							break;
-						case IPC.MSG_SERVICE_LIST_GET: 
-						{
-//							int treeLevel = data.getInt(IPC.BUNDLE_KEYS[0]);
-//							sendServices(treeLevel, replyTo);
-							String parentCode = data.getString(IPC.BUNDLE_KEYS[0]);
-							sendServices(parentCode, replyTo);
-						}
 							break;
 						case IPC.MSG_TOPOLOGY_ADD:
 							break;
@@ -793,13 +708,6 @@ public class WiseAgent extends android.app.Service {
 							break;
 						case IPC.MSG_TOPOLOGY_DELETE:
 							break;						
-						case IPC.MSG_TOPOLOGY_LIST_GET_WITH_CODE:
-						{
-							ArrayList<String> codes = data.getStringArrayList(IPC.BUNDLE_DATA1);
-							sendTopologies(codes, replyTo);
-						
-						}
-							break;
 
 						case 3:
 						case 6:
@@ -924,5 +832,137 @@ public class WiseAgent extends android.app.Service {
 				WiseAgent.this.setAlarm(WiseAgent.this.mStartScanPendingIntent, WiseAgent.this.scanWaitTimeMillis());
 		}
 	}
+	
+	IWiseAgent.Stub mBinder = new Stub() {
+		@Override
+		public void addBeaconGroup(String name, String parentCode) throws RemoteException {
+			int major = WiseServer.requestMajor();
+
+			MajorGroup majorGroup = new MajorGroup(name);
+			majorGroup.setMajor(major);
+			majorGroup.setCode(WiseServer.requestCode());
+
+			UuidGroup uuidGroup = (UuidGroup) mWiseObjects.getBeaconGroup(parentCode);
+			uuidGroup.addChild(majorGroup);
+
+			mWiseObjects.putBeaconGroup(uuidGroup);
+			mWiseObjects.putBeaconGroup(majorGroup);
+		}
+
+		@Override
+		public void addBeaconsToBeaconGroup(String groupCode, List<Beacon> beacons) 
+				throws RemoteException {
+			
+			BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
+			
+			for(Beacon beacon : beacons) {
+				int minor = WiseServer.requestMinor();
+				MinorGroup minorGroup = new MinorGroup("minor");
+				minorGroup.setMinor(minor);
+				minorGroup.setCode(WiseServer.requestCode());
+				minorGroup.addBeacon(beacon);		
+				
+//				beacon.setAddress(((UuidGroup) mWiseObjects.getBeaconGroup(parentCode)).getUuid(), major, minor);
+				
+				group.addChild(minorGroup);
+				
+				mWiseObjects.putBeaconGroup(minorGroup);
+				mWiseObjects.putBeacon(beacon);
+			}
+			
+			mWiseObjects.putBeaconGroup(group);
+		}
+
+		@Override
+		public void addBeaconToBeaconGroup(String groupCode, Beacon beacon)
+				throws RemoteException {
+			
+			BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
+			
+			beacon.setCode(WiseServer.requestCode());
+			
+			int minor = WiseServer.requestMinor();
+			MinorGroup minorGroup = new MinorGroup("minor");
+			minorGroup.setMinor(minor);
+			minorGroup.setCode(WiseServer.requestCode());
+			minorGroup.addBeacon(beacon);	
+			
+			group.addChild(minorGroup);
+			
+			mWiseObjects.putBeaconGroup(minorGroup);
+			mWiseObjects.putBeacon(beacon);
+		}
+
+		@Override
+		public List<UuidGroup> getUuidGroups() throws RemoteException {
+			return mWiseObjects.getUuidGroups();
+		}
+
+		@Override
+		public List<MajorGroup> getMajorGroups(String uuidGroupCode)
+				throws RemoteException {
+			return mWiseObjects.getMajorGroups(uuidGroupCode);
+		}
+
+		@Override
+		public List<BeaconGroup> getBeaconGroups(List<String> codes)
+				throws RemoteException {
+			
+			ArrayList<BeaconGroup> groups = new ArrayList<BeaconGroup>();
+			for(String code : codes) {
+				groups.add(mWiseObjects.getBeaconGroup(code));
+			}
+			
+			return groups;
+		}
+
+		@Override
+		public List<Beacon> getBeacons(String groupCode) throws RemoteException {
+			ArrayList<Beacon> beacons = mWiseObjects.getBeaconsInGroup(groupCode);
+			return beacons;
+		}
+
+		@Override
+		public List<Topology> getTopologies(List<String> codes)
+				throws RemoteException {
+			
+			ArrayList<Topology> topologies = new ArrayList<Topology>();
+			for(String code : codes) {
+				topologies.add(mWiseObjects.getTopology(code));
+			}
+			return topologies;
+		}
+
+		@Override
+		public void addService(String name, String parentCode)
+				throws RemoteException {
+			
+			String code = WiseServer.requestCode();
+			
+			Service service = new Service(name);
+			service.setCode(code);
+			
+			mWiseObjects.getService(parentCode).addChild(service);		
+			mWiseObjects.putService(service);
+		}
+
+		@Override
+		public List<Service> getServices(String parentCode)
+				throws RemoteException {
+			
+			ArrayList<Service> services = mWiseObjects.getServices();
+			ArrayList<Service> willReturn = new ArrayList<Service>();
+			
+			for(Service service : services) {
+				if(parentCode == null) {
+					if(service.getTreeLevel() == Service.SERVICE_TREE_ROOT) willReturn.add(service);
+				}
+				else if(service.getParentCode() != null && service.getParentCode().equals(parentCode)) 
+					willReturn.add(service);
+			}
+			
+			return willReturn;
+		}
+	};
 }
 

@@ -2,7 +2,7 @@ package com.wisewells.agent;
  
 import android.os.Messenger;
 
-import com.wisewells.sdk.Region;
+import com.wisewells.sdk.ibeacon.Region;
  
 class MonitoringRegion extends RangingRegion
 {

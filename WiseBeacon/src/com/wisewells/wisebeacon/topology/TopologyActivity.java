@@ -9,6 +9,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.wisewells.sdk.datas.BeaconGroup;
+import com.wisewells.sdk.datas.MajorGroup;
+import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 
 public class TopologyActivity extends Activity {

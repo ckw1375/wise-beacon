@@ -1,4 +1,4 @@
- package com.wisewells.sdk.ipc;
+ package com.wisewells.sdk.ibeacon;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +10,6 @@ import android.os.Parcelable;
 
 import com.estimote.sdk.internal.Objects;
 import com.estimote.sdk.internal.Preconditions;
-import com.wisewells.sdk.Region;
 import com.wisewells.sdk.datas.Beacon;
 
 public final class RangingResult implements Parcelable
