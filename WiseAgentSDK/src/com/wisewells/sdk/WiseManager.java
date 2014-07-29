@@ -56,9 +56,11 @@ public class WiseManager {
 	private ScanPeriodData mBackgroundScanPeriod;	
 	
 	private GetBeaconGroupListener mUuidGroupListener;
-	private GetBeaconGroupListener mMajorGroupListener;	
+	private GetBeaconGroupListener mMajorGroupListener;
+	private GetBeaconGroupListener mBeaconGroupWithCodeListener;
 	private GetBeaconListener mBeaconListener;
 	private GetServiceListener mServiceListener;
+	private GetTopologyListener mTopologyListener;
 	
 	private static WiseManager sInstance;
 	
@@ -307,23 +309,6 @@ public class WiseManager {
 		return mSendingMessenger != null;
 	}
 	
-	public void testStartMakingDummy() {
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, mContext.getPackageName());
-		
-		Message msg = Message.obtain(null, IPC.MSG_DUMMY_BEACON_START);
-		msg.setData(data);
-		try {
-			mSendingMessenger.send(msg);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void testStopMakingDummy() {
-		
-	}
-	
 	public void registerMessenger() {
 		Message registerMsg = Message.obtain(null, IPC.MSG_MESSENGER_REGISTER);
 		Bundle data = new Bundle();
@@ -443,14 +428,14 @@ public class WiseManager {
 
 	}
 
-	public void addBeacon(Beacon beacon) {
+	/*public void addBeacon(Beacon beacon) {
 		Message msg = Message.obtain(null, IPC.MSG_BEACON_ADD, beacon);
 		try {
 			mSendingMessenger.send(msg);
 		} catch (RemoteException e) {
 			L.e("Error while adding beacon");
 		}
-	}
+	}*/
 	
 	public void modifyBeacon(Beacon beacon) {
 		
@@ -460,11 +445,20 @@ public class WiseManager {
 
 	}
 	
-	public void addService(String name) {
+	public void addService(String name, String parentCode) {
+		
+		Bundle data = new Bundle();
+		data.putString(IPC.BUNDLE_DATA1, name);
+		data.putString(IPC.BUNDLE_DATA2, parentCode);
+		
+		Message message = Message.obtain(null, IPC.MSG_SERVICE_ADD);
+		message.setData(data);
+		message.replyTo = mIncomingMessenger;
+		
 		try {
-			IpcUtils.sendMessage(IPC.MSG_SERVICE_ADD, null, mSendingMessenger, name);
+			mSendingMessenger.send(message);
 		} catch (RemoteException e) {
-			L.e("Error in addService");
+			L.i("Error in getService");
 		}
 	}
 
@@ -488,21 +482,18 @@ public class WiseManager {
 		
 	}
 	
-//	public void getService(int treeLevel, GetServiceListener listener) {
-//		mServiceListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
-//		
-//		try {
-//			IpcUtils.sendMessage(IPC.MSG_SERVICE_LIST_GET, mIncomingMessenger, mSendingMessenger, treeLevel);
-//		} catch (RemoteException e) {
-//			L.i("Error in getService");
-//		}
-//	}
-	
-	public void getService(String parentCode, GetServiceListener listener) {
+	public void getServices(String parentCode, GetServiceListener listener) {
 		mServiceListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
 		
+		Bundle data = new Bundle();
+		data.putString(IPC.BUNDLE_DATA1, parentCode);
+		
+		Message message = Message.obtain(null, IPC.MSG_SERVICE_LIST_GET);
+		message.setData(data);
+		message.replyTo = mIncomingMessenger;
+		
 		try {
-			IpcUtils.sendMessage(IPC.MSG_SERVICE_LIST_GET, mIncomingMessenger, mSendingMessenger, parentCode);
+			mSendingMessenger.send(message);
 		} catch (RemoteException e) {
 			L.i("Error in getService");
 		}
@@ -524,7 +515,7 @@ public class WiseManager {
 	public void getMajorGroups(String uuidGroupCode, GetBeaconGroupListener listener) {
 		mMajorGroupListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
 
-/*		Bundle data = new Bundle();
+		Bundle data = new Bundle();
 		data.putString(IPC.BUNDLE_DATA1, uuidGroupCode);
 		
 		Message message = Message.obtain(null, IPC.MSG_MAJOR_GROUP_LIST_GET);
@@ -535,12 +526,23 @@ public class WiseManager {
 			mSendingMessenger.send(message);
 		} catch (RemoteException e) {
 			e.printStackTrace();
-		}*/
+		}
+	}
+	
+	public void getBeaconGroups(ArrayList<String> codes, GetBeaconGroupListener listener) {
+		mBeaconGroupWithCodeListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
+
+		Bundle data = new Bundle();
+		data.putStringArrayList(IPC.BUNDLE_DATA1, codes);
+		
+		Message message = Message.obtain(null, IPC.MSG_BEACON_GROUP_LIST_GET_WITH_CODE);
+		message.setData(data);
+		message.replyTo = mIncomingMessenger;
 		
 		try {
-			IpcUtils.sendMessage(IPC.MSG_MAJOR_GROUP_LIST_GET, mIncomingMessenger, mSendingMessenger, uuidGroupCode);
+			mSendingMessenger.send(message);
 		} catch (RemoteException e) {
-			L.e("Error in getMajorGroups");
+			e.printStackTrace();
 		}
 	}
 	
@@ -551,6 +553,23 @@ public class WiseManager {
 		data.putString(IPC.BUNDLE_DATA1, groupCode);
 		
 		Message message = Message.obtain(null, IPC.MSG_BEACON_LIST_GET);
+		message.setData(data);
+		message.replyTo = mIncomingMessenger;
+		
+		try {
+			mSendingMessenger.send(message);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void getTopologies(ArrayList<String> codes, GetTopologyListener listener) {
+		mTopologyListener = Preconditions.checkNotNull(listener, "Listener must be not null");
+		
+		Bundle data = new Bundle();
+		data.putStringArrayList(IPC.BUNDLE_DATA1, codes);
+		
+		Message message = Message.obtain(null, IPC.MSG_TOPOLOGY_LIST_GET_WITH_CODE);
 		message.setData(data);
 		message.replyTo = mIncomingMessenger;
 		
@@ -626,6 +645,18 @@ public class WiseManager {
 					data.setClassLoader(Service.class.getClassLoader());
 					ArrayList<Service> services = data.getParcelableArrayList(IPC.BUNDLE_KEYS[0]);
 					WiseManager.this.mServiceListener.onResponseService(services);
+				}
+			case IPC.MSG_RESPONSE_BEACON_GROUP_LIST_WITH_CODE:
+				if (WiseManager.this.mBeaconGroupWithCodeListener != null) {
+					data.setClassLoader(BeaconGroup.class.getClassLoader());
+					ArrayList<BeaconGroup> groups = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
+					WiseManager.this.mBeaconGroupWithCodeListener.onResponseBeaconGroup(groups);
+				}
+			case IPC.MSG_RESPONSE_TOPOLOGY_LIST_WITH_CODE:
+				if (WiseManager.this.mTopologyListener != null) {
+					data.setClassLoader(Topology.class.getClassLoader());
+					ArrayList<Topology> topologies = data.getParcelableArrayList(IPC.BUNDLE_DATA1);
+					WiseManager.this.mTopologyListener.onResponseTopology(topologies);
 				}
 			default:
 				L.d("Unknown message: " + msg);
@@ -706,5 +737,9 @@ public class WiseManager {
 	
 	public interface GetServiceListener {
 		public void onResponseService(List<Service> services);
+	}
+	
+	public interface GetTopologyListener {
+		public void onResponseTopology(List<Topology> topologies);
 	}
 }

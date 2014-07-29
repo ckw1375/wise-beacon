@@ -16,8 +16,12 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.WiseManager.GetBeaconGroupListener;
 import com.wisewells.sdk.WiseManager.GetServiceListener;
+import com.wisewells.sdk.WiseManager.GetTopologyListener;
+import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.Service;
+import com.wisewells.sdk.datas.Topology;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.topology.TopologyActivity;
 
@@ -74,8 +78,13 @@ public class ServiceActivity extends Activity {
 				onListItemClicked(position);
 			}
 		});
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		receiveRootService();
 		
-		readySpinnerDatas();
 	}
 
 	private void onAddButtonClicked() {
@@ -85,13 +94,12 @@ public class ServiceActivity extends Activity {
 			
 			@Override
 			public void onConfirmButtonClicked(String str) {
-				
+				mWiseManager.addService(str, mSelectedRootService.getCode());
+
 				/*
 				 * add beacon이 완료된것이 확인되면! (리스터 이용) display 해줘야 한다!!
 				 */
-				mWiseManager.addService(str);
-				
-				
+				receiveRowLankService();
 			}
 		});
 	}
@@ -105,10 +113,10 @@ public class ServiceActivity extends Activity {
 		}
 		
 		mSelectedRootService = service;
-		mWiseManager.getService(mSelectedRootService.getCode(), new GetServiceListener() {
+		mWiseManager.getServices(mSelectedRootService.getCode(), new GetServiceListener() {
 			@Override
 			public void onResponseService(List<Service> services) {
-				mListAdapter.replaceWith(services);
+					mListAdapter.replaceWith(services);
 			}
 		});
 	}
@@ -121,8 +129,8 @@ public class ServiceActivity extends Activity {
 		startActivity(intent);
 	}
 	
-	private void readySpinnerDatas() {
-		mWiseManager.getService(null, new GetServiceListener() {
+	private void receiveRootService() {
+		mWiseManager.getServices(null, new GetServiceListener() {
 			@Override
 			public void onResponseService(List<Service> services) {
 				ArrayList<ServiceSpinnerData> datas = new ArrayList<ServiceSpinnerData>();
@@ -137,7 +145,43 @@ public class ServiceActivity extends Activity {
 		});
 	}
 	
-	private void readyListDatas() {
+	private void receiveRowLankService() {
+		if(mSelectedRootService == null) return;
 		
+		mWiseManager.getServices(mSelectedRootService.getCode(), new GetServiceListener() {
+			@Override
+			public void onResponseService(List<Service> services) {
+//				mListAdapter.replaceWith(services);
+				receiveTopologysInService(services);
+			}
+		});
+	}
+	
+	private void receiveTopologysInService(List<Service> services) {
+		ArrayList<String> topologyCodes = new ArrayList<String>();
+		for(Service service : services) {
+			topologyCodes.add(service.getTopologyCode());
+		}
+		
+		mWiseManager.getTopologies(topologyCodes, new GetTopologyListener() {
+			@Override
+			public void onResponseTopology(List<Topology> topologies) {
+				receiveBeaconGroupsInService(topologies);
+			}
+		});
+	}
+	
+	private void receiveBeaconGroupsInService(List<Topology> topologies) {
+		ArrayList<String> groupCodes = new ArrayList<String>();
+		for(Topology topology : topologies) {
+			groupCodes.add(topology.getBeaconGroupCode());
+		}
+		
+		mWiseManager.getBeaconGroups(groupCodes, new GetBeaconGroupListener() {
+			@Override
+			public void onResponseBeaconGroup(List<BeaconGroup> groups) {
+				
+			}
+		});
 	}
 }

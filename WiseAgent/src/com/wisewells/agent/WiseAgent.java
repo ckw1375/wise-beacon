@@ -361,13 +361,6 @@ public class WiseAgent extends android.app.Service {
 
 	}
 	
-	/*
-	 *	Set, Delete ���� �޼ҵ���� ��� �����δ� 
-	 *	1. ��Ʈ��ũ ��� �� �Ϸ�Ǹ� (������ ���� �� �ʿ� �Ӽ����� �޾ƿ�)
-	 *	2. Local DB�� �����ϰ�
-	 *	3. WiseObjects�� �����ϰ�
-	 *	4. Manager�� ���� App�� �Ϸ������ �˷��ش�. 
-	 */	
 	private void addBeaconGroup(String name, String parentCode, ArrayList<Beacon> beacons) {
 		
 		int major = WiseServer.requestMajor();
@@ -460,7 +453,7 @@ public class WiseAgent extends android.app.Service {
 
 	}
 
-	public void addBeacon(Beacon beacon) {
+	/*public void addBeacon(Beacon beacon) {
 		String code = WiseServer.requestCode();
 		int minor = WiseServer.requestMinor();
 							
@@ -475,7 +468,7 @@ public class WiseAgent extends android.app.Service {
 		
 		mWiseObjects.putBeacon(beacon);
 		mWiseObjects.putBeaconGroup(group);
-	}
+	}*/
 	
 	public void modifyBeacon(Beacon beacon) {
 		
@@ -485,8 +478,14 @@ public class WiseAgent extends android.app.Service {
 
 	}
 	
-	public void addService(Service service) {
+	public void addService(String name, String parentCode) {
+		String code = WiseServer.requestCode();
 		
+		Service service = new Service(name);
+		service.setCode(code);
+		
+		mWiseObjects.getService(parentCode).addChild(service);		
+		mWiseObjects.putService(service);
 	}
 
 	public void modifyService(Service service) {
@@ -543,6 +542,26 @@ public class WiseAgent extends android.app.Service {
 		}
 	}	
 	
+	private void sendBeaconGroups(ArrayList<String> codes, Messenger replyTo) {
+		ArrayList<BeaconGroup> groups = new ArrayList<BeaconGroup>();
+		for(String code : codes) {
+			groups.add(mWiseObjects.getBeaconGroup(code));
+		}
+		
+		Bundle data = new Bundle();
+		data.putParcelableArrayList(IPC.BUNDLE_DATA1, groups);
+		
+		Message message = Message.obtain(null, IPC.MSG_RESPONSE_BEACON_GROUP_LIST_WITH_CODE);
+		message.setData(data);
+		
+		try {
+			replyTo.send(message);
+		} catch (RemoteException e) {
+			L.e("Error in sendBeaconGroups");
+			e.printStackTrace();
+		}
+	}
+	
 	private void sendBeacons(String groupCode, Messenger replyTo) {
 		ArrayList<Beacon> beacons = mWiseObjects.getBeaconsInGroup(groupCode);
 		
@@ -580,14 +599,43 @@ public class WiseAgent extends android.app.Service {
 		ArrayList<Service> willSend = new ArrayList<Service>();
 		
 		for(Service service : services) {
-			if(parentCode == null && service.getParentCode() == null) willSend.add(service);
-			else if(service.getParentCode() != null && service.getParentCode().equals(parentCode)) willSend.add(service);
+			if(parentCode == null) {
+				if(service.getTreeLevel() == Service.SERVICE_TREE_ROOT) willSend.add(service);
+			}
+			else if(service.getParentCode() != null && service.getParentCode().equals(parentCode)) 
+				willSend.add(service);
 		}
 		
+		Bundle data = new Bundle();
+		data.putParcelableArrayList(IPC.BUNDLE_DATA1, willSend);
+		
+		Message message = Message.obtain(null, IPC.MSG_RESPONSE_SERVICE_LIST);
+		message.setData(data);
+		
 		try {
-			IpcUtils.sendMessage(IPC.MSG_RESPONSE_SERVICE_LIST, null, replyTo, new ArrayList<Service>());
+			replyTo.send(message);
 		} catch (RemoteException e) {
 			L.e("Error in sendService");
+		}
+	}
+	
+	private void sendTopologies(ArrayList<String> codes, Messenger replyTo) {
+		ArrayList<Topology> topologies = new ArrayList<Topology>();
+		for(String code : codes) {
+			topologies.add(mWiseObjects.getTopology(code));
+		}
+		
+		Bundle data = new Bundle();
+		data.putParcelableArrayList(IPC.BUNDLE_DATA1, topologies);
+		
+		Message message = Message.obtain(null, IPC.MSG_RESPONSE_TOPOLOGY_LIST_WITH_CODE);
+		message.setData(data);
+		
+		try {
+			replyTo.send(message);
+		} catch (RemoteException e) {
+			L.e("Error in sendBeaconGroups");
+			e.printStackTrace();
 		}
 	}
  
@@ -702,6 +750,12 @@ public class WiseAgent extends android.app.Service {
 							sendMajorGroups(code, replyTo);
 						}
 							break;
+						case IPC.MSG_BEACON_GROUP_LIST_GET_WITH_CODE:
+						{
+							ArrayList<String> codes = data.getStringArrayList(IPC.BUNDLE_DATA1);
+							sendBeaconGroups(codes, replyTo);
+							
+						}
 						case IPC.MSG_BEACON_ADD:
 							break;
 						case IPC.MSG_BEACON_MODIFY:
@@ -715,6 +769,11 @@ public class WiseAgent extends android.app.Service {
 						}
 							break;
 						case IPC.MSG_SERVICE_ADD:
+						{
+							String name = data.getString(IPC.BUNDLE_DATA1);
+							String parentCode = data.getString(IPC.BUNDLE_DATA2);
+							addService(name, parentCode);
+						}
 							break;
 						case IPC.MSG_SERVICE_MODIFY:
 							break;
@@ -734,6 +793,13 @@ public class WiseAgent extends android.app.Service {
 							break;
 						case IPC.MSG_TOPOLOGY_DELETE:
 							break;						
+						case IPC.MSG_TOPOLOGY_LIST_GET_WITH_CODE:
+						{
+							ArrayList<String> codes = data.getStringArrayList(IPC.BUNDLE_DATA1);
+							sendTopologies(codes, replyTo);
+						
+						}
+							break;
 
 						case 3:
 						case 6:

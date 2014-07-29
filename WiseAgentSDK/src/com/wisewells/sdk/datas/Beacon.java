@@ -101,7 +101,7 @@ public class Beacon implements Parcelable {
 		this.minor = minor;
 		
 		/*
-		 * ½ÇÁ¦ BeaconÀÇ Address °ªÀ» ¹Ù²ãÁÖ´Â µ¿ÀÛ Ãß°¡
+		 * ï¿½ï¿½ï¿½ï¿½ Beaconï¿½ï¿½ Address ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
 		 */
 	}
 	
@@ -177,7 +177,12 @@ public class Beacon implements Parcelable {
 		this.rssi = rssi;
 	}
 	
-	public void setBeaconGroupCode(String code) {
+	/**
+	 * ì´ í•¨ìˆ˜ëŠ” ì§ì ‘ ì‚¬ìš©ë˜ì§€ ì•ŠëŠ”ë‹¤
+	 * MinorGroupì— addBeaconì„ í†µí•´ beaconì„ ì¶”ê°€í•˜ë©´  ì¶”ê°€ëœë‹¤.
+	 * @param code
+	 */
+	void setBeaconGroupCode(String code) {
 		beaconGroupCode = code;
 	}
 }

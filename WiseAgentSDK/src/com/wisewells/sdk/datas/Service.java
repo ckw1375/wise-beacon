@@ -110,7 +110,12 @@ public class Service implements Parcelable{
 		return parentCode;
 	}
 
-	private void setParentCode(String parentCode) {
+	/**
+	 * 이 함수는 직접 사용되지 않는다
+	 * 부모 노드에 add하면 수행된다.
+	 * @param parentCode
+	 */
+	void setParentCode(String parentCode) {
 		this.parentCode = parentCode;
 	}
 

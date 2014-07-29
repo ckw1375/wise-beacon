@@ -1,15 +1,15 @@
-package com.wisewells.wisebeacon.service;
+package com.wisewells.sdk.ipc;
 
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
 
-public class ServiceListData {
+public class ServiceWithInnerObjects {
 	private Service service;
 	private Topology topology;
 	private BeaconGroup beaconGroup;
 	
-	public ServiceListData(Service service, Topology topology, BeaconGroup beaconGroup) {
+	public ServiceWithInnerObjects(Service service, Topology topology, BeaconGroup beaconGroup) {
 		this.service = service;
 		this.topology = topology;
 		this.beaconGroup = beaconGroup;

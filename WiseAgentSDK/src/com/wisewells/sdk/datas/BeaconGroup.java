@@ -91,10 +91,6 @@ public class BeaconGroup implements Parcelable{
 		t.setBeaconGroupCode(this.code);
 	}
 	
-	/*
-	 * Getter, Setter
-	 */
-	
 	public String getCode() {
 		return code;
 	}
@@ -107,7 +103,12 @@ public class BeaconGroup implements Parcelable{
 		return parentCode;
 	}
 
-	private void setParentCode(String parent) {
+	/**
+	 * 이 함수는 직접 사용되지 않는다
+	 * 부모 노드에 add하면 수행된다.
+	 * @param parent
+	 */
+	protected void setParentCode(String parent) {
 		this.parentCode = parent;
 	}
 	

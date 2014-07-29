@@ -72,7 +72,11 @@ public class Topology implements Parcelable {
 		return beaconGroupCode;
 	}
 
-	public void setBeaconGroupCode(String beaconGroupCode) {
+	/**
+	 * 직접 호출 되지 않고 BeaconGroup의 attachTo함수를 통해 수행된다.
+	 * @param beaconGroupCode
+	 */
+	protected void setBeaconGroupCode(String beaconGroupCode) {
 		this.beaconGroupCode = beaconGroupCode;
 	}
 
@@ -80,7 +84,11 @@ public class Topology implements Parcelable {
 		return serviceCode;
 	}
 
-	public void setServiceCode(String serviceCode) {
+	/**
+	 * 직접 호출 되지 않고 Service의 attachTo 함수를 통해 수행된다.
+	 * @param serviceCode
+	 */
+	protected void setServiceCode(String serviceCode) {
 		this.serviceCode = serviceCode;
 	}
 }

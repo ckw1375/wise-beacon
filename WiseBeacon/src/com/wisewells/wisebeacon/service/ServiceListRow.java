@@ -24,6 +24,7 @@ public class ServiceListRow extends FrameLayout {
 	}
 	
 	public void setData(Service service) {
+		mServiceName.setText(service.getName());
 		
 	}
 }

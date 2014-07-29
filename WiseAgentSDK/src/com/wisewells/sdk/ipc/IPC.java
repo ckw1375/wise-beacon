@@ -15,9 +15,10 @@ public abstract class IPC {
 	public static final int MSG_BEACON_GROUP_ADD		= 120;
 	public static final int MSG_BEACON_GROUP_MODIFY 	= 121;
 	public static final int MSG_BEACON_GROUP_DELETE 	= 122;
-	public static final int MSG_ADD_BEACON_TO_BEACON_GROUP	= 123;
+	public static final int MSG_ADD_BEACON_TO_BEACON_GROUP		= 123;
 	public static final int MSG_UUID_GROUP_LIST_GET		= 124;
 	public static final int MSG_MAJOR_GROUP_LIST_GET	= 125;
+	public static final int MSG_BEACON_GROUP_LIST_GET_WITH_CODE = 126;
 	
 	public static final int MSG_BEACON_ADD				= 130;
 	public static final int MSG_BEACON_MODIFY 			= 131;
@@ -32,6 +33,7 @@ public abstract class IPC {
 	public static final int MSG_TOPOLOGY_ADD			= 150;
 	public static final int MSG_TOPOLOGY_MODIFY			= 151;
 	public static final int MSG_TOPOLOGY_DELETE			= 152;		
+	public static final int MSG_TOPOLOGY_LIST_GET_WITH_CODE	= 153;
 	
 	public static final int MSG_DUMMY_BEACON_START		= 1000;
 	public static final int MSG_DUMMY_BEACON_STOP		= 1001;
@@ -49,6 +51,8 @@ public abstract class IPC {
 	public static final int MSG_RESPONSE_MAJOR_GROUP_LIST	= 204;
 	public static final int MSG_RESPONSE_BEACON_LIST		= 205;
 	public static final int MSG_RESPONSE_SERVICE_LIST		= 206;
+	public static final int MSG_RESPONSE_BEACON_GROUP_LIST_WITH_CODE	= 207;
+	public static final int MSG_RESPONSE_TOPOLOGY_LIST_WITH_CODE		= 208;
 	
 	/**
 	 * Bundle Data in Message Object
