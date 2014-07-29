@@ -22,14 +22,15 @@ import android.os.RemoteException;
 
 import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.sdk.aidl.IWiseAgent;
+import com.wisewells.sdk.aidl.MonitoringListener;
+import com.wisewells.sdk.aidl.RangingListener;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.MajorGroup;
+import com.wisewells.sdk.datas.ProximityTopology;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.datas.UuidGroup;
-import com.wisewells.sdk.ibeacon.MonitoringResult;
-import com.wisewells.sdk.ibeacon.RangingResult;
 import com.wisewells.sdk.ibeacon.Region;
 import com.wisewells.sdk.ibeacon.ScanPeriodData;
 import com.wisewells.sdk.utils.L;
@@ -41,15 +42,15 @@ public class WiseManager {
 			"AndroidManifest.xml does not contain android.permission.BLUETOOTH or "
 			+ "android.permission.BLUETOOTH_ADMIN permissions. ";			
 	
+	
 	private final Context mContext;
 	private final InternalServiceConnection mServiceConnection;
 	private final Messenger mIncomingMessenger;
 	private final Set<String> mRangedRegionIds;
 	private final Set<String> mMonitoredRegionIds;
 
+	private IWiseAgent mAgent;
 	private Messenger mSendingMessenger;
-	private RangingListener mRangingListener;
-	private MonitoringListener mMonitoringListener;
 	private ErrorListener mErrorListener;
 	private ServiceReadyCallback mReadyCallback;
 	private ScanPeriodData mForegroundScanPeriod;
@@ -151,13 +152,24 @@ public class WiseManager {
 		mSendingMessenger = null;
 	}
 
-
-	public void setRangingListener(RangingListener listener) {
-		mRangingListener = ((RangingListener)Preconditions.checkNotNull(listener, "listener cannot be null"));
+	/**
+	 * callback은 Main Thread에서 불리지 않는다.
+	 * @param listener
+	 * @throws RemoteException
+	 */
+	public void registerRangingListener(RangingListener listener) throws RemoteException {
+		RangingListener check = Preconditions.checkNotNull(listener, "listener cannot be null");
+		mAgent.registerRangingListener(check);
 	}
 
-	public void setMonitoringListener(MonitoringListener listener) {
-		mMonitoringListener = ((MonitoringListener)Preconditions.checkNotNull(listener, "listener cannot be null"));
+	/**
+	 * callback은 Main Thread에서 불리지 않는다.
+	 * @param listener
+	 * @throws RemoteException
+	 */
+	public void registerMonitoringListener(MonitoringListener listener) throws RemoteException {
+		MonitoringListener check = Preconditions.checkNotNull(listener, "listener cannot be null");
+		mAgent.registerMonitoringListener(check);
 	}
 
 	public void setErrorListener(ErrorListener listener) {
@@ -200,7 +212,7 @@ public class WiseManager {
 		}
 	}
 
-	public void startRanging(Region region) throws RemoteException {
+	public void startRanging(Region region) throws RemoteException {		
 		if (!isConnectedToService()) {
 			L.i("Not starting ranging, not connected to service");
 			return;
@@ -210,20 +222,9 @@ public class WiseManager {
 		if (mRangedRegionIds.contains(region.getIdentifier())) {
 			L.i("Region already ranged but that's OK: " + region);
 		}
-		mRangedRegionIds.add(region.getIdentifier());
-		
-		Bundle data = new Bundle();
-		data.putParcelable(IPC.BUNDLE_DATA1, region);
 
-		Message startRangingMsg = Message.obtain(null, IPC.MSG_START_RANGING);
-		startRangingMsg.setData(data);
-		startRangingMsg.replyTo = mIncomingMessenger;
-		try {
-			mSendingMessenger.send(startRangingMsg);
-		} catch (RemoteException e) {
-			L.e("Error while starting ranging", e);
-			throw e;
-		}
+		mRangedRegionIds.add(region.getIdentifier());
+		mAgent.startRanging(region);
 	}
 
 	public void stopRanging(Region region) throws RemoteException {
@@ -238,18 +239,7 @@ public class WiseManager {
 
 	private void internalStopRanging(String regionId) throws RemoteException {
 		mRangedRegionIds.remove(regionId);
-		
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, regionId);
-		
-		Message stopRangingMsg = Message.obtain(null, IPC.MSG_STOP_RANGING);
-		stopRangingMsg.setData(data);
-		try {
-			mSendingMessenger.send(stopRangingMsg);
-		} catch (RemoteException e) {
-			L.e("Error while stopping ranging", e);
-			throw e;
-		}
+		mAgent.stopRanging(regionId);
 	}
 
 	public void startMonitoring(Region region) throws RemoteException {
@@ -257,6 +247,7 @@ public class WiseManager {
 			L.i("Not starting monitoring, not connected to service");
 			return;
 		}
+		
 		Preconditions.checkNotNull(region, "region cannot be null");
 
 		if (mMonitoredRegionIds.contains(region.getIdentifier())) {
@@ -264,16 +255,7 @@ public class WiseManager {
 		}
 
 		mMonitoredRegionIds.add(region.getIdentifier());
-
-		Message startMonitoringMsg = Message.obtain(null, 4);
-		startMonitoringMsg.obj = region;
-		startMonitoringMsg.replyTo = mIncomingMessenger;
-		try {
-			mSendingMessenger.send(startMonitoringMsg);
-		} catch (RemoteException e) {
-			L.e("Error while starting monitoring", e);
-			throw e;
-		}
+		mAgent.startMonitoring(region);
 	}
 
 	public void stopMonitoring(Region region) throws RemoteException {
@@ -288,14 +270,7 @@ public class WiseManager {
 
 	private void internalStopMonitoring(String regionId) throws RemoteException {
 		mMonitoredRegionIds.remove(regionId);
-		Message stopMonitoringMsg = Message.obtain(null, 5);
-		stopMonitoringMsg.obj = regionId;
-		try {
-			mSendingMessenger.send(stopMonitoringMsg);
-		} catch (RemoteException e) {
-			L.e("Error while stopping ranging");
-			throw e;
-		}
+		mAgent.stopMonitoring(regionId);
 	}
 
 	private boolean isConnectedToService() {
@@ -426,6 +401,10 @@ public class WiseManager {
 		
 	}
 	
+	public List<Service> getRootServices() throws RemoteException {
+		return mAgent.getServices(null);
+	}
+	
 	public List<Service> getServices(String parentCode) throws RemoteException {
 		return mAgent.getServices(parentCode);
 	}
@@ -446,8 +425,14 @@ public class WiseManager {
 		return mAgent.getBeacons(groupCode);
 	}
 	
-	public List<Topology> getTopologies(ArrayList<String> codes) throws RemoteException {
-		return mAgent.getTopologies(codes);
+	public BeaconGroup getBeaconGroup(String code) throws RemoteException {
+		return mAgent.getBeaconGroup(code);
+	}
+
+	public Topology getTopology(String code) throws RemoteException {
+		Bundle bundle = mAgent.getTopology(code);
+		bundle.setClassLoader(Topology.class.getClassLoader());
+		return (Topology) bundle.get("topology");
 	}
 
 	private class IncomingHandler extends Handler {
@@ -460,22 +445,6 @@ public class WiseManager {
 			Bundle data = msg.getData();
 			
 			switch (msg.what) {
-			case IPC.MSG_RANGING_RESPONSE:
-				if (WiseManager.this.mRangingListener != null) {
-					data.setClassLoader(RangingResult.class.getClassLoader());
-					RangingResult rangingResult = (RangingResult) data.getParcelable(IPC.BUNDLE_DATA1);
-					mRangingListener.onBeaconsDiscovered(rangingResult.region, rangingResult.beacons);
-				}
-				break;
-			case IPC.MSG_MONITORING_RESPONSE:
-				if (WiseManager.this.mMonitoringListener != null) {
-					MonitoringResult monitoringResult = (MonitoringResult)msg.obj;
-					if (monitoringResult.state == Region.State.INSIDE)
-						WiseManager.this.mMonitoringListener.onEnteredRegion(monitoringResult.region);
-					else
-						WiseManager.this.mMonitoringListener.onExitedRegion(monitoringResult.region);
-				}
-				break;
 			case IPC.MSG_ERROR_RESPONSE:
 				if (WiseManager.this.mErrorListener != null) {
 					Integer errorId = (Integer)msg.obj;
@@ -487,8 +456,6 @@ public class WiseManager {
 			}
 		}
 	}
-
-	IWiseAgent mAgent;
 	
 	private class InternalServiceConnection implements ServiceConnection {
 		private InternalServiceConnection() {
@@ -530,15 +497,6 @@ public class WiseManager {
 
 	public static abstract interface ErrorListener  {
 		public abstract void onError(Integer code);
-	}
-
-	public static abstract interface MonitoringListener {
-		public abstract void onEnteredRegion(Region region);
-		public abstract void onExitedRegion(Region region);
-	}
-
-	public static abstract interface RangingListener {
-		public abstract void onBeaconsDiscovered(Region region, List<Beacon> beacons);
 	}
 
 	public static abstract interface ServiceReadyCallback {

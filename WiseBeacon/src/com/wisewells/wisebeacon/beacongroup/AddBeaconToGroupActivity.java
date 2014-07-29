@@ -13,11 +13,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.wisewells.sdk.Region;
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.WiseManager.RangingListener;
+import com.wisewells.sdk.aidl.RangingListener;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.MajorGroup;
+import com.wisewells.sdk.ibeacon.Region;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.beacongroup.AddBeaconToGroupBeaconNameDialog.ConfirmListener;
 
@@ -96,15 +96,23 @@ public class AddBeaconToGroupActivity extends Activity {
 		}
 	}
 	
+	RangingListener listener = new RangingListener.Stub() {
+		@Override
+		public void onBeaconsDiscovered(Region region, final List<Beacon> beacons)
+				throws RemoteException {
+			
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					mAdapter.replaceWith(beacons);
+				}
+			});
+		}		
+	};
+	
 	private void receiveAroundBeaconInformation() {
-		mWiseManager.setRangingListener(new RangingListener() {
-			@Override
-			public void onBeaconsDiscovered(Region region, List<Beacon> beacons) {
-				mAdapter.replaceWith(beacons);
-			}
-		});
-		
 		try {
+			mWiseManager.registerRangingListener(listener);
 			mWiseManager.startRanging(RANGING_REGION);
 		} catch (RemoteException e) {
 			e.printStackTrace();

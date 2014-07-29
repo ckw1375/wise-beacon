@@ -25,14 +25,18 @@ public class LocationTopology extends Topology implements Parcelable {
 		}
 	};
 	
-	public LocationTopology(String code, String name) {
-		super(code, name);
-		beaconLocations = new HashMap<String, Point>();
+	public LocationTopology(String name) {
+		super(name, Topology.TYPE_LOCATION);
+		init();
 	}
 
 	public LocationTopology(Parcel p) {
 		super(p);
 		beaconLocations = (HashMap<String, Point>) IpcUtils.readMapFromParcel(p, Point.class.getClassLoader());
+	}
+	
+	private void init() {
+		beaconLocations = new HashMap<String, Point>();
 	}
 	
 	@Override
@@ -48,7 +52,7 @@ public class LocationTopology extends Topology implements Parcelable {
 	
 	public Point getCurrentPoint(RssiVector vector) {
 		/*
-		 * ¹Ì±¸Çö
+		 * ï¿½Ì±ï¿½ï¿½ï¿½
 		 */
 		return null;
 	}

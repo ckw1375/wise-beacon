@@ -10,9 +10,9 @@ class MonitoringRegion extends RangingRegion
 	private long lastSeenTimeMillis = -1L;
 	private boolean wasInside;
 
-	public MonitoringRegion(Region region, Messenger replyTo)
+	public MonitoringRegion(Region region)
 	{
-		super(region, replyTo);
+		super(region);
 	}
  
 	public boolean markAsSeen(long currentTimeMillis)

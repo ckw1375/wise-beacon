@@ -32,6 +32,8 @@ import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.sdk.IPC;
 import com.wisewells.sdk.aidl.IWiseAgent;
 import com.wisewells.sdk.aidl.IWiseAgent.Stub;
+import com.wisewells.sdk.aidl.MonitoringListener;
+import com.wisewells.sdk.aidl.RangingListener;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.MajorGroup;
@@ -39,8 +41,6 @@ import com.wisewells.sdk.datas.MinorGroup;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.datas.UuidGroup;
-import com.wisewells.sdk.ibeacon.MonitoringResult;
-import com.wisewells.sdk.ibeacon.RangingResult;
 import com.wisewells.sdk.ibeacon.Region;
 import com.wisewells.sdk.ibeacon.ScanPeriodData;
 import com.wisewells.sdk.utils.BeaconUtils;
@@ -70,6 +70,7 @@ public class WiseAgent extends android.app.Service {
 	private AlarmManager mAlarmManager;
 	private HandlerThread mHandlerThread;
 	private Handler mHandler;
+	private Handler mUiHanlder;
 	private Runnable mAfterScanCycleTask;
 	private boolean mScanning;
 	private Messenger mErrorReplyTo;
@@ -80,6 +81,9 @@ public class WiseAgent extends android.app.Service {
 	private PendingIntent mAfterScanPendingIntent;
 	private ScanPeriodData mForegroundScanPeriod;
 	private ScanPeriodData mBackgroundScanPeriod;
+	
+	private RangingListener mRangingListener;
+	private MonitoringListener mMonitoringListener;
 	
 	private void makeDummyData() {
 		mWiseObjects.putBeaconGroup(Dummy.getUUidGroup());
@@ -106,7 +110,7 @@ public class WiseAgent extends android.app.Service {
 		super.onCreate();		
 		if(DEBUG_MODE) android.os.Debug.waitForDebugger();
 		L.i("Creating service");
- 
+		
 		mAlarmManager = ((AlarmManager)getSystemService("alarm"));
 		BluetoothManager bluetoothManager = (BluetoothManager)getSystemService("bluetooth");
 		mAdapter = bluetoothManager.getAdapter();
@@ -114,6 +118,7 @@ public class WiseAgent extends android.app.Service {
 		mHandlerThread = new HandlerThread(THREAD_NAME_AGENT, 10);
 		mHandlerThread.start();
 		mHandler = new Handler(mHandlerThread.getLooper());
+		mUiHanlder = new Handler(getMainLooper());
 
 		mBluetoothReceiver = createBluetoothBroadcastReceiver();
 		mStartScanReceiver = createScanStartBroadcastReceiver();
@@ -146,59 +151,6 @@ public class WiseAgent extends android.app.Service {
 //		return mIncomingMessenger.getBinder();
 	}
 
-	private void startRanging(RangingRegion rangingRegion) {
-		checkNotOnUiThread();
-		L.v("Start ranging: " + rangingRegion.region);
-		Preconditions.checkNotNull(mAdapter, "Bluetooth adapter cannot be null");
-		mRangedRegions.add(rangingRegion);
-		startScanning();
-	}
-
-	private void stopRanging(String regionId) {
-		checkNotOnUiThread();
-		L.v("Stopping ranging: " + regionId);		
-		Iterator<RangingRegion> iterator = mRangedRegions.iterator();
-		while (iterator.hasNext()) {
-			RangingRegion rangingRegion = (RangingRegion)iterator.next();
-			if (regionId.equals(rangingRegion.region.getIdentifier())) {
-				iterator.remove();
-			}
-		}
-     
-		if ((mRangedRegions.isEmpty()) && (mMonitoredRegions.isEmpty())) {
-			removeAfterScanCycleCallback();
-			stopScanning();
-			mBeaconsFoundInScanCycle.clear();
-		}
-	}
-
-	public void startMonitoring(MonitoringRegion monitoringRegion) {
-		checkNotOnUiThread();
-		L.v("Starting monitoring: " + monitoringRegion.region);
-		Preconditions.checkNotNull(mAdapter, "Bluetooth adapter cannot be null");
-		mMonitoredRegions.add(monitoringRegion);
-		startScanning();
-   }
-
-	public void stopMonitoring(String regionId) {
-		L.v("Stopping monitoring: " + regionId);
-		checkNotOnUiThread();
-		Iterator<MonitoringRegion> iterator = mMonitoredRegions.iterator();
-		while (iterator.hasNext()) {
-			MonitoringRegion monitoringRegion = (MonitoringRegion)iterator.next();
-			if (regionId.equals(monitoringRegion.region.getIdentifier())) {
-				iterator.remove();
-			}
-		}
-     
-		if ((mMonitoredRegions.isEmpty()) && (mRangedRegions.isEmpty())) {
-			removeAfterScanCycleCallback();
-			stopScanning();
-			mBeaconsFoundInScanCycle.clear();
-		}
-	}
-
-   
 	private void startScanning() {
 		if (mScanning) {
 			L.d("Scanning already in progress, not starting one more");			
@@ -340,90 +292,6 @@ public class WiseAgent extends android.app.Service {
 
 	}
 	
-	private void addBeaconGroup(String name, String parentCode, ArrayList<Beacon> beacons) {
-		
-		int major = WiseServer.requestMajor();
-		
-		MajorGroup majorGroup = new MajorGroup(name);
-		majorGroup.setMajor(major);
-		majorGroup.setCode(WiseServer.requestCode());
-		
-		UuidGroup uuidGroup = (UuidGroup) mWiseObjects.getBeaconGroup(parentCode);
-		uuidGroup.addChild(majorGroup);
-		
-		L.i("name : " + name + " parent : " + parentCode + " " + majorGroup.toString() + " "  + uuidGroup.toString()); 
-		
-		for(Beacon beacon : beacons) {
-			int minor = WiseServer.requestMinor();
-			MinorGroup minorGroup = new MinorGroup("minor");
-			minorGroup.setMinor(minor);
-			minorGroup.setCode(WiseServer.requestCode());
-			minorGroup.addBeacon(beacon);		
-			
-			beacon.setAddress(((UuidGroup) mWiseObjects.getBeaconGroup(parentCode)).getUuid(), major, minor);
-			
-			majorGroup.addChild(minorGroup);
-			
-			mWiseObjects.putBeaconGroup(minorGroup);
-			mWiseObjects.putBeacon(beacon);
-		}
-		
-		mWiseObjects.putBeaconGroup(uuidGroup);
-		mWiseObjects.putBeaconGroup(majorGroup);
-	}
-	
-	private void addBeaconGroup(String name, String parentCode) {
-		int major = WiseServer.requestMajor();
-
-		MajorGroup majorGroup = new MajorGroup(name);
-		majorGroup.setMajor(major);
-		majorGroup.setCode(WiseServer.requestCode());
-
-		UuidGroup uuidGroup = (UuidGroup) mWiseObjects.getBeaconGroup(parentCode);
-		uuidGroup.addChild(majorGroup);
-
-		mWiseObjects.putBeaconGroup(uuidGroup);
-		mWiseObjects.putBeaconGroup(majorGroup);
-	}
-
-	private void addBeaconToBeaconGroup(String groupCode, ArrayList<Beacon> beacons) {
-		BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
-		
-		for(Beacon beacon : beacons) {
-			int minor = WiseServer.requestMinor();
-			MinorGroup minorGroup = new MinorGroup("minor");
-			minorGroup.setMinor(minor);
-			minorGroup.setCode(WiseServer.requestCode());
-			minorGroup.addBeacon(beacon);		
-			
-//			beacon.setAddress(((UuidGroup) mWiseObjects.getBeaconGroup(parentCode)).getUuid(), major, minor);
-			
-			group.addChild(minorGroup);
-			
-			mWiseObjects.putBeaconGroup(minorGroup);
-			mWiseObjects.putBeacon(beacon);
-		}
-		
-		mWiseObjects.putBeaconGroup(group);
-	}
-	
-	private void addBeaconToBeaconGroup(String groupCode, Beacon beacon) {
-		BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
-		
-		beacon.setCode(WiseServer.requestCode());
-		
-		int minor = WiseServer.requestMinor();
-		MinorGroup minorGroup = new MinorGroup("minor");
-		minorGroup.setMinor(minor);
-		minorGroup.setCode(WiseServer.requestCode());
-		minorGroup.addBeacon(beacon);	
-		
-		group.addChild(minorGroup);
-		
-		mWiseObjects.putBeaconGroup(minorGroup);
-		mWiseObjects.putBeacon(beacon);
-	}
-	
 	public void modifyBeaconGroup(BeaconGroup group) {
 		mWiseObjects.putBeaconGroup(group);
 	}
@@ -486,138 +354,7 @@ public class WiseAgent extends android.app.Service {
 	public void deleteTopology(String code) {
 
 	}
-	
-	private void sendUuidGroups(Messenger replyTo) {
 
-		ArrayList<UuidGroup> groups = mWiseObjects.getUuidGroups();
-		Bundle data = new Bundle();
-		data.putParcelableArrayList(IPC.BUNDLE_DATA1, groups);
-
-		Message message = Message.obtain(null, IPC.MSG_RESPONSE_UUID_GROUP_LIST);
-		message.setData(data);
-
-		try {
-			replyTo.send(message);
-		} catch (RemoteException e) {
-			L.e("Error while sending Beacon Group List");
-			e.printStackTrace();
-		}
-	}
-	
-	private void sendMajorGroups(String uuidGroupCode, Messenger replyTo) {
-		ArrayList<MajorGroup> groups = mWiseObjects.getMajorGroups(uuidGroupCode);
-		
-		Bundle data = new Bundle();
-		data.putParcelableArrayList(IPC.BUNDLE_DATA1, groups);
-		
-		Message message = Message.obtain(null, IPC.MSG_RESPONSE_MAJOR_GROUP_LIST);
-		message.setData(data);
-		
-		try {
-			replyTo.send(message);
-		} catch (RemoteException e) {
-			L.e("Error while sending Beacon Group List");
-			e.printStackTrace();
-		}
-	}	
-	
-	private void sendBeaconGroups(ArrayList<String> codes, Messenger replyTo) {
-		ArrayList<BeaconGroup> groups = new ArrayList<BeaconGroup>();
-		for(String code : codes) {
-			groups.add(mWiseObjects.getBeaconGroup(code));
-		}
-		
-		Bundle data = new Bundle();
-		data.putParcelableArrayList(IPC.BUNDLE_DATA1, groups);
-		
-		Message message = Message.obtain(null, IPC.MSG_RESPONSE_BEACON_GROUP_LIST_WITH_CODE);
-		message.setData(data);
-		
-		try {
-			replyTo.send(message);
-		} catch (RemoteException e) {
-			L.e("Error in sendBeaconGroups");
-			e.printStackTrace();
-		}
-	}
-	
-	private void sendBeacons(String groupCode, Messenger replyTo) {
-		ArrayList<Beacon> beacons = mWiseObjects.getBeaconsInGroup(groupCode);
-		
-		Bundle data = new Bundle();
-		data.putParcelableArrayList(IPC.BUNDLE_DATA1, beacons);
-		
-		Message message = Message.obtain(null, IPC.MSG_RESPONSE_BEACON_LIST);
-		message.setData(data);
-		
-		try {
-			replyTo.send(message);
-		} catch (RemoteException e) {
-			L.e("Error while sending Beacon List");
-			e.printStackTrace();
-		}
-	}
-
-	/*private void sendServices(int treeLevel, Messenger replyTo) {
-		ArrayList<Service> services = mWiseObjects.getServices();
-		ArrayList<Service> willSend = new ArrayList<Service>();
-		
-		for(Service service : services) {
-			if(service.getTreeLevel() == treeLevel) willSend.add(service);
-		}
-		
-		try {
-			IpcUtils.sendMessage(IPC.MSG_RESPONSE_SERVICE_LIST, null, replyTo, willSend);
-		} catch (RemoteException e) {
-			L.e("Error in sendService");
-		}
-	}*/
-	
-	private void sendServices(String parentCode, Messenger replyTo) {
-		ArrayList<Service> services = mWiseObjects.getServices();
-		ArrayList<Service> willSend = new ArrayList<Service>();
-		
-		for(Service service : services) {
-			if(parentCode == null) {
-				if(service.getTreeLevel() == Service.SERVICE_TREE_ROOT) willSend.add(service);
-			}
-			else if(service.getParentCode() != null && service.getParentCode().equals(parentCode)) 
-				willSend.add(service);
-		}
-		
-		Bundle data = new Bundle();
-		data.putParcelableArrayList(IPC.BUNDLE_DATA1, willSend);
-		
-		Message message = Message.obtain(null, IPC.MSG_RESPONSE_SERVICE_LIST);
-		message.setData(data);
-		
-		try {
-			replyTo.send(message);
-		} catch (RemoteException e) {
-			L.e("Error in sendService");
-		}
-	}
-	
-	private void sendTopologies(ArrayList<String> codes, Messenger replyTo) {
-		ArrayList<Topology> topologies = new ArrayList<Topology>();
-		for(String code : codes) {
-			topologies.add(mWiseObjects.getTopology(code));
-		}
-		
-		Bundle data = new Bundle();
-		data.putParcelableArrayList(IPC.BUNDLE_DATA1, topologies);
-		
-		Message message = Message.obtain(null, IPC.MSG_RESPONSE_TOPOLOGY_LIST_WITH_CODE);
-		message.setData(data);
-		
-		try {
-			replyTo.send(message);
-		} catch (RemoteException e) {
-			L.e("Error in sendBeaconGroups");
-			e.printStackTrace();
-		}
-	}
- 
 	private class InternalLeScanCallback implements BluetoothAdapter.LeScanCallback {
 		private InternalLeScanCallback() {
 		
@@ -644,24 +381,6 @@ public class WiseAgent extends android.app.Service {
 			WiseAgent.this.mHandler.post(new Runnable() {
 				public void run() {
 					switch (what) {
-						case IPC.MSG_START_RANGING:
-							data.setClassLoader(Region.class.getClassLoader());							
-							RangingRegion rangingRegion = 
-									new RangingRegion((Region)data.getParcelable(IPC.BUNDLE_DATA1), replyTo);
-							WiseAgent.this.startRanging(rangingRegion);
-							break;
-						case IPC.MSG_STOP_RANGING:							
-							String rangingRegionId = data.getString(IPC.BUNDLE_DATA1);
-							WiseAgent.this.stopRanging(rangingRegionId);
-							break;
-						case IPC.MSG_START_MONITORING:
-							MonitoringRegion monitoringRegion = new MonitoringRegion((Region)obj, replyTo);
-							WiseAgent.this.startMonitoring(monitoringRegion);
-							break;
-						case IPC.MSG_STOP_MONITORING:
-							String monitoredRegionId = (String)obj;
-							WiseAgent.this.stopMonitoring(monitoredRegionId);
-							break;
 						case IPC.MSG_REGISTER_ERROR_LISTENER:
 							WiseAgent.this.mErrorReplyTo = replyTo;
 							break;
@@ -726,12 +445,14 @@ public class WiseAgent extends android.app.Service {
 		}
 
 		private void processRanging() {
+			
 			for (RangingRegion rangedRegion : WiseAgent.this.mRangedRegions){
 				rangedRegion.processFoundBeacons(WiseAgent.this.mBeaconsFoundInScanCycle);
 			}
 		}
 
 		private List<MonitoringRegion> findEnteredRegions(long currentTimeMillis) {
+			
 			List<MonitoringRegion> didEnterRegions = new ArrayList<MonitoringRegion>();
 			for (Entry<Beacon, Long> entry : WiseAgent.this.mBeaconsFoundInScanCycle.entrySet()) {
 				for (MonitoringRegion monitoringRegion : matchingMonitoredRegions((Beacon)entry.getKey())) {
@@ -746,6 +467,7 @@ public class WiseAgent extends android.app.Service {
 		}
  
 		private List<MonitoringRegion> matchingMonitoredRegions(Beacon beacon) {
+			
 			List<MonitoringRegion> results = new ArrayList<MonitoringRegion>();
 			for (MonitoringRegion monitoredRegion : WiseAgent.this.mMonitoredRegions) {
 				if (BeaconUtils.isBeaconInRegion(beacon, monitoredRegion.region)) {
@@ -757,6 +479,7 @@ public class WiseAgent extends android.app.Service {
 		}
  
 		private void removeNotSeenBeacons(long currentTimeMillis) {
+			
 			for (RangingRegion rangedRegion : WiseAgent.this.mRangedRegions) {
 				rangedRegion.removeNotSeenBeacons(currentTimeMillis);
 			}
@@ -766,8 +489,8 @@ public class WiseAgent extends android.app.Service {
 			}
 		}
  
-		private List<MonitoringRegion> findExitedRegions(long currentTimeMillis)
-		{	
+		private List<MonitoringRegion> findExitedRegions(long currentTimeMillis) {	
+			
 			List<MonitoringRegion> didExitMonitors = new ArrayList<MonitoringRegion>();
 			for (MonitoringRegion monitoredRegion : WiseAgent.this.mMonitoredRegions) {
 				if (monitoredRegion.didJustExit(currentTimeMillis)) {
@@ -781,36 +504,25 @@ public class WiseAgent extends android.app.Service {
 		private void invokeCallbacks(List<MonitoringRegion> enteredMonitors, List<MonitoringRegion> exitedMonitors) {
 			for (RangingRegion rangingRegion : WiseAgent.this.mRangedRegions) {
 				try {
-					Bundle data = new Bundle();
-					data.putParcelable(IPC.BUNDLE_DATA1, new RangingResult(rangingRegion.region, rangingRegion.getSortedBeacons()));
-
-					Message rangingResponseMsg = Message.obtain(null, IPC.MSG_RANGING_RESPONSE);
-					rangingResponseMsg.setData(data);
-					rangingRegion.replyTo.send(rangingResponseMsg);
+					mRangingListener.onBeaconsDiscovered(rangingRegion.region, (List<Beacon>) rangingRegion.getSortedBeacons());
 				} catch (RemoteException e) {
 					L.e("Error while delivering responses", e);
 				}
 			}
        
 			for (MonitoringRegion didEnterMonitor : enteredMonitors) {
-				Message monitoringResponseMsg = Message.obtain(null, IPC.MSG_MONITORING_RESPONSE);
-				monitoringResponseMsg.obj = new MonitoringResult(didEnterMonitor.region, Region.State.INSIDE);
-				try
-				{
-					didEnterMonitor.replyTo.send(monitoringResponseMsg);
+				try {
+					mMonitoringListener.onEnteredRegion(didEnterMonitor.region);
 				} catch (RemoteException e) {
-					L.e("Error while delivering responses", e);
+					e.printStackTrace();
 				}
 			}
 			
 			for (MonitoringRegion didEnterMonitor : exitedMonitors) {
-				Message monitoringResponseMsg = Message.obtain(null, IPC.MSG_MONITORING_RESPONSE);
-				monitoringResponseMsg.obj = new MonitoringResult(didEnterMonitor.region, Region.State.OUTSIDE);
-				try
-				{
-					didEnterMonitor.replyTo.send(monitoringResponseMsg);
+				try {
+					mMonitoringListener.onExitedRegion(didEnterMonitor.region);
 				} catch (RemoteException e) {
-					L.e("Error while delivering responses", e);
+					e.printStackTrace();
 				}
 			}
 		}
@@ -820,12 +532,17 @@ public class WiseAgent extends android.app.Service {
 			WiseAgent.this.checkNotOnUiThread();
 			long now = System.currentTimeMillis();
 			WiseAgent.this.stopScanning();
+			
 			processRanging();
-			List enteredRegions = findEnteredRegions(now);
-			List exitedRegions = findExitedRegions(now);
+			List<MonitoringRegion> enteredRegions = findEnteredRegions(now);
+			List<MonitoringRegion> exitedRegions = findExitedRegions(now);
+			
 			removeNotSeenBeacons(now);
+			
 			WiseAgent.this.mBeaconsFoundInScanCycle.clear();
+			
 			invokeCallbacks(enteredRegions, exitedRegions);
+			
 			if (WiseAgent.this.scanWaitTimeMillis() == 0L)
 				WiseAgent.this.startScanning();
 			else
@@ -922,16 +639,16 @@ public class WiseAgent extends android.app.Service {
 			return beacons;
 		}
 
-		@Override
-		public List<Topology> getTopologies(List<String> codes)
-				throws RemoteException {
-			
-			ArrayList<Topology> topologies = new ArrayList<Topology>();
-			for(String code : codes) {
-				topologies.add(mWiseObjects.getTopology(code));
-			}
-			return topologies;
-		}
+//		@Override
+//		public List<Topology> getTopologies(List<String> codes)
+//				throws RemoteException {
+//			
+//			ArrayList<Topology> topologies = new ArrayList<Topology>();
+//			for(String code : codes) {
+//				topologies.add(mWiseObjects.getTopology(code));
+//			}
+//			return topologies;
+//		}
 
 		@Override
 		public void addService(String name, String parentCode)
@@ -962,6 +679,106 @@ public class WiseAgent extends android.app.Service {
 			}
 			
 			return willReturn;
+		}
+
+		@Override
+		public void setBackgroundScanPeriod(long scanPeriodMillis, long waitTimeMillis)
+				throws RemoteException {
+			
+		}
+
+		@Override
+		public void setForegroundScanPeriod(long scanPeriodMillis, long waitTimeMillis)
+				throws RemoteException {
+			
+		}
+
+		@Override
+		public void startMonitoring(Region region) throws RemoteException {
+			checkNotOnUiThread();
+			
+			MonitoringRegion monitoringRegion = new MonitoringRegion(region);			
+			
+			L.v("Starting monitoring: " + monitoringRegion.region);			
+			Preconditions.checkNotNull(mAdapter, "Bluetooth adapter cannot be null");
+			
+			mMonitoredRegions.add(monitoringRegion);
+			startScanning();
+		}
+
+		@Override
+		public void startRanging(Region region) throws RemoteException {
+			checkNotOnUiThread();
+			
+			RangingRegion rangingRegion = new RangingRegion(region);	
+			
+			L.v("Start ranging: " + rangingRegion.region);
+			Preconditions.checkNotNull(mAdapter, "Bluetooth adapter cannot be null");
+			
+			mRangedRegions.add(rangingRegion);
+			startScanning();
+		}
+
+		@Override
+		public void stopMonitoring(String regionId) throws RemoteException {
+			L.v("Stopping monitoring: " + regionId);
+			checkNotOnUiThread();
+			Iterator<MonitoringRegion> iterator = mMonitoredRegions.iterator();
+			while (iterator.hasNext()) {
+				MonitoringRegion monitoringRegion = (MonitoringRegion)iterator.next();
+				if (regionId.equals(monitoringRegion.region.getIdentifier())) {
+					iterator.remove();
+				}
+			}
+	     
+			if ((mMonitoredRegions.isEmpty()) && (mRangedRegions.isEmpty())) {
+				removeAfterScanCycleCallback();
+				stopScanning();
+				mBeaconsFoundInScanCycle.clear();
+			}
+		}
+
+		@Override
+		public void stopRanging(String regionId) throws RemoteException {
+			checkNotOnUiThread();
+			L.v("Stopping ranging: " + regionId);		
+			Iterator<RangingRegion> iterator = mRangedRegions.iterator();
+			while (iterator.hasNext()) {
+				RangingRegion rangingRegion = (RangingRegion)iterator.next();
+				if (regionId.equals(rangingRegion.region.getIdentifier())) {
+					iterator.remove();
+				}
+			}
+	     
+			if ((mRangedRegions.isEmpty()) && (mMonitoredRegions.isEmpty())) {
+				removeAfterScanCycleCallback();
+				stopScanning();
+				mBeaconsFoundInScanCycle.clear();
+			}
+		}
+
+		@Override
+		public void registerMonitoringListener(MonitoringListener listener)
+				throws RemoteException {
+			mMonitoringListener = listener;
+		}
+
+		@Override
+		public void registerRangingListener(RangingListener listener)
+				throws RemoteException {
+			mRangingListener = listener;
+		}
+
+		@Override
+		public BeaconGroup getBeaconGroup(String code) throws RemoteException {
+			return new MajorGroup("test group");
+		}
+
+		@Override
+		public Bundle getTopology(String code) throws RemoteException {
+			Bundle bundle = new Bundle();
+			bundle.putParcelable("topology", mWiseObjects.getTopology(code));
+			return bundle;
 		}
 	};
 }

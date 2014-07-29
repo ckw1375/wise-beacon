@@ -1,5 +1,8 @@
 package com.wisewells.wisebeacon.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +17,9 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.Service;
+import com.wisewells.sdk.datas.Topology;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.topology.TopologyActivity;
 
@@ -76,7 +81,7 @@ public class ServiceActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-//		receiveRootService();
+		receiveRootService();
 		
 	}
 
@@ -96,7 +101,7 @@ public class ServiceActivity extends Activity {
 				/*
 				 * add beacon이 완료된것이 확인되면! (리스터 이용) display 해줘야 한다!!
 				 */
-//				receiveRowLankService();
+				receiveRowLankService();
 			}
 		});
 	}
@@ -109,76 +114,97 @@ public class ServiceActivity extends Activity {
 			return;
 		}
 		
-//		mSelectedRootService = service;
-//		mWiseManager.getServices(mSelectedRootService.getCode(), new GetServiceListener() {
-//			@Override
-//			public void onResponseService(List<Service> services) {
-//					mListAdapter.replaceWith(services);
-//			}
-//		});
+		mSelectedRootService = service;
+		receiveRowLankService();
 	}
 	
 	private void onListItemClicked(int position) {
-		Service service = mListAdapter.getItem(position);
+		Service service = mListAdapter.getItem(position).getService();
 		
 		Intent intent = new Intent(this, TopologyActivity.class);
 		intent.putExtra(EXTRA_SERVICE_OBJECT, service);
 		startActivity(intent);
 	}
 	
-//	private void receiveRootService() {
-//		mWiseManager.getServices(null, new GetServiceListener() {
-//			@Override
-//			public void onResponseService(List<Service> services) {
-//				ArrayList<ServiceSpinnerData> datas = new ArrayList<ServiceSpinnerData>();
-//				datas.add(new ServiceSpinnerData("선택하세요."));
-//				
-//				for(Service service : services) {
-//					datas.add(new ServiceSpinnerData(service));
-//				}
-//				
-//				mSpinnerAdapter.addAll(datas);
-//			}
-//		});
-//	}
-//	
-//	private void receiveRowLankService() {
-//		if(mSelectedRootService == null) return;
-//		
-//		mWiseManager.getServices(mSelectedRootService.getCode(), new GetServiceListener() {
-//			@Override
-//			public void onResponseService(List<Service> services) {
-////				mListAdapter.replaceWith(services);
-//				receiveTopologysInService(services);
-//			}
-//		});
-//	}
-//	
-//	private void receiveTopologysInService(List<Service> services) {
-//		ArrayList<String> topologyCodes = new ArrayList<String>();
-//		for(Service service : services) {
-//			topologyCodes.add(service.getTopologyCode());
-//		}
-//		
-//		mWiseManager.getTopologies(topologyCodes, new GetTopologyListener() {
-//			@Override
-//			public void onResponseTopology(List<Topology> topologies) {
-//				receiveBeaconGroupsInService(topologies);
-//			}
-//		});
-//	}
-//	
-//	private void receiveBeaconGroupsInService(List<Topology> topologies) {
-//		ArrayList<String> groupCodes = new ArrayList<String>();
-//		for(Topology topology : topologies) {
-//			groupCodes.add(topology.getBeaconGroupCode());
-//		}
-//		
-//		mWiseManager.getBeaconGroups(groupCodes, new GetBeaconGroupListener() {
-//			@Override
-//			public void onResponseBeaconGroup(List<BeaconGroup> groups) {
-//				
-//			}
-//		});
-//	}
+	private void receiveRootService() {
+		List<Service> services = new ArrayList<Service>();
+		try {
+			services = mWiseManager.getRootServices();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		ArrayList<ServiceSpinnerData> datas = new ArrayList<ServiceSpinnerData>();
+		datas.add(new ServiceSpinnerData("선택하세요."));
+		
+		for(Service service : services) {
+			datas.add(new ServiceSpinnerData(service));
+		}
+		
+		mSpinnerAdapter.clear();
+		mSpinnerAdapter.addAll(datas);
+	}
+	
+	private void receiveRowLankService() {
+		if(mSelectedRootService == null) return;
+		
+		List<Service> services = new ArrayList<Service>();
+		try {
+			services = mWiseManager.getServices(mSelectedRootService.getCode());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		List<ServiceListData> datas = new ArrayList<ServiceListData>();
+		for(Service service : services)
+			datas.add(new ServiceListData(service, null, null));
+		
+		receiveTopologysInService(datas);
+	}
+	
+	private void receiveTopologysInService(List<ServiceListData> datas) {
+		for(ServiceListData data : datas) {
+			Service service = data.getService();
+			if(service == null) {
+				continue;
+			}
+			
+			String topologyCode = service.getTopologyCode();
+			if(topologyCode == null) {
+				continue;				
+			}
+			
+			try {
+				Topology topology = mWiseManager.getTopology(topologyCode);
+				data.setTopology(topology);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		receiveBeaconGroupsInService(datas);
+	}
+	
+	private void receiveBeaconGroupsInService(List<ServiceListData> datas) {
+		for(ServiceListData data : datas) {
+			Topology topology = data.getTopology();
+			if(topology == null) {
+				continue;
+			}
+			
+			String groupCode = topology.getBeaconGroupCode();
+			if(groupCode == null) {
+				continue;				
+			}
+			
+			try {
+				BeaconGroup beaconGroup = mWiseManager.getBeaconGroup(groupCode);
+				data.setBeaconGroup(beaconGroup);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		mListAdapter.replaceWith(datas);
+	}
 }

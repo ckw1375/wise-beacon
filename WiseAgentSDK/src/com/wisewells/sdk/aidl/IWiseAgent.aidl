@@ -7,6 +7,14 @@ import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.ibeacon.Region;
 
+import com.wisewells.sdk.aidl.RangingListener;
+import com.wisewells.sdk.aidl.MonitoringListener;
+
+
+/*
+ *	AIDL에서는 Parcel.CREATOR을 클래스에서 직접 지정해줘서, 다형성을 살릴 수 없다.
+ * 	이를 해결하고자 Bundle을 이용한다.
+ */
 interface IWiseAgent {
 	// BeaconGroup
 	void addBeaconGroup(String name, String parentCode);
@@ -15,22 +23,28 @@ interface IWiseAgent {
 	List<UuidGroup> getUuidGroups();
 	List<MajorGroup> getMajorGroups(String uuidGroupCode);
 	List<BeaconGroup> getBeaconGroups(in List<String> codes);
+	BeaconGroup getBeaconGroup(String code);
 	
 	// Beacon
 	List<Beacon> getBeacons(String groupCode);
 	
 	// Topology
-	List<Topology> getTopologies(in List<String> codes);
+	Bundle getTopology(String code);
 	
 	// Service
 	void addService(String name, String parentCode);
 	List<Service> getServices(String parentCode);
 	
+	
 	// Estimote
-	void startRanging(in Region region);
-	void stopRanging(in Region region);
-	void startMonitoring(in Region region);
-	void stopMonitoring(in Region region);
+	void startRanging(in com.wisewells.sdk.ibeacon.Region region);
+	void stopRanging(String regionId);
+	void startMonitoring(in com.wisewells.sdk.ibeacon.Region region);
+	void stopMonitoring(String regionId);
 	void setForegroundScanPeriod(long scanPeriodMillis, long waitTimeMillis);
 	void setBackgroundScanPeriod(long scanPeriodMillis, long waitTimeMillis);
+	
+	// Callback
+	void registerRangingListener(RangingListener listener);
+	void registerMonitoringListener(MonitoringListener listener);
 }

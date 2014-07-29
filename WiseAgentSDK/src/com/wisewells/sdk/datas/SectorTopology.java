@@ -22,8 +22,8 @@ public class SectorTopology extends Topology implements Parcelable {
 		}
 	};
 	
-	public SectorTopology(String code, String name) {
-		super(code, name);
+	public SectorTopology(String name) {
+		super(name, Topology.TYPE_SECTOR);
 		init();
 	}
 	
@@ -51,7 +51,7 @@ public class SectorTopology extends Topology implements Parcelable {
 	
 	public Sector getCurrnetSector(RssiVector vector) {
 		/*
-		 * ¹Ì±¸Çö
+		 * ï¿½Ì±ï¿½ï¿½ï¿½
 		 */
 		return null;
 	}
@@ -64,7 +64,7 @@ public class SectorTopology extends Topology implements Parcelable {
 		Sector sector = findSector(name);
 		
 		if(sector == null) {
-			// ¿¹¿ÜÃ³¸®
+			// ï¿½ï¿½ï¿½ï¿½Ã³ï¿½ï¿½
 			return;
 		}
 		
@@ -75,7 +75,7 @@ public class SectorTopology extends Topology implements Parcelable {
 		Sector sector = findSector(name);
 
 		if(sector == null) {
-			// ¿¹¿ÜÃ³¸®
+			// ï¿½ï¿½ï¿½ï¿½Ã³ï¿½ï¿½
 			return;
 		}
 
@@ -86,7 +86,7 @@ public class SectorTopology extends Topology implements Parcelable {
 		Sector sector = findSector(name);
 
 		if(sector == null) {
-			// ¿¹¿ÜÃ³¸®
+			// ï¿½ï¿½ï¿½ï¿½Ã³ï¿½ï¿½
 			return;
 		}
 		
@@ -97,7 +97,7 @@ public class SectorTopology extends Topology implements Parcelable {
 		Sector sector = findSector(name);
 
 		if(sector == null) {
-			// ¿¹¿ÜÃ³¸®
+			// ï¿½ï¿½ï¿½ï¿½Ã³ï¿½ï¿½
 			return;
 		}
 		sectors.remove(sector);

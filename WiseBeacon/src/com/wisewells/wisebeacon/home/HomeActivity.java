@@ -1,19 +1,21 @@
 package com.wisewells.wisebeacon.home;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 
-import com.wisewells.sdk.datas.BeaconGroup;
-import com.wisewells.sdk.datas.MajorGroup;
+import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.beacongroup.BeaconGroupActivity;
 import com.wisewells.wisebeacon.service.ServiceActivity;
-import com.wisewells.wisebeacon.topology.TopologyActivity;
 
 public class HomeActivity extends Activity {
 
@@ -66,7 +68,6 @@ public class HomeActivity extends Activity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-	
 	
 	private void onHistoryButtonClick() {
 	}

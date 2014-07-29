@@ -1,34 +1,42 @@
 package com.wisewells.sdk.datas;
 
+import com.wisewells.sdk.utils.L;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Topology implements Parcelable {
+public abstract class Topology implements Parcelable {
 
+	public static final int TYPE_PROXIMITY = 1;
+	public static final int TYPE_SECTOR = 2;
+	public static final int TYPE_LOCATION = 3;
+	
 	protected String code;
 	protected String name;
 	protected String beaconGroupCode;
 	protected String serviceCode;
+	protected int type; 
 
-	public static final Parcelable.Creator<Topology> CREATOR = new Creator<Topology>() {
+//	public static final Parcelable.Creator<Topology> CREATOR = new Creator<Topology>() {
+//
+//		@Override
+//		public Topology[] newArray(int size) {
+//			return new Topology[size];
+//		}
+//
+//		@Override
+//		public Topology createFromParcel(Parcel source) {
+//			L.w(getClass().getName());
+//			return new Topology(source);
+//		}
+//	};
 
-		@Override
-		public Topology[] newArray(int size) {
-			return new Topology[size];
-		}
-
-		@Override
-		public Topology createFromParcel(Parcel source) {
-			return new Topology(source);
-		}
-	};
-
-	public Topology(String code, String name) {
-		this.code = code;
+	protected Topology(String name, int type) {
 		this.name = name;
+		this.type = type;
 	}
 
-	public Topology(Parcel p) {
+	protected Topology(Parcel p) {
 		code = p.readString();
 		name = p.readString();
 		beaconGroupCode = p.readString();
@@ -42,6 +50,7 @@ public class Topology implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		L.w(getClass().getName());
 		dest.writeString(code);
 		dest.writeString(name);
 		dest.writeString(beaconGroupCode);
@@ -90,5 +99,9 @@ public class Topology implements Parcelable {
 	 */
 	protected void setServiceCode(String serviceCode) {
 		this.serviceCode = serviceCode;
+	}
+	
+	public int getType() {
+		return this.type;
 	}
 }

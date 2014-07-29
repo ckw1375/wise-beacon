@@ -26,6 +26,16 @@ public class ServiceListData {
 	public BeaconGroup getBeaconGroup() {
 		return this.beaconGroup;
 	}
-	
-	
+
+	public void setService(Service service) {
+		this.service = service;
+	}
+
+	public void setTopology(Topology topology) {
+		this.topology = topology;
+	}
+
+	public void setBeaconGroup(BeaconGroup beaconGroup) {
+		this.beaconGroup = beaconGroup;
+	}
 }

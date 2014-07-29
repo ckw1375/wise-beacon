@@ -25,8 +25,8 @@ public class ProximityTopology extends Topology implements Parcelable {
 		}
 	};
 	
-	public ProximityTopology(String code, String name) {
-		super(code, name);
+	public ProximityTopology(String name) {
+		super(name, Topology.TYPE_PROXIMITY);
 		init();
 	}
 	
@@ -56,7 +56,7 @@ public class ProximityTopology extends Topology implements Parcelable {
 	
 	public Beacon getNearestBeacon(RssiVector vector) {
 		/*
-		 * ¹Ì±¸Çö
+		 * ï¿½Ì±ï¿½ï¿½ï¿½
 		 */
 		
 		return null;

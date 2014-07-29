@@ -24,11 +24,9 @@ class RangingRegion {
 
 	private final ConcurrentHashMap<Beacon, Long> beacons;
 	final Region region;
-	final Messenger replyTo;
 
-	RangingRegion(Region region, Messenger replyTo) {
+	RangingRegion(Region region) {
 		this.region = region;
-		this.replyTo = replyTo;
 		this.beacons = new ConcurrentHashMap<Beacon, Long>();
 	}
 
@@ -38,10 +36,6 @@ class RangingRegion {
 		return sortedBeacons;
 	}
 
-	/**
-	 * @param beaconsFoundInScanCycle
-	 * Scan Sycle ���� ã�� Beacon�� �� Region�� ���ϴ� Beacon���� �����ؼ� ����. 
-	 */
 	public final void processFoundBeacons(Map<Beacon, Long> beaconsFoundInScanCycle) {
 		for (Map.Entry<Beacon, Long> entry : beaconsFoundInScanCycle.entrySet())
 			if (BeaconUtils.isBeaconInRegion((Beacon)entry.getKey(), this.region)) {

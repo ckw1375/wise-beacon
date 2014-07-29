@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.wisebeacon.BaseArrayAdapter;
 
-public class ServiceListAdapter extends BaseArrayAdapter<Service> {
+public class ServiceListAdapter extends BaseArrayAdapter<ServiceListData> {
 	
 	public ServiceListAdapter(Context context) {
 		super(context);
