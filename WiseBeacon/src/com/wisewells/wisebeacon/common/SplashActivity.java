@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon;
+package com.wisewells.wisebeacon.common;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.wisewells.sdk.WiseManager;
+import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.home.HomeActivity;
 
 public class SplashActivity extends Activity {

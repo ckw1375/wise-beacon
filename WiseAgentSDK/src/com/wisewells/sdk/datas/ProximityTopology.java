@@ -61,6 +61,11 @@ public class ProximityTopology extends Topology implements Parcelable {
 		
 		return null;
 	}
+
+	@Override
+	public String getTypeName() {
+		return "Proximity";
+	}
 	
 	
 }

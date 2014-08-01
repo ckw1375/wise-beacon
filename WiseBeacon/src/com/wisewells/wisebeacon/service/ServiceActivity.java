@@ -25,7 +25,10 @@ import com.wisewells.wisebeacon.topology.TopologyActivity;
 
 public class ServiceActivity extends Activity {
 
-	public static final String EXTRA_SERVICE_OBJECT = "service";
+	public static final String EXTRA_SERVICE = "service";
+	public static final String EXTRA_TOPOLOGY = "topology";
+	public static final String EXTRA_BEACON_GROUP = "group";
+	public static final String EXTRA_PARENT_SERVICE = "parent";
 	
 	private WiseManager mWiseManager;
 	private Service mSelectedRootService;
@@ -120,9 +123,15 @@ public class ServiceActivity extends Activity {
 	
 	private void onListItemClicked(int position) {
 		Service service = mListAdapter.getItem(position).getService();
+		Topology topology = mListAdapter.getItem(position).getTopology();
+		BeaconGroup group = mListAdapter.getItem(position).getBeaconGroup();
 		
-		Intent intent = new Intent(this, TopologyActivity.class);
-		intent.putExtra(EXTRA_SERVICE_OBJECT, service);
+		Intent intent = new Intent(this, DetailServiceActivity.class);
+		intent.putExtra(EXTRA_SERVICE, service);
+		intent.putExtra(EXTRA_TOPOLOGY, topology);
+		intent.putExtra(EXTRA_BEACON_GROUP, group);
+		intent.putExtra(EXTRA_PARENT_SERVICE, mSelectedRootService);
+		
 		startActivity(intent);
 	}
 	

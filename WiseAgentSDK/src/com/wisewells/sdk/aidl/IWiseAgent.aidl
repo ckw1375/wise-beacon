@@ -23,6 +23,7 @@ interface IWiseAgent {
 	List<UuidGroup> getUuidGroups();
 	List<MajorGroup> getMajorGroups(String uuidGroupCode);
 	List<BeaconGroup> getBeaconGroups(in List<String> codes);
+	Bundle getBeaconGroupsInAuthority();
 	BeaconGroup getBeaconGroup(String code);
 	
 	// Beacon

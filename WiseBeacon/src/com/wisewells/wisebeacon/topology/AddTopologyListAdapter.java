@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.wisewells.sdk.datas.BeaconGroup;
-import com.wisewells.wisebeacon.BaseArrayAdapter;
+import com.wisewells.wisebeacon.common.BaseArrayAdapter;
 
 public class AddTopologyListAdapter extends BaseArrayAdapter<BeaconGroup> {
 

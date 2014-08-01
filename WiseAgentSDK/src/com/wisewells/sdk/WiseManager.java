@@ -62,7 +62,7 @@ public class WiseManager {
 		if(sInstance == null) sInstance = new WiseManager(context);
 		return sInstance;
 	}
-	
+
 	private WiseManager(Context context) {
 		mContext = ((Context)Preconditions.checkNotNull(context));
 		mServiceConnection = new InternalServiceConnection();
@@ -428,11 +428,17 @@ public class WiseManager {
 	public BeaconGroup getBeaconGroup(String code) throws RemoteException {
 		return mAgent.getBeaconGroup(code);
 	}
+	
+	public List<BeaconGroup> getBeaconGroupsInAuthority() throws RemoteException {
+		Bundle bundle = mAgent.getBeaconGroupsInAuthority();
+		bundle.setClassLoader(BeaconGroup.class.getClassLoader());
+		return bundle.getParcelableArrayList(IPC.BUNDLE_DATA1);
+	}
 
 	public Topology getTopology(String code) throws RemoteException {
 		Bundle bundle = mAgent.getTopology(code);
 		bundle.setClassLoader(Topology.class.getClassLoader());
-		return (Topology) bundle.get("topology");
+		return bundle.getParcelable(IPC.BUNDLE_DATA1);
 	}
 
 	private class IncomingHandler extends Handler {

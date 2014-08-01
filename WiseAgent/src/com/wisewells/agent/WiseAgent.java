@@ -777,7 +777,14 @@ public class WiseAgent extends android.app.Service {
 		@Override
 		public Bundle getTopology(String code) throws RemoteException {
 			Bundle bundle = new Bundle();
-			bundle.putParcelable("topology", mWiseObjects.getTopology(code));
+			bundle.putParcelable(IPC.BUNDLE_DATA1, mWiseObjects.getTopology(code));
+			return bundle;
+		}
+
+		@Override
+		public Bundle getBeaconGroupsInAuthority() throws RemoteException {
+			Bundle bundle = new Bundle();
+			bundle.putParcelableArrayList(IPC.BUNDLE_DATA1, mWiseObjects.getBeaconGroupsInAuthority());
 			return bundle;
 		}
 	};

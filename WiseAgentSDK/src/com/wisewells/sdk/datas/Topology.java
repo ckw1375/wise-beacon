@@ -104,4 +104,6 @@ public abstract class Topology implements Parcelable {
 	public int getType() {
 		return this.type;
 	}
+	
+	public abstract String getTypeName();
 }

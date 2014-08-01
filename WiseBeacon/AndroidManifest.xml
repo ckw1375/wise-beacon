@@ -19,7 +19,7 @@
         <activity android:name=".beacongroup.DetailBeaconGroupActivity" >
         </activity>
         <activity
-            android:name=".SplashActivity"
+            android:name=".common.SplashActivity"
             android:label="@string/title_activity_splash" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,8 +46,12 @@
             android:label="@string/title_activity_location_topology" >
         </activity>
         <activity
-            android:name="com.wisewells.wisebeacon.beacongroup.AddBeaconToGroupActivity"
+            android:name=".beacongroup.AddBeaconToGroupActivity"
             android:label="@string/title_activity_add_beacon_to_group" >
+        </activity>
+        <activity
+            android:name="com.wisewells.wisebeacon.service.DetailServiceActivity"
+            android:label="@string/title_activity_detail_service" >
         </activity>
     </application>
 

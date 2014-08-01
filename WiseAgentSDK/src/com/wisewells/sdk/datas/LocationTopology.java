@@ -60,4 +60,9 @@ public class LocationTopology extends Topology implements Parcelable {
 	public void setBeaconPoint(String beaconCode, Point point) {
 		beaconLocations.put(beaconCode, point);
 	}
+
+	@Override
+	public String getTypeName() {
+		return "Location";
+	}
 }

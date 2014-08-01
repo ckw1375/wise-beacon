@@ -21,7 +21,7 @@ public class ServiceListRow extends FrameLayout {
 		
 		LayoutInflater.from(context).inflate(R.layout.list_row_service, this);
 		mServiceName = (TextView) findViewById(R.id.txt_service_name);
-		mBeaconGroupName = (TextView) findViewById(R.id.txt_beacongroup_name);
+		mBeaconGroupName = (TextView) findViewById(R.id.txt_beacon_group_name);
 		mTopologyType = (TextView) findViewById(R.id.txt_topology_type);
 	}
 	

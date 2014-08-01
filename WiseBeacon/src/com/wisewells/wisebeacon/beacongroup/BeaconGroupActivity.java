@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -70,6 +69,7 @@ public class BeaconGroupActivity extends Activity {
 		
 		mSpinner = (Spinner) findViewById(R.id.group_spin_uuigroup);
 		mSpinner.setAdapter(mSpinnerAdapter);
+		
 		mSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

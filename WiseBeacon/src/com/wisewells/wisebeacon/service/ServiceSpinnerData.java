@@ -7,7 +7,7 @@ public class ServiceSpinnerData {
 	private Service service;
 
 	public ServiceSpinnerData(String spinnerContent) {
-		this.spinnerContent = spinnerContent; 
+		this.spinnerContent = spinnerContent;
 	}
 	
 	public ServiceSpinnerData(Service service) {

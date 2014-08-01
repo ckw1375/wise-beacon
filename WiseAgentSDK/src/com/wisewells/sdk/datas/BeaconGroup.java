@@ -63,6 +63,11 @@ public class BeaconGroup implements Parcelable{
 		dest.writeSerializable(topologyCodes);
 	}
 	
+	@Override
+	public String toString() {
+		return this.name + "(" + this.code + ")";
+	}
+	
 	public List<Beacon> getBeaconsInGroup() {
 		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
 		

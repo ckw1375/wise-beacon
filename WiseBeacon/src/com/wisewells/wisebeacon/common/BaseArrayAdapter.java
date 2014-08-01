@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon;
+package com.wisewells.wisebeacon.common;
 
 import java.util.ArrayList;
 import java.util.Collection;

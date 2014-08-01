@@ -6,9 +6,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.datas.Topology;
@@ -29,7 +32,6 @@ public class HomeActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         L.enableDebugLogging(true);
-        
         mBeaconButton = (Button) findViewById(R.id.main_beacon_button);
         mBeaconButton.setOnClickListener(new View.OnClickListener() {
 			@Override

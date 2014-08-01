@@ -27,10 +27,10 @@ import com.wisewells.sdk.utils.IpcUtils;
 
 public class WiseObjects implements Parcelable {
 	
-	private HashMap<String, Beacon> beacons;
-	private HashMap<String, BeaconGroup> beaconGroups;
-	private HashMap<String, Service> services;
-	private HashMap<String, Topology> topologies;
+	private HashMap<String, Beacon> mBeacons;
+	private HashMap<String, BeaconGroup> mBeaconGroups;
+	private HashMap<String, Service> mServices;
+	private HashMap<String, Topology> mTopologies;
 	
 	public static WiseObjects instance;
 	public static Parcelable.Creator<WiseObjects> CREATOR = new Creator<WiseObjects>() {
@@ -58,17 +58,17 @@ public class WiseObjects implements Parcelable {
 	}
 
 	private WiseObjects(Parcel p) {
-		beacons = (HashMap<String, Beacon>) IpcUtils.readMapFromParcel(p, Beacon.class.getClassLoader());;
-		beaconGroups = (HashMap<String, BeaconGroup>) IpcUtils.readMapFromParcel(p, BeaconGroup.class.getClassLoader());
-		services = (HashMap<String, Service>) IpcUtils.readMapFromParcel(p, Service.class.getClassLoader());
-		topologies = (HashMap<String, Topology>) IpcUtils.readMapFromParcel(p, Topology.class.getClassLoader());
+		mBeacons = (HashMap<String, Beacon>) IpcUtils.readMapFromParcel(p, Beacon.class.getClassLoader());;
+		mBeaconGroups = (HashMap<String, BeaconGroup>) IpcUtils.readMapFromParcel(p, BeaconGroup.class.getClassLoader());
+		mServices = (HashMap<String, Service>) IpcUtils.readMapFromParcel(p, Service.class.getClassLoader());
+		mTopologies = (HashMap<String, Topology>) IpcUtils.readMapFromParcel(p, Topology.class.getClassLoader());
 	}
 		
 	private void init() {
-		beacons = new HashMap<String, Beacon>();
-		beaconGroups = new HashMap<String, BeaconGroup>();
-		services = new HashMap<String, Service>();
-		topologies = new HashMap<String, Topology>();
+		mBeacons = new HashMap<String, Beacon>();
+		mBeaconGroups = new HashMap<String, BeaconGroup>();
+		mServices = new HashMap<String, Service>();
+		mTopologies = new HashMap<String, Topology>();
 	}
 	
 	@Override
@@ -78,53 +78,59 @@ public class WiseObjects implements Parcelable {
 	
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		IpcUtils.writeMapToParcel(dest, beacons);
-		IpcUtils.writeMapToParcel(dest, beaconGroups);
-		IpcUtils.writeMapToParcel(dest, services);
-		IpcUtils.writeMapToParcel(dest, topologies);
+		IpcUtils.writeMapToParcel(dest, mBeacons);
+		IpcUtils.writeMapToParcel(dest, mBeaconGroups);
+		IpcUtils.writeMapToParcel(dest, mServices);
+		IpcUtils.writeMapToParcel(dest, mTopologies);
 	}
 	
 	public Beacon getBeacon(String code) {
-		return (Beacon) beacons.get(code);
+		return (Beacon) mBeacons.get(code);
 	}
 
 	public BeaconGroup getBeaconGroup(String code) {
-		return (BeaconGroup) beaconGroups.get(code);
+		return (BeaconGroup) mBeaconGroups.get(code);
 	}
 	
 	public Service getService(String code) {
-		return (Service) services.get(code);
+		return (Service) mServices.get(code);
 	}
 	
 	public Topology getTopology(String code) {
-		return (Topology) topologies.get(code);
+		return (Topology) mTopologies.get(code);
 	}
 	
 	public ArrayList<Beacon> getBeacons() {
-		ArrayList<Beacon> beacons = new ArrayList<Beacon>(this.beacons.values());
+		ArrayList<Beacon> beacons = new ArrayList<Beacon>(mBeacons.values());
 		return beacons;
 	}
 	
 	public ArrayList<Beacon> getBeaconsInGroup(String groupCode) {
 		ArrayList<Beacon> beaconsInGroup = new ArrayList<Beacon>();
-		BeaconGroup group = this.beaconGroups.get(groupCode);
-		if( !(group instanceof MajorGroup) ) {
-			throw new RuntimeException("Group code is must MajorGroup's Code");
-		}
+		BeaconGroup group = mBeaconGroups.get(groupCode);
 		
-		for(String childCode : group.getChildCodes()) {
-			MinorGroup minor = (MinorGroup) this.beaconGroups.get(childCode);
-			Set<String> beaconCodes = minor.getChildCodes();
-			for(String beaconCode : beaconCodes) {
-				beaconsInGroup.add(this.beacons.get(beaconCode));
+		if(group instanceof UuidGroup) {
+			for(String code : group.getChildCodes()) {
+				beaconsInGroup.addAll(getBeaconsInGroup(code));
+				return beaconsInGroup;
 			}
 		}
 		
-		return beaconsInGroup;
+		if(group instanceof MajorGroup) {
+			for(String childCode : group.getChildCodes()) {
+				MinorGroup minor = (MinorGroup) mBeaconGroups.get(childCode);
+				for(String beaconCode : minor.getChildCodes()) {
+					beaconsInGroup.add(mBeacons.get(beaconCode));
+				}
+			}
+			return beaconsInGroup;
+		}
+		
+		throw new RuntimeException("Error in getBeaconsInGroup");
 	}
 	
 	public ArrayList<BeaconGroup> getBeaconGroups() {
-		ArrayList<BeaconGroup> beaconGroups = new ArrayList<BeaconGroup>(this.beaconGroups.values());
+		ArrayList<BeaconGroup> beaconGroups = new ArrayList<BeaconGroup>(mBeaconGroups.values());
 		return beaconGroups;
 	}
 	
@@ -139,39 +145,53 @@ public class WiseObjects implements Parcelable {
 	}
 	
 	public ArrayList<MajorGroup> getMajorGroups(String uuidGroupCode) {	
-		Set<String> majorCodes = this.beaconGroups.get(uuidGroupCode).getChildCodes();
+		Set<String> majorCodes = mBeaconGroups.get(uuidGroupCode).getChildCodes();
 		
 		ArrayList<MajorGroup> majorGroups = new ArrayList<MajorGroup>();
 		
 		for(String code : majorCodes) {
-			majorGroups.add((MajorGroup) this.beaconGroups.get(code));
+			majorGroups.add((MajorGroup) mBeaconGroups.get(code));
 		}
 		return majorGroups;
 	}
 	
+	public ArrayList<BeaconGroup> getBeaconGroupsInAuthority() {
+		ArrayList<BeaconGroup> groups = new ArrayList<BeaconGroup>(mBeaconGroups.values());
+		ArrayList<BeaconGroup> willReturn = new ArrayList<BeaconGroup>();
+		
+		for(BeaconGroup group : groups) {
+			if(group instanceof MinorGroup)
+				continue;
+			willReturn.add(group);
+		}
+		
+		return willReturn;
+	}
+	
+	
 	public ArrayList<Service> getServices() {
-		ArrayList<Service> s = new ArrayList<Service>(this.services.values());
+		ArrayList<Service> s = new ArrayList<Service>(mServices.values());
 		return s;
 	}
 	
 	public ArrayList<Topology> getTopologies() {
-		ArrayList<Topology> t = new ArrayList<Topology>(this.topologies.values());
+		ArrayList<Topology> t = new ArrayList<Topology>(mTopologies.values());
 		return t;
 	}
 	
 	public void putBeacon(Beacon beacon) {
-		beacons.put(beacon.getCode(), beacon);		
+		mBeacons.put(beacon.getCode(), beacon);		
 	}
 	
 	public void putBeaconGroup(BeaconGroup beaconGroup) {
-		beaconGroups.put(beaconGroup.getCode(), beaconGroup);		
+		mBeaconGroups.put(beaconGroup.getCode(), beaconGroup);		
 	}
 	
 	public void putService(Service service) {
-		services.put(service.getCode(), service);
+		mServices.put(service.getCode(), service);
 	}
 	
 	public void putTopology(Topology topology) {
-		topologies.put(topology.getCode(), topology);
+		mTopologies.put(topology.getCode(), topology);
 	}
 }

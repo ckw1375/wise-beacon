@@ -115,6 +115,12 @@ public class SectorTopology extends Topology implements Parcelable {
 		}
 		
 		return sector;
+	}
+
+
+	@Override
+	public String getTypeName() {
+		return "Sector";
 	}	
 }
 
