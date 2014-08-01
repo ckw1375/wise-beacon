@@ -21,14 +21,14 @@ public class Dummy {
 	
 	public static UuidGroup getUUidGroup() {
 		UuidGroup g = new UuidGroup("지오다노");
-		g.setCode("wise");
+		g.setCode("uuid-giordano");
 		g.setUuid("DF-36-34-A3");
 		return g;
 	}
 	
 	public static UuidGroup getUUidGroup2() {
 		UuidGroup g = new UuidGroup("교보문고");
-		g.setCode("wise2");
+		g.setCode("uuid-kyobo");
 		g.setUuid("AC-36-11-A3");
 		return g;
 	}
@@ -36,7 +36,6 @@ public class Dummy {
 	public static Service getRootService() {
 		Service s = new Service("지오다노");
 		s.setCode("giodarno");
-		
 		return s;
 	}
 	

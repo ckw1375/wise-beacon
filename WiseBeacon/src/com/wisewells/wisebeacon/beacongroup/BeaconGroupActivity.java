@@ -23,7 +23,8 @@ import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.MajorGroup;
 import com.wisewells.sdk.datas.UuidGroup;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.beacongroup.BeaconGroupDialog.ConfirmListener;
+import com.wisewells.wisebeacon.common.dialog.OneEditTwoButtonsDialog;
+import com.wisewells.wisebeacon.common.dialog.OneEditTwoButtonsDialog.ConfirmListener;
 
 public class BeaconGroupActivity extends Activity {
 
@@ -35,7 +36,8 @@ public class BeaconGroupActivity extends Activity {
 	private WiseManager mWiseManager;
 	private ListView mListView;
 	private BeaconGroupListAdapter mListAdapter;
-	private Button mAddButton;
+	private Button mAddMajorButton;
+	private Button mAddUuidButton;
 	private Spinner mSpinner;
 	private ArrayAdapter<BeaconGroupSpinnerData> mSpinnerAdapter;
 		
@@ -57,11 +59,19 @@ public class BeaconGroupActivity extends Activity {
 			}
 		});
 		
-		mAddButton = (Button) findViewById(R.id.group_add_button);
-		mAddButton.setOnClickListener(new View.OnClickListener() {
+		mAddMajorButton = (Button) findViewById(R.id.btn_add_major_group);
+		mAddMajorButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onAddButtonClicked();
+				onAddMajorButtonClicked();
+			}
+		});
+		
+		mAddUuidButton = (Button) findViewById(R.id.btn_add_uuid_group);
+		mAddUuidButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onAddUuidButtonClicked();
 			}
 		});
 
@@ -84,8 +94,8 @@ public class BeaconGroupActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		displayUuidGroupsInSpinner();		
-		if(mSelectedUuidGroup != null) displayMajorGroupsInListView(mSelectedUuidGroup);
+		updateUuidGroupSpinner();		
+		if(mSelectedUuidGroup != null) updateMajorGroupListView(mSelectedUuidGroup);
 	}
 	
 	@Override
@@ -107,20 +117,43 @@ public class BeaconGroupActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-	private void onAddButtonClicked() {		
-		BeaconGroupDialog dialog = new BeaconGroupDialog();
+	
+	private void onAddUuidButtonClicked() {
+		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
 		dialog.setConfirmListener(new ConfirmListener() {
 			@Override
 			public void onConfirmButtonClicked(String str) {
 				try {
-					mWiseManager.addBeaconGroup(str, mSelectedUuidGroup.getCode());
+					mWiseManager.addUuidGroup(str);
 					
 					/*
 					 * 
 					 * add beacon이 완료된것이 확인되면! (리스터 이용) display 해줘야 한다!!
 					 */
-					displayMajorGroupsInListView(mSelectedUuidGroup);
+					updateUuidGroupSpinner();
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+
+		dialog.show(getFragmentManager(), "dialog");
+	}
+
+	private void onAddMajorButtonClicked() {		
+		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
+		dialog.setConfirmListener(new ConfirmListener() {
+			@Override
+			public void onConfirmButtonClicked(String str) {
+				try {
+					mWiseManager.addMajorGroup(str, mSelectedUuidGroup.getCode());
+					
+					/*
+					 * 
+					 * add beacon이 완료된것이 확인되면! (리스터 이용) display 해줘야 한다!!
+					 */
+					updateMajorGroupListView(mSelectedUuidGroup);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -140,10 +173,10 @@ public class BeaconGroupActivity extends Activity {
 
 	private void onSpinnerItemSelected(int position) {
 		mSelectedUuidGroup = (UuidGroup) mSpinnerAdapter.getItem(position).getUuidGroup();		
-		displayMajorGroupsInListView(mSelectedUuidGroup);
+		updateMajorGroupListView(mSelectedUuidGroup);
 	}
 	
-	private void displayMajorGroupsInListView(UuidGroup uuidGroup) {
+	private void updateMajorGroupListView(UuidGroup uuidGroup) {
 		List<MajorGroup> groups = new ArrayList<MajorGroup>();
 		try {
 			groups = mWiseManager.getMajorGroups(uuidGroup.getCode());
@@ -155,7 +188,7 @@ public class BeaconGroupActivity extends Activity {
 		mListAdapter.replaceWith(param);
 	}
 	
-	private void displayUuidGroupsInSpinner() {
+	private void updateUuidGroupSpinner() {
 		List<UuidGroup> groups = new ArrayList<UuidGroup>();
 		
 		try {

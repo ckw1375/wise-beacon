@@ -17,7 +17,8 @@ import com.wisewells.sdk.aidl.MonitoringListener;
  */
 interface IWiseAgent {
 	// BeaconGroup
-	void addBeaconGroup(String name, String parentCode);
+	void addUuidGroup(String name);
+	void addMajorGroup(String name, String parentCode);
 	void addBeaconsToBeaconGroup(String groupCode, in List<Beacon> beacons); // 이거 안쓰이나???
 	void addBeaconToBeaconGroup(String groupCode, in Beacon beacon);
 	List<UuidGroup> getUuidGroups();

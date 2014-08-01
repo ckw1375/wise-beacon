@@ -48,7 +48,7 @@ import com.wisewells.sdk.utils.L;
 
 public class WiseAgent extends android.app.Service {
 
-	static final boolean DEBUG_MODE = true;
+	static final boolean DEBUG_MODE = false;
 	
 	static final long EXPIRATION_MILLIS = TimeUnit.SECONDS.toMillis(10L);
 	
@@ -85,8 +85,9 @@ public class WiseAgent extends android.app.Service {
 	private MonitoringListener mMonitoringListener;
 	
 	private void makeDummyData() {
-		mWiseObjects.putBeaconGroup(Dummy.getUUidGroup());
-		mWiseObjects.putBeaconGroup(Dummy.getUUidGroup2());
+		BeaconGroup d = mWiseObjects.getBeaconGroup("uuid-kyobo");
+//		mWiseObjects.putBeaconGroup(Dummy.getUUidGroup());
+//		mWiseObjects.putBeaconGroup(Dummy.getUUidGroup2());
 		mWiseObjects.putService(Dummy.getRootService());
 		mWiseObjects.putService(Dummy.getRootService2());
 	}
@@ -549,18 +550,23 @@ public class WiseAgent extends android.app.Service {
 	}
 	
 	IWiseAgent.Stub mBinder = new Stub() {
+		
 		@Override
-		public void addBeaconGroup(String name, String parentCode) throws RemoteException {
-			int major = WiseServer.requestMajor();
-
+		public void addUuidGroup(String name) {
+			UuidGroup uuidGroup = new UuidGroup(name);
+			uuidGroup.setUuid(WiseServer.requestUuid());
+			uuidGroup.setCode(WiseServer.requestCode());
+			
+			mWiseObjects.putBeaconGroup(uuidGroup);
+		}
+		
+		@Override
+		public void addMajorGroup(String name, String parentCode) throws RemoteException {
 			MajorGroup majorGroup = new MajorGroup(name);
-			majorGroup.setMajor(major);
+			majorGroup.setMajor(WiseServer.requestMajor());
 			majorGroup.setCode(WiseServer.requestCode());
 
-			UuidGroup uuidGroup = (UuidGroup) mWiseObjects.getBeaconGroup(parentCode);
-			uuidGroup.addChild(majorGroup);
-
-			mWiseObjects.putBeaconGroup(uuidGroup);
+			mWiseObjects.getBeaconGroup(parentCode).addChild(majorGroup);;
 			mWiseObjects.putBeaconGroup(majorGroup);
 		}
 

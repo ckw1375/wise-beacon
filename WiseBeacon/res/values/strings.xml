@@ -16,5 +16,7 @@
     <string name="string_sector_information">Sector 정보</string>
     <string name="string_save">저장</string>
     <string name="string_cancel">취소</string>
+    <string name="string_beacon_group_management">비콘그룹 관리</string>
+    <string name="string_service_managerment">서비스 관리</string>
 
 </resources>

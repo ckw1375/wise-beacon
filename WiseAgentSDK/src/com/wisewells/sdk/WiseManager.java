@@ -312,25 +312,12 @@ public class WiseManager {
 		
 	}
 	
-	/*public void addBeaconGroup(String name, String parentCode, ArrayList<Beacon> beacons) throws RemoteException {
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, name);
-		data.putString(IPC.BUNDLE_DATA2, parentCode);
-		data.putParcelableArrayList(IPC.BUNDLE_DATA3, beacons);
-		
-		Message msg = Message.obtain(null, IPC.MSG_BEACON_GROUP_ADD);
-		msg.setData(data);
-		
-		try {
-			mSendingMessenger.send(msg);
-		} catch (RemoteException e) {
-			L.e("Error while adding Beacon Group");
-			throw e;
-		}
-	}*/
+	public void addUuidGroup(String name) throws RemoteException {
+		mAgent.addUuidGroup(name);
+	}
 	
-	public void addBeaconGroup(String name, String parentCode) throws RemoteException {
-		mAgent.addBeaconGroup(name, parentCode);
+	public void addMajorGroup(String name, String parentCode) throws RemoteException {
+		mAgent.addMajorGroup(name, parentCode);
 	}
 	
 	public void addBeaconsToBeaconGroup(String groupCode, ArrayList<Beacon> beacons) throws RemoteException {

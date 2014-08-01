@@ -24,7 +24,7 @@ public class UuidGroup extends BeaconGroup implements Parcelable {
 		super(name);
 	}
 
-	public UuidGroup(Parcel p) {
+	private UuidGroup(Parcel p) {
 		super(p);
 		uuid = p.readString();
 	}
