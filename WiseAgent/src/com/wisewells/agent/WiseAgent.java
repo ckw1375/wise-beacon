@@ -48,7 +48,7 @@ import com.wisewells.sdk.utils.L;
 
 public class WiseAgent extends android.app.Service {
 
-	static final boolean DEBUG_MODE = false;
+	static final boolean DEBUG_MODE = true;
 	
 	static final long EXPIRATION_MILLIS = TimeUnit.SECONDS.toMillis(10L);
 	
@@ -70,7 +70,6 @@ public class WiseAgent extends android.app.Service {
 	private AlarmManager mAlarmManager;
 	private HandlerThread mHandlerThread;
 	private Handler mHandler;
-	private Handler mUiHanlder;
 	private Runnable mAfterScanCycleTask;
 	private boolean mScanning;
 	private Messenger mErrorReplyTo;
@@ -118,7 +117,6 @@ public class WiseAgent extends android.app.Service {
 		mHandlerThread = new HandlerThread(THREAD_NAME_AGENT, 10);
 		mHandlerThread.start();
 		mHandler = new Handler(mHandlerThread.getLooper());
-		mUiHanlder = new Handler(getMainLooper());
 
 		mBluetoothReceiver = createBluetoothBroadcastReceiver();
 		mStartScanReceiver = createScanStartBroadcastReceiver();

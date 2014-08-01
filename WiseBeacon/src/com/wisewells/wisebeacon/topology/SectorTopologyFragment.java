@@ -13,11 +13,11 @@ import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.service.DetailServiceActivity;
 
-public class LocationTopologyFragment extends Fragment {
+public class SectorTopologyFragment extends Fragment {
 	
 	private List<Beacon> mBeaconsInGroup;
 	
-	private LocationTopologyListAdapter mAdapter;
+	private SectorTopologyListAdapter mAdapter;
 	private ListView mListView;
 	
 	@Override
@@ -28,10 +28,10 @@ public class LocationTopologyFragment extends Fragment {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.fragment_location_topology, container, false);
+		View v = inflater.inflate(R.layout.fragment_sector_topology, container, false);
 		
-		mAdapter = new LocationTopologyListAdapter(getActivity());		
-		mListView = (ListView) v.findViewById(R.id.list_location_topology_setting);
+		mAdapter = new SectorTopologyListAdapter(getActivity());		
+		mListView = (ListView) v.findViewById(R.id.list_sector);
 		mListView.setAdapter(mAdapter);
 		initListDatas();
 		return v;
@@ -39,7 +39,7 @@ public class LocationTopologyFragment extends Fragment {
 	
 	private void initListDatas() {
 		for(Beacon beacon : mBeaconsInGroup) {
-			mAdapter.add(new LocationTopologyListData(beacon));		
+			mAdapter.add(new SectorTopologyListData(beacon));		
 		}
 	}
 }

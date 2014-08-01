@@ -9,21 +9,19 @@ import android.widget.TextView;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.wisebeacon.R;
 
-public class LocationTopologyListRow extends FrameLayout {
+public class ProximityTopologyListRow extends FrameLayout {
 
 	private TextView mBeaconName;
-	private EditText mXCoordinate;
-	private EditText mYCorrdinate;
+	private EditText mRange;
 	
-	public LocationTopologyListRow(Context context) {
+	public ProximityTopologyListRow(Context context) {
 		super(context);
-		LayoutInflater.from(context).inflate(R.layout.list_row_location_topology, this);
+		LayoutInflater.from(context).inflate(R.layout.list_row_proximity_topology, this);
 		mBeaconName = (TextView) findViewById(R.id.txt_beacon_name);
-		mXCoordinate = (EditText) findViewById(R.id.edit_x_coordinate);
-		mYCorrdinate = (EditText) findViewById(R.id.edit_y_coordinate);
+		mRange = (EditText) findViewById(R.id.edit_range);
 	}
 	
-	public void setData(LocationTopologyListData data) {
+	public void setData(ProximityTopologyListData data) {
 		mBeaconName.setText(data.getBeacon().getName());
 	}
 }

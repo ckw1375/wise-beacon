@@ -17,27 +17,8 @@
             android:gravity="center"
             android:text="TextView" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="X : " />
-
         <EditText
-            android:id="@+id/edit_x_coordinate"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number" >
-        </EditText>
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Y : " />
-
-        <EditText
-            android:id="@+id/edit_y_coordinate"
+            android:id="@+id/edit_range"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:ems="10"

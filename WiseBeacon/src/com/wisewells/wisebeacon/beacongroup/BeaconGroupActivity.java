@@ -129,10 +129,6 @@ public class BeaconGroupActivity extends Activity {
 		});
 
 		dialog.show(getFragmentManager(), "dialog");
-		
-		/*Intent intent = new Intent(this, AddGroupActivity.class);
-		intent.putExtra(EXTRA_UUID_GROUP_CODE, mUuidGroupCode);
-		startActivity(intent);*/
 	}
 	
 	private void onBeaconGroupListClicked(int position) {

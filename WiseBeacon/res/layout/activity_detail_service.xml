@@ -61,6 +61,7 @@
             android:id="@+id/TextView02"
             android:layout_width="90dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:text="비콘 그룹" />
 
         <FrameLayout
@@ -71,6 +72,7 @@
                 android:id="@+id/txt_beacon_group_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:text="TextView" />
 
             <Spinner
@@ -90,6 +92,7 @@
             android:id="@+id/TextView03"
             android:layout_width="90dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:text="Type" />
 
         <FrameLayout
@@ -100,6 +103,7 @@
                 android:id="@+id/txt_topology_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:text="TextView" />
 
             <Spinner
@@ -112,6 +116,7 @@
     </LinearLayout>
 
     <FrameLayout
+        android:id="@+id/layout_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
@@ -123,10 +128,10 @@
         android:layout_height="wrap_content" >
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/btn_save_topology"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="@string/string_save" />
 
         <TextView
             android:id="@+id/textView3"
@@ -135,10 +140,10 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btn_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="@string/string_cancel" />
 
     </LinearLayout>
 

@@ -21,7 +21,6 @@ import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.topology.TopologyActivity;
 
 public class ServiceActivity extends Activity {
 

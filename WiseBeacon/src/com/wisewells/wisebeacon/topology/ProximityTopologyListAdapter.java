@@ -4,19 +4,19 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.wisewells.sdk.datas.Topology;
+import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.wisebeacon.common.BaseArrayAdapter;
 
-public class TopologyListAdapter extends BaseArrayAdapter<Topology> {
+public class ProximityTopologyListAdapter extends BaseArrayAdapter<ProximityTopologyListData> {
 
-	public TopologyListAdapter(Context context) {
+	public ProximityTopologyListAdapter(Context context) {
 		super(context);
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		TopologyListRow view = (TopologyListRow) convertView;
-		if(view == null) view = new TopologyListRow(mContext);
+		ProximityTopologyListRow view = (ProximityTopologyListRow) convertView;
+		if(view == null) view = new ProximityTopologyListRow(mContext);
 		view.setData(getItem(position));
 		return view;
 	}

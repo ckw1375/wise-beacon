@@ -10,5 +10,11 @@
     <string name="title_activity_location_topology">LocationTopologyActivity</string>
     <string name="title_activity_add_beacon_to_group">AddBeaconToGroupActivity</string>
     <string name="title_activity_detail_service">DetailServiceActivity</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="string_location_information">Location 정보</string>
+    <string name="string_proximity_information">Proximity 정보</string>
+    <string name="string_sector_information">Sector 정보</string>
+    <string name="string_save">저장</string>
+    <string name="string_cancel">취소</string>
 
 </resources>

@@ -12,24 +12,39 @@ import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.topology.LocationTopologyFragment;
+import com.wisewells.wisebeacon.topology.ProximityTopologyFragment;
+import com.wisewells.wisebeacon.topology.SectorTopologyFragment;
 
 public class DetailServiceActivity extends Activity {
 
+	public static final String BUNDLE_BEACONS = "beacons";
+	
+	private static final int TOPOLOGY_TYPE_PROXIMITY = 0;
+	private static final int TOPOLOGY_TYPE_SECTOR = 1;
+	private static final int TOPOLOGY_TYPE_LOCATION = 2;
+	private static final String[] TOPOLOGY_TYPE = {
+		"Proximity", "Sector", "Location"
+	};
+	
 	private WiseManager mWiseManager;
 	private Service mService;
 	private Topology mTopology;
 	private BeaconGroup mBeaconGroup;
 	private Service mParentService;
+	private ArrayList<Beacon> mBeaconsInGroup;
 	
 	private TextView mParentServiceName;
 	private TextView mChildServiceName;
@@ -61,15 +76,60 @@ public class DetailServiceActivity extends Activity {
 			
 		mBeaconGroupAdapter = new ArrayAdapter<BeaconGroup>(this, android.R.layout.simple_spinner_dropdown_item);
 		mBeaconGroupSpinner = (Spinner) findViewById(R.id.spinner_beacon_group);
-		mBeaconGroupSpinner.setAdapter(mBeaconGroupAdapter);		
+		mBeaconGroupSpinner.setAdapter(mBeaconGroupAdapter);
+		mBeaconGroupSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				onBeaconGroupSelected(position);
+			}
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+			}
+		});
 		
 		mTopologyTypeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item);
 		mTopologyTypeSpinner = (Spinner) findViewById(R.id.spinner_topology_type);
 		mTopologyTypeSpinner.setAdapter(mTopologyTypeAdapter);
+		mTopologyTypeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				onTopologyTypeSelected(position);
+			}
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				
+			}
+		});
 		
 		initBeaconGroupView();
 		initTopologyTypeView();		
-		initFragmentArea();
+	}
+	
+	private void onBeaconGroupSelected(int position) {
+		try {
+			mBeaconsInGroup = new ArrayList<Beacon>(
+					mWiseManager.getBeacons(mBeaconGroupAdapter.getItem(position).getCode()));
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void onTopologyTypeSelected(int position) {
+		Fragment fragment = null;
+		switch(position) {
+		case TOPOLOGY_TYPE_LOCATION: fragment = new LocationTopologyFragment(); break;
+		case TOPOLOGY_TYPE_PROXIMITY: fragment = new ProximityTopologyFragment(); break;
+		case TOPOLOGY_TYPE_SECTOR: fragment = new SectorTopologyFragment(); break;
+		}
+
+		Bundle args = new Bundle();
+		args.putParcelableArrayList(BUNDLE_BEACONS, mBeaconsInGroup);
+		fragment.setArguments(args);
+
+		FragmentManager fm = getFragmentManager();
+		FragmentTransaction ft = fm.beginTransaction();
+		ft.replace(R.id.layout_fragment_container, fragment);
+		ft.commit();
 	}
 	
 	private void initBeaconGroupView() {
@@ -110,24 +170,6 @@ public class DetailServiceActivity extends Activity {
 			e.printStackTrace();
 		}
 		return groups;
-	}
-	
-	private void initFragmentArea() {
-		Fragment fragment = null;
-		
-		if(mTopology == null) fragment = new LocationTopologyFragment();
-		else {
-			switch(mTopology.getType()) {
-			case Topology.TYPE_LOCATION: fragment = new Fragment(); break;
-			case Topology.TYPE_PROXIMITY: fragment = new Fragment(); break;
-			case Topology.TYPE_SECTOR: fragment = new Fragment(); break;
-			}
-		}
-		
-		FragmentManager fm = getFragmentManager();
-		FragmentTransaction ft = fm.beginTransaction();
-		ft.add(R.id.layout_fragment_container, fragment);
-		ft.commit();
 	}
 	
 	private void getIntentDatas() {
