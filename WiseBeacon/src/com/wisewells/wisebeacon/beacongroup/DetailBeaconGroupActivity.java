@@ -18,8 +18,6 @@ import com.wisewells.wisebeacon.R;
 
 public class DetailBeaconGroupActivity extends Activity {
 	
-	private static final Region RANGING_REGION = new Region("beacons", null, null, null);
-	
 	public static final String EXTRA_UUID_GROUP_NAME = "uuid";
 	public static final String EXTRA_MAJOR_GROUP = "major";
 	

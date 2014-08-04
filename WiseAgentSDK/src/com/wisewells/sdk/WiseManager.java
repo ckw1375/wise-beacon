@@ -1,10 +1,7 @@
 package com.wisewells.sdk;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -14,24 +11,17 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.RemoteException;
 
 import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.sdk.aidl.IWiseAgent;
-import com.wisewells.sdk.aidl.MonitoringListener;
-import com.wisewells.sdk.aidl.RangingListener;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.MajorGroup;
-import com.wisewells.sdk.datas.Region;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.datas.UuidGroup;
-import com.wisewells.sdk.ibeacon.ScanPeriodData;
 import com.wisewells.sdk.utils.L;
 
 public class WiseManager {
@@ -41,19 +31,11 @@ public class WiseManager {
 			"AndroidManifest.xml does not contain android.permission.BLUETOOTH or "
 			+ "android.permission.BLUETOOTH_ADMIN permissions. ";			
 	
-	
 	private final Context mContext;
 	private final InternalServiceConnection mServiceConnection;
-	private final Messenger mIncomingMessenger;
-	private final Set<String> mRangedRegionIds;
-	private final Set<String> mMonitoredRegionIds;
 
 	private IWiseAgent mAgent;
-	private Messenger mSendingMessenger;
-	private ErrorListener mErrorListener;
 	private ServiceReadyCallback mReadyCallback;
-	private ScanPeriodData mForegroundScanPeriod;
-	private ScanPeriodData mBackgroundScanPeriod;	
 	
 	private static WiseManager sInstance;
 	
@@ -65,9 +47,6 @@ public class WiseManager {
 	private WiseManager(Context context) {
 		mContext = ((Context)Preconditions.checkNotNull(context));
 		mServiceConnection = new InternalServiceConnection();
-		mIncomingMessenger = new Messenger(new IncomingHandler());
-		mRangedRegionIds = new HashSet<String>();
-		mMonitoredRegionIds = new HashSet<String>();
 	}
 
 	public boolean hasBluetooth() {
@@ -84,19 +63,6 @@ public class WiseManager {
 		BluetoothAdapter adapter = bluetoothManager.getAdapter();
 		return (adapter != null) && (adapter.isEnabled());
 	}
-
-	/*public boolean checkPermissionsAndService() {
-		PackageManager pm = mContext.getPackageManager();
-		int bluetoothPermission = pm.checkPermission("android.permission.BLUETOOTH", mContext.getPackageName());
-		int bluetoothAdminPermission = pm.checkPermission("android.permission.BLUETOOTH_ADMIN", mContext.getPackageName());
-
-		Intent intent = new Intent(mContext, WiseAgent.class);
-		List<ResolveInfo> resolveInfo = pm.queryIntentServices(intent, PackageManager.MATCH_DEFAULT_ONLY);
-
-		return (bluetoothPermission == PackageManager.PERMISSION_GRANTED) && 
-				(bluetoothAdminPermission == PackageManager.PERMISSION_GRANTED) && 
-				(resolveInfo.size() > 0);
-	}*/
 	
 	public boolean checkPermissions() {
 		PackageManager pm = mContext.getPackageManager();
@@ -129,178 +95,11 @@ public class WiseManager {
 			return;
 		}
 
-		CopyOnWriteArraySet<String> tempRangedRegionIds = new CopyOnWriteArraySet<String>(mRangedRegionIds);
-		for (String regionId : tempRangedRegionIds) {
-			try {
-				internalStopRanging(regionId);
-			} catch (RemoteException e) {
-				L.e("Swallowing error while disconnect/stopRanging", e);
-			}
-		}
-
-		CopyOnWriteArraySet<String> tempMonitoredRegionIds = new CopyOnWriteArraySet<String>(mMonitoredRegionIds);
-		for (String regionId : tempMonitoredRegionIds) {
-			try {
-				internalStopMonitoring(regionId);
-			} catch (RemoteException e) {
-				L.e("Swallowing error while disconnect/stopMonitoring", e);
-			}
-		}
-
 		mContext.unbindService(mServiceConnection);
-		mSendingMessenger = null;
-	}
-
-	/**
-	 * callback은 Main Thread에서 불리지 않는다.
-	 * @param listener
-	 * @throws RemoteException
-	 */
-	public void registerRangingListener(RangingListener listener) throws RemoteException {
-		RangingListener check = Preconditions.checkNotNull(listener, "listener cannot be null");
-		mAgent.registerRangingListener(check);
-	}
-
-	/**
-	 * callback은 Main Thread에서 불리지 않는다.
-	 * @param listener
-	 * @throws RemoteException
-	 */
-	public void registerMonitoringListener(MonitoringListener listener) throws RemoteException {
-		MonitoringListener check = Preconditions.checkNotNull(listener, "listener cannot be null");
-		mAgent.registerMonitoringListener(check);
-	}
-
-	public void setErrorListener(ErrorListener listener) {
-		mErrorListener = listener;
-		if ((isConnectedToService()) && (listener != null))
-			registerErrorListenerInService();
-	}
-
-	public void setForegroundScanPeriod(long scanPeriodMillis, long waitTimeMillis) {
-		if (isConnectedToService())
-			setScanPeriod(new ScanPeriodData(scanPeriodMillis, waitTimeMillis), 10);
-		else
-			mForegroundScanPeriod = new ScanPeriodData(scanPeriodMillis, waitTimeMillis);
-	}
-
-	public void setBackgroundScanPeriod(long scanPeriodMillis, long waitTimeMillis) {
-		if (isConnectedToService())
-			setScanPeriod(new ScanPeriodData(scanPeriodMillis, waitTimeMillis), 9);
-		else
-			mBackgroundScanPeriod = new ScanPeriodData(scanPeriodMillis, waitTimeMillis);
-	}
-
-	private void setScanPeriod(ScanPeriodData scanPeriodData, int msgId) {
-		Message scanPeriodMsg = Message.obtain(null, msgId);
-		scanPeriodMsg.obj = scanPeriodData;
-		try {
-			mSendingMessenger.send(scanPeriodMsg);
-		} catch (RemoteException e) {
-			L.e("Error while setting scan periods: " + msgId);
-		}
-	}
-
-	private void registerErrorListenerInService() {
-		Message registerMsg = Message.obtain(null, 7);
-		registerMsg.replyTo = mIncomingMessenger;
-		try {
-			mSendingMessenger.send(registerMsg);
-		} catch (RemoteException e) {
-			L.e("Error while registering error listener");
-		}
-	}
-
-	public void startRanging(Region region) throws RemoteException {		
-		if (!isConnectedToService()) {
-			L.i("Not starting ranging, not connected to service");
-			return;
-		}
-		Preconditions.checkNotNull(region, "region cannot be null");
-
-		if (mRangedRegionIds.contains(region.getIdentifier())) {
-			L.i("Region already ranged but that's OK: " + region);
-		}
-
-		mRangedRegionIds.add(region.getIdentifier());
-		mAgent.startRanging(region);
-	}
-
-	public void stopRanging(Region region) throws RemoteException {
-		if (!isConnectedToService()) {
-			L.i("Not stopping ranging, not connected to service");
-			return;
-		}
-
-		Preconditions.checkNotNull(region, "region cannot be null");
-		internalStopRanging(region.getIdentifier());
-	}
-
-	private void internalStopRanging(String regionId) throws RemoteException {
-		mRangedRegionIds.remove(regionId);
-		mAgent.stopRanging(regionId);
-	}
-
-	public void startMonitoring(Region region) throws RemoteException {
-		if (!isConnectedToService()) {
-			L.i("Not starting monitoring, not connected to service");
-			return;
-		}
-		
-		Preconditions.checkNotNull(region, "region cannot be null");
-
-		if (mMonitoredRegionIds.contains(region.getIdentifier())) {
-			L.i("Region already monitored but that's OK: " + region);
-		}
-
-		mMonitoredRegionIds.add(region.getIdentifier());
-		mAgent.startMonitoring(region);
-	}
-
-	public void stopMonitoring(Region region) throws RemoteException {
-		if (!isConnectedToService()) {
-			L.i("Not stopping monitoring, not connected to service");
-			return;
-		}
-		Preconditions.checkNotNull(region, "region cannot be null");
-		internalStopMonitoring(region.getIdentifier());
-	}
-
-
-	private void internalStopMonitoring(String regionId) throws RemoteException {
-		mMonitoredRegionIds.remove(regionId);
-		mAgent.stopMonitoring(regionId);
 	}
 
 	private boolean isConnectedToService() {
-		return mSendingMessenger != null;
-	}
-	
-	public void registerMessenger() {
-		Message registerMsg = Message.obtain(null, IPC.MSG_MESSENGER_REGISTER);
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, mContext.getPackageName());
-		registerMsg.setData(data);
-		registerMsg.replyTo = mIncomingMessenger;
-		
-		try {
-			mSendingMessenger.send(registerMsg);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void unregisterMessenger() {
-		Message unregisterMsg = Message.obtain(null, IPC.MSG_MESSENGER_UNREGISTER);
-		Bundle data = new Bundle();
-		data.putString(IPC.BUNDLE_DATA1, mContext.getPackageName());
-		unregisterMsg.setData(data);
-		
-		try {
-			mSendingMessenger.send(unregisterMsg);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		return mAgent != null;
 	}
 	
 	public void startTracking() {
@@ -328,32 +127,10 @@ public class WiseManager {
 	}
 	
 	public void modifyBeaconGroup(BeaconGroup group) throws RemoteException {
-		Bundle data = new Bundle();
-		data.putParcelable(IPC.BUNDLE_DATA1, group);
-		
-		Message msg = Message.obtain(null, IPC.MSG_BEACON_GROUP_MODIFY);
-		msg.setData(data);
-		
-		try {
-			mSendingMessenger.send(msg);
-		} catch (RemoteException e) {
-			L.e("Error while modifying Beacon Group");
-			throw e;
-		}		
 	}
 
 	public void deleteBeaconGroup(String code) {
-
 	}
-
-	/*public void addBeacon(Beacon beacon) {
-		Message msg = Message.obtain(null, IPC.MSG_BEACON_ADD, beacon);
-		try {
-			mSendingMessenger.send(msg);
-		} catch (RemoteException e) {
-			L.e("Error while adding beacon");
-		}
-	}*/
 	
 	public void modifyBeacon(Beacon beacon) {
 		
@@ -426,27 +203,9 @@ public class WiseManager {
 		bundle.setClassLoader(Topology.class.getClassLoader());
 		return bundle.getParcelable(IPC.BUNDLE_DATA1);
 	}
-
-	private class IncomingHandler extends Handler {
-		private IncomingHandler() {
-
-		}
-
-		public void handleMessage(Message msg) {
-			
-			Bundle data = msg.getData();
-			
-			switch (msg.what) {
-			case IPC.MSG_ERROR_RESPONSE:
-				if (WiseManager.this.mErrorListener != null) {
-					Integer errorId = (Integer)msg.obj;
-					WiseManager.this.mErrorListener.onError(errorId);
-				}
-				break;
-			default:
-				L.d("Unknown message: " + msg);
-			}
-		}
+	
+	public IWiseAgent getAgent() {
+		return mAgent;
 	}
 	
 	private class InternalServiceConnection implements ServiceConnection {
@@ -455,40 +214,13 @@ public class WiseManager {
 
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			mAgent = IWiseAgent.Stub.asInterface(service);
-			
-			WiseManager.this.mSendingMessenger = new Messenger(service);
-			
-			registerMessenger();
-			
-			/*if (WiseManager.this.mErrorListener != null) {
-				WiseManager.this.registerErrorListenerInService();
-			}*/
-
-			if (WiseManager.this.mForegroundScanPeriod != null) {
-				WiseManager.this.setScanPeriod(WiseManager.this.mForegroundScanPeriod, 9);
-				WiseManager.this.mForegroundScanPeriod = null;
-			}
-
-			if (WiseManager.this.mBackgroundScanPeriod != null) {
-				WiseManager.this.setScanPeriod(WiseManager.this.mBackgroundScanPeriod, 10);
-				WiseManager.this.mBackgroundScanPeriod = null;
-			}
-
-			if (WiseManager.this.mReadyCallback != null) {
-				WiseManager.this.mReadyCallback.onServiceReady();
-				WiseManager.this.mReadyCallback = null;
-			}
+			WiseManager.this.mReadyCallback.onServiceReady();
 		}
 
 		public void onServiceDisconnected(ComponentName name) {
 			L.e("Service disconnected, crashed? " + name);
-			unregisterMessenger();
-			WiseManager.this.mSendingMessenger = null;
+			WiseManager.this.mAgent = null;
 		}
-	}
-
-	public static abstract interface ErrorListener  {
-		public abstract void onError(Integer code);
 	}
 
 	public static abstract interface ServiceReadyCallback {

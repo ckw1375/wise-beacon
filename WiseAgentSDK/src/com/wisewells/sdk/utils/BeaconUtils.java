@@ -76,7 +76,7 @@ public class BeaconUtils
    }
 
    public static boolean isBeaconInRegion(Beacon beacon, Region region) {
-	   return ((region.getUuid() == null) || (beacon.getProximityUUID().equals(region.getUuid()))) && ((region.getMajor() == null) || (beacon.getMajor() == region.getMajor().intValue())) && ((region.getMinor() == null) || (beacon.getMinor() == region.getMinor().intValue()));
+	   return ((region.getProximityUUID() == null) || (beacon.getProximityUUID().equals(region.getProximityUUID()))) && ((region.getMajor() == null) || (beacon.getMajor() == region.getMajor().intValue())) && ((region.getMinor() == null) || (beacon.getMinor() == region.getMinor().intValue()));
    }
 
    public static double computeAccuracy(Beacon beacon) {

@@ -4,16 +4,13 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.estimote.sdk.internal.Objects;
-import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.sdk.utils.BeaconUtils;
 
 public class Region implements Parcelable {
-	private final String identifier;
-	private final String uuid;
+	private final String proximityUUID;
 	private final Integer major;
 	private final Integer minor;
-
-	public static final Parcelable.Creator<Region> CREATOR = new Creator<Region>() {
+	public static final Parcelable.Creator<Region> CREATOR = new Parcelable.Creator<Region>() {
 		public Region createFromParcel(Parcel source) {
 			return new Region(source);
 		}
@@ -23,19 +20,14 @@ public class Region implements Parcelable {
 		}
 	};
 
-	public Region(String identifier, String uuid, Integer major, Integer minor) {
-		this.identifier = ((String) Preconditions.checkNotNull(identifier));
-		this.uuid = (uuid != null ? BeaconUtils.normalizeProximityUUID(uuid) : uuid);
+	public Region(String proximityUUID, Integer major, Integer minor) {
+		this.proximityUUID = (proximityUUID != null ? BeaconUtils.normalizeProximityUUID(proximityUUID) : proximityUUID);
 		this.major = major;
 		this.minor = minor;
 	}
 
-	public String getIdentifier() {
-		return this.identifier;
-	}
-
-	public String getUuid() {
-		return this.uuid;
+	public String getProximityUUID() {
+		return this.proximityUUID;
 	}
 
 	public Integer getMajor() {
@@ -47,9 +39,9 @@ public class Region implements Parcelable {
 	}
 
 	public String toString() {
-		return Objects.toStringHelper(this).add("identifier", this.identifier)
-				.add("Uuid", this.uuid).add("major", this.major)
-				.add("minor", this.minor).toString();
+		return Objects.toStringHelper(this)
+				.add("proximityUUID", this.proximityUUID)
+				.add("major", this.major).add("minor", this.minor).toString();
 	}
 
 	public boolean equals(Object o) {
@@ -66,8 +58,8 @@ public class Region implements Parcelable {
 		if (this.minor != null ? !this.minor.equals(region.minor)
 				: region.minor != null)
 			return false;
-		if (this.uuid != null ? !this.uuid.equals(region.uuid)
-				: region.uuid != null) {
+		if (this.proximityUUID != null ? !this.proximityUUID
+				.equals(region.proximityUUID) : region.proximityUUID != null) {
 
 			return false;
 		}
@@ -75,27 +67,58 @@ public class Region implements Parcelable {
 		return true;
 	}
 
+	public boolean includes(Object o) {
+		if (this == o)
+			return true;
+		if ((o == null) || (getClass() != o.getClass()))
+			return false;
+
+		Region region = (Region) o;
+
+		// UUID check
+		if (this.proximityUUID == null)
+			return true;
+		if (!this.proximityUUID.equals(region.proximityUUID))
+			return false;
+		// major check
+		if (this.major == null)
+			return true;
+		if (!this.major.equals(region.major))
+			return false;
+		// minor check
+		if (this.minor == null)
+			return true;
+		if (!this.minor.equals(region.major))
+			return false;
+
+		// UUID, major, minor are the same
+		return true;
+	}
+
 	public int hashCode() {
-		int result = this.uuid != null ? this.uuid.hashCode() : 0;
+		int result = this.proximityUUID != null ? this.proximityUUID.hashCode()
+				: 0;
 		result = 31 * result + (this.major != null ? this.major.hashCode() : 0);
 		result = 31 * result + (this.minor != null ? this.minor.hashCode() : 0);
+
 		return result;
 	}
 
 	private Region(Parcel parcel) {
-		this.identifier = parcel.readString();
-		this.uuid = parcel.readString();
-		
+		this.proximityUUID = parcel.readString();
 		Integer majorTemp = Integer.valueOf(parcel.readInt());
 		if (majorTemp.intValue() == -1) {
+
 			majorTemp = null;
 		}
+
 		this.major = majorTemp;
-		
 		Integer minorTemp = Integer.valueOf(parcel.readInt());
 		if (minorTemp.intValue() == -1) {
+
 			minorTemp = null;
 		}
+
 		this.minor = minorTemp;
 	}
 
@@ -104,14 +127,8 @@ public class Region implements Parcelable {
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(this.identifier);
-		dest.writeString(this.uuid);
+		dest.writeString(this.proximityUUID);
 		dest.writeInt(this.major == null ? -1 : this.major.intValue());
 		dest.writeInt(this.minor == null ? -1 : this.minor.intValue());
-	}
-
-	public static enum State {
-		INSIDE, 
-		OUTSIDE;
 	}
 }

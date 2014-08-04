@@ -10,12 +10,13 @@ import com.wisewells.sdk.datas.Region;
 import com.wisewells.sdk.aidl.RangingListener;
 import com.wisewells.sdk.aidl.MonitoringListener;
 
-
 /*
  *	AIDL에서는 Parcel.CREATOR을 클래스에서 직접 지정해줘서, 다형성을 살릴 수 없다.
  * 	이를 해결하고자 Bundle을 이용한다.
  */
+ 
 interface IWiseAgent {
+
 	// BeaconGroup
 	void addUuidGroup(String name);
 	void addMajorGroup(String name, String parentCode);
@@ -37,16 +38,10 @@ interface IWiseAgent {
 	void addService(String name, String parentCode);
 	List<Service> getServices(String parentCode);
 	
-	
-	// Estimote
-	void startRanging(in com.wisewells.sdk.datas.Region region);
-	void stopRanging(String regionId);
-	void startMonitoring(in com.wisewells.sdk.datas.Region region);
-	void stopMonitoring(String regionId);
-	void setForegroundScanPeriod(long scanPeriodMillis, long waitTimeMillis);
-	void setBackgroundScanPeriod(long scanPeriodMillis, long waitTimeMillis);
-	
+	// Receive Beacon
+	void startReceiving();
+	void stopReceiving();
+	List<Beacon> getAllNearbyBeacons();
+		
 	// Callback
-	void registerRangingListener(RangingListener listener);
-	void registerMonitoringListener(MonitoringListener listener);
 }
