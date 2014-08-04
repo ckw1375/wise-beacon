@@ -13,7 +13,7 @@ import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.service.DetailServiceActivity;
 
-public class ProximityTopologyFragment extends Fragment {
+public class ProximityTopologyFragment extends TopologyFragment {
 	
 	private List<Beacon> mBeaconsInGroup;
 	
@@ -38,8 +38,15 @@ public class ProximityTopologyFragment extends Fragment {
 	}
 	
 	private void initListDatas() {
+		mAdapter.clear();
 		for(Beacon beacon : mBeaconsInGroup) {
 			mAdapter.add(new ProximityTopologyListData(beacon));		
 		}
+	}
+	
+	@Override
+	public void updateListViewWith(List<Beacon> beacons) {
+		mBeaconsInGroup = beacons;
+		initListDatas();
 	}
 }

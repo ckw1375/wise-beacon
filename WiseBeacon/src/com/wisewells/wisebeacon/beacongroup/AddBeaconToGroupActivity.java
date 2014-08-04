@@ -17,9 +17,10 @@ import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.aidl.RangingListener;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.MajorGroup;
-import com.wisewells.sdk.ibeacon.Region;
+import com.wisewells.sdk.datas.Region;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.beacongroup.AddBeaconToGroupBeaconNameDialog.ConfirmListener;
+import com.wisewells.wisebeacon.common.dialog.OneEditTwoButtonsDialog;
+import com.wisewells.wisebeacon.common.dialog.OneEditTwoButtonsDialog.ConfirmListener;
 
 public class AddBeaconToGroupActivity extends Activity {
 
@@ -33,11 +34,14 @@ public class AddBeaconToGroupActivity extends Activity {
 	private Button mAddBeaconToGroupButton;
 	private ListView mListView;;
 	private AddBeaconToGroupBeaconListAdapter mAdapter;
+	private ListView mBeaconInGroupList;
+	private DetailBeaconGroupBeaconListAdapter mBeaconInGroupAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_beacon_to_group);
+		mWiseManager = WiseManager.getInstance(this);
 		
 		String uuidGroupName = getIntent().getStringExtra(DetailBeaconGroupActivity.EXTRA_UUID_GROUP_NAME);
 		mSelectedBeaconGroup = getIntent().getParcelableExtra(DetailBeaconGroupActivity.EXTRA_MAJOR_GROUP);
@@ -62,7 +66,10 @@ public class AddBeaconToGroupActivity extends Activity {
 		mListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 		mListView.setAdapter(mAdapter);
 		
-		mWiseManager = WiseManager.getInstance(this);
+		mBeaconInGroupAdapter = new DetailBeaconGroupBeaconListAdapter(this);
+		
+		mBeaconInGroupList = (ListView) findViewById(R.id.list_beacon_in_group);
+		mBeaconInGroupList.setAdapter(mBeaconInGroupAdapter);
 	}
 
 	@Override
@@ -120,7 +127,7 @@ public class AddBeaconToGroupActivity extends Activity {
 	}
 	
 	private void onAddBeaconClicked() {
-		AddBeaconToGroupBeaconNameDialog dialog = new AddBeaconToGroupBeaconNameDialog();
+		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
 		dialog.setConfirmListener(new ConfirmListener() {
 			@Override
 			public void onConfirmButtonClicked(String str) {
@@ -128,8 +135,8 @@ public class AddBeaconToGroupActivity extends Activity {
 				beacon.setName(str);
 				try {
 					mWiseManager.addBeaconToBeaconGroup(mSelectedBeaconGroup.getCode(), beacon);
+					mBeaconInGroupAdapter.replaceWith(mWiseManager.getBeacons(mSelectedBeaconGroup.getCode()));
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}

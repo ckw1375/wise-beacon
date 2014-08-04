@@ -31,7 +31,7 @@ public class AddBeaconToGroupBeaconListRow extends FrameLayout implements Checka
 	}
 	
 	public void setData(Beacon beacon) {
-		mUuidView.setText(beacon.getUuid());
+		mUuidView.setText(beacon.getProximityUUID());
 		mMajorView.setText(beacon.getMajor() + "");
 		mMinorView.setText(beacon.getMinor() + "");
 	}

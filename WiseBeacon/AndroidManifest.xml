@@ -41,6 +41,10 @@
             android:name=".service.DetailServiceActivity"
             android:label="@string/title_activity_detail_service" >
         </activity>
+        <activity
+            android:name=".DetailBeaconActivity"
+            android:label="@string/title_activity_detail_beacon" >
+        </activity>
     </application>
 
 </manifest>

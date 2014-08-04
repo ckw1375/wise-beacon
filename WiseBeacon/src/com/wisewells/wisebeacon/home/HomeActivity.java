@@ -64,7 +64,7 @@ public class HomeActivity extends Activity {
 		try {
 			List<BeaconGroup> groups = WiseManager.getInstance(this).getBeaconGroupsInAuthority();
 			for(BeaconGroup group : groups) {
-				L.w(group.toString());
+				L.w(group.toString() + " children : " + group.getChildCodes().size());
 			}
 			
 			List<Service> services = WiseManager.getInstance(this).getServices(null);
@@ -72,7 +72,6 @@ public class HomeActivity extends Activity {
 				L.w(service.toString());
 			}
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

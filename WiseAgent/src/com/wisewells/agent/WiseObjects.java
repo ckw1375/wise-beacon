@@ -112,7 +112,6 @@ public class WiseObjects implements Parcelable {
 		if(group instanceof UuidGroup) {
 			for(String code : group.getChildCodes()) {
 				beaconsInGroup.addAll(getBeaconsInGroup(code));
-				return beaconsInGroup;
 			}
 		}
 		
@@ -123,10 +122,8 @@ public class WiseObjects implements Parcelable {
 					beaconsInGroup.add(mBeacons.get(beaconCode));
 				}
 			}
-			return beaconsInGroup;
 		}
-		
-		throw new RuntimeException("Error in getBeaconsInGroup");
+		return beaconsInGroup;
 	}
 	
 	public ArrayList<BeaconGroup> getBeaconGroups() {

@@ -13,7 +13,7 @@ import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.service.DetailServiceActivity;
 
-public class SectorTopologyFragment extends Fragment {
+public class SectorTopologyFragment extends TopologyFragment {
 	
 	private List<Beacon> mBeaconsInGroup;
 	
@@ -38,8 +38,15 @@ public class SectorTopologyFragment extends Fragment {
 	}
 	
 	private void initListDatas() {
+		mAdapter.clear();
 		for(Beacon beacon : mBeaconsInGroup) {
 			mAdapter.add(new SectorTopologyListData(beacon));		
 		}
+	}
+	
+	@Override
+	public void updateListViewWith(List<Beacon> beacons) {
+		mBeaconsInGroup = beacons;
+		initListDatas();
 	}
 }

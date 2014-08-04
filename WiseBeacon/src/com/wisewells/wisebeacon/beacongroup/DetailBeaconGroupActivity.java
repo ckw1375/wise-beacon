@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.datas.MajorGroup;
-import com.wisewells.sdk.ibeacon.Region;
+import com.wisewells.sdk.datas.Region;
 import com.wisewells.wisebeacon.R;
 
 public class DetailBeaconGroupActivity extends Activity {

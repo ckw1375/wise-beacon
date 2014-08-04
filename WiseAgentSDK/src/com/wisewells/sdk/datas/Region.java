@@ -1,4 +1,4 @@
-package com.wisewells.sdk.ibeacon;
+package com.wisewells.sdk.datas;
 
 import android.os.Parcel;
 import android.os.Parcelable;

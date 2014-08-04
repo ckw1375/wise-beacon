@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.estimote.sdk.internal.Objects;
 import com.estimote.sdk.internal.Preconditions;
+import com.wisewells.sdk.datas.Region;
 
 public class MonitoringResult implements Parcelable
 {

@@ -18,5 +18,6 @@
     <string name="string_cancel">취소</string>
     <string name="string_beacon_group_management">비콘그룹 관리</string>
     <string name="string_service_managerment">서비스 관리</string>
+    <string name="title_activity_detail_beacon">DetailBeaconActivity</string>
 
 </resources>

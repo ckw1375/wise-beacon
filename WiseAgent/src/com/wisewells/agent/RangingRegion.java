@@ -8,10 +8,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import android.os.Messenger;
-
 import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.ibeacon.Region;
+import com.wisewells.sdk.datas.Region;
 import com.wisewells.sdk.utils.BeaconUtils;
 import com.wisewells.sdk.utils.L;
 

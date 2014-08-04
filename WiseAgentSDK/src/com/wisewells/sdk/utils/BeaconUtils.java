@@ -12,7 +12,7 @@ import android.content.IntentFilter;
 import com.estimote.sdk.internal.HashCode;
 import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.ibeacon.Region;
+import com.wisewells.sdk.datas.Region;
 
 public class BeaconUtils
 {
@@ -76,7 +76,7 @@ public class BeaconUtils
    }
 
    public static boolean isBeaconInRegion(Beacon beacon, Region region) {
-	   return ((region.getUuid() == null) || (beacon.getUuid().equals(region.getUuid()))) && ((region.getMajor() == null) || (beacon.getMajor() == region.getMajor().intValue())) && ((region.getMinor() == null) || (beacon.getMinor() == region.getMinor().intValue()));
+	   return ((region.getUuid() == null) || (beacon.getProximityUUID().equals(region.getUuid()))) && ((region.getMajor() == null) || (beacon.getMajor() == region.getMajor().intValue())) && ((region.getMinor() == null) || (beacon.getMinor() == region.getMinor().intValue()));
    }
 
    public static double computeAccuracy(Beacon beacon) {
@@ -84,7 +84,7 @@ public class BeaconUtils
 		   return -1.0D;
 	   }
 
-	   double ratio = beacon.getRssi() / beacon.getTxPower();
+	   double ratio = beacon.getRssi() / beacon.getMeasuredPower();
 	   double rssiCorrection = 0.96D + Math.pow(Math.abs(beacon.getRssi()), 3.0D) % 10.0D / 150.0D;
 
 	   if (ratio <= 1.0D) {
@@ -99,7 +99,7 @@ public class BeaconUtils
 			return -1.0D; // if we cannot determine accuracy, return -1.
 		}
 		
-		double ratio = beacon.getRssi() *1.0/ beacon.getTxPower();
+		double ratio = beacon.getRssi() *1.0/ beacon.getMeasuredPower();
 		
 		if (ratio < 1.0D) {
 			return Math.pow(ratio,10D);
@@ -116,7 +116,7 @@ public class BeaconUtils
 		   return -1.0D;
 	   }
 
-	   double ratio = beacon.getRssi() / beacon.getTxPower();
+	   double ratio = beacon.getRssi() / beacon.getMeasuredPower();
 	   double rssiCorrection = 0.96D + Math.pow(Math.abs(beacon.getRssi()), 3.0D) % 10.0D / 150.0D;
 
 	   if (ratio <= 1.0D) {

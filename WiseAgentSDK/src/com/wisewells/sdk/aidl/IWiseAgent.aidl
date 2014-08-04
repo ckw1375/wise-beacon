@@ -5,7 +5,7 @@ import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.datas.Service;
-import com.wisewells.sdk.ibeacon.Region;
+import com.wisewells.sdk.datas.Region;
 
 import com.wisewells.sdk.aidl.RangingListener;
 import com.wisewells.sdk.aidl.MonitoringListener;
@@ -39,9 +39,9 @@ interface IWiseAgent {
 	
 	
 	// Estimote
-	void startRanging(in com.wisewells.sdk.ibeacon.Region region);
+	void startRanging(in com.wisewells.sdk.datas.Region region);
 	void stopRanging(String regionId);
-	void startMonitoring(in com.wisewells.sdk.ibeacon.Region region);
+	void startMonitoring(in com.wisewells.sdk.datas.Region region);
 	void stopMonitoring(String regionId);
 	void setForegroundScanPeriod(long scanPeriodMillis, long waitTimeMillis);
 	void setBackgroundScanPeriod(long scanPeriodMillis, long waitTimeMillis);

@@ -27,11 +27,10 @@ import com.wisewells.sdk.aidl.RangingListener;
 import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.sdk.datas.BeaconGroup;
 import com.wisewells.sdk.datas.MajorGroup;
-import com.wisewells.sdk.datas.ProximityTopology;
+import com.wisewells.sdk.datas.Region;
 import com.wisewells.sdk.datas.Service;
 import com.wisewells.sdk.datas.Topology;
 import com.wisewells.sdk.datas.UuidGroup;
-import com.wisewells.sdk.ibeacon.Region;
 import com.wisewells.sdk.ibeacon.ScanPeriodData;
 import com.wisewells.sdk.utils.L;
 
