@@ -1,14 +1,14 @@
 package com.wisewells.wisebeacon.service;
 
-import com.wisewells.sdk.datas.BeaconGroup;
-import com.wisewells.sdk.datas.Service;
-import com.wisewells.sdk.datas.Topology;
-import com.wisewells.wisebeacon.R;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.service.Service;
+import com.wisewells.sdk.service.Topology;
+import com.wisewells.wisebeacon.R;
 
 public class ServiceListRow extends FrameLayout {
 
@@ -36,7 +36,7 @@ public class ServiceListRow extends FrameLayout {
 		if(group != null) mBeaconGroupName.setText(group.getName());
 		else mBeaconGroupName.setText("없음");
 		
-		if(topology != null) mTopologyType.setText(topology.getName());
+		if(topology != null) mTopologyType.setText(topology.getTypeName());
 		else mTopologyType.setText("없음");
 	}
 }

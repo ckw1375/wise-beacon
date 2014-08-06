@@ -3,9 +3,9 @@ package com.wisewells.agent;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.Service;
-import com.wisewells.sdk.datas.UuidGroup;
+import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.UuidGroup;
+import com.wisewells.sdk.service.Service;
 
 public class Dummy {
 	public static ArrayList<Beacon> getBeacons() {

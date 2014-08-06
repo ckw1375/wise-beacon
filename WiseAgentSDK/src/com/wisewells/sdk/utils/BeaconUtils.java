@@ -11,8 +11,8 @@ import android.content.IntentFilter;
 
 import com.estimote.sdk.internal.HashCode;
 import com.estimote.sdk.internal.Preconditions;
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.Region;
+import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.Region;
 
 public class BeaconUtils
 {

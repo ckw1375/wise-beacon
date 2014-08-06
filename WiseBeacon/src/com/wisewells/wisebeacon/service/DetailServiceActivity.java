@@ -19,11 +19,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.BeaconGroup;
-import com.wisewells.sdk.datas.Service;
-import com.wisewells.sdk.datas.Topology;
+import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.service.Service;
+import com.wisewells.sdk.service.Topology;
 import com.wisewells.wisebeacon.R;
+import com.wisewells.wisebeacon.common.TitleDialogSpinner;
 import com.wisewells.wisebeacon.topology.LocationTopologyFragment;
 import com.wisewells.wisebeacon.topology.ProximityTopologyFragment;
 import com.wisewells.wisebeacon.topology.SectorTopologyFragment;
@@ -32,10 +33,14 @@ import com.wisewells.wisebeacon.topology.TopologyFragment;
 public class DetailServiceActivity extends Activity {
 
 	public static final String BUNDLE_BEACONS = "beacons";
-	
+	public static final String BUNDLE_TOPOLOGY = "topology";
+	public static final String BUNDLE_SERVICE = "service";
+	public static final String BUNDLE_GROUP = "group";
+
 	private static final int TOPOLOGY_TYPE_PROXIMITY = 0;
 	private static final int TOPOLOGY_TYPE_SECTOR = 1;
 	private static final int TOPOLOGY_TYPE_LOCATION = 2;
+	
 	private static final String[] TOPOLOGY_TYPE = {
 		"Proximity", "Sector", "Location"
 	};
@@ -52,11 +57,9 @@ public class DetailServiceActivity extends Activity {
 	private TextView mChildServiceName;
 	private TextView mBeaconGroupName;
 	private TextView mTopologyType;	
-	private Button mSaveButton;
-	private Button mCancelButton;
 	
-	private Spinner mBeaconGroupSpinner;
-	private Spinner mTopologyTypeSpinner;
+	private TitleDialogSpinner mBeaconGroupSpinner;
+	private TitleDialogSpinner mTopologyTypeSpinner;
 	private ArrayAdapter<BeaconGroup> mBeaconGroupAdapter;
 	private ArrayAdapter<String> mTopologyTypeAdapter;
 	
@@ -77,66 +80,39 @@ public class DetailServiceActivity extends Activity {
 		mBeaconGroupName = (TextView) findViewById(R.id.txt_beacon_group_name);
 		
 		mTopologyType = (TextView) findViewById(R.id.txt_topology_type);
-		
-		mSaveButton = (Button) findViewById(R.id.btn_save_topology);
-		mSaveButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onSaveButtonClicked();
-			}
-		});
-		
-		mCancelButton = (Button) findViewById(R.id.btn_cancel);
-		mCancelButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onCancelButtonClicked();
-			}
-		});
 			
 		mBeaconGroupAdapter = new ArrayAdapter<BeaconGroup>(this, android.R.layout.simple_spinner_dropdown_item);
-		mBeaconGroupSpinner = (Spinner) findViewById(R.id.spinner_beacon_group);
+		mBeaconGroupSpinner = (TitleDialogSpinner) findViewById(R.id.custom_spinner_beacon_group);
 		mBeaconGroupSpinner.setAdapter(mBeaconGroupAdapter);
-		mBeaconGroupSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+		mBeaconGroupSpinner.setFragmentManager(getFragmentManager());
+		mBeaconGroupSpinner.setListener(new TitleDialogSpinner.TitleSpinnerListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				onBeaconGroupSelected(position);
 			}
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-			}
 		});
 		
 		mTopologyTypeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item);
-		mTopologyTypeSpinner = (Spinner) findViewById(R.id.spinner_topology_type);
+		mTopologyTypeSpinner = (TitleDialogSpinner) findViewById(R.id.custom_spinner_topology_type);
 		mTopologyTypeSpinner.setAdapter(mTopologyTypeAdapter);
-		mTopologyTypeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+		mTopologyTypeSpinner.setFragmentManager(getFragmentManager());
+		mTopologyTypeSpinner.setListener(new TitleDialogSpinner.TitleSpinnerListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				onTopologyTypeSelected(position);
 			}
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-				
-			}
 		});
 		
 		initBeaconGroupView();
-		initTopologyTypeView();		
+		initTopologyTypeView();
 	}
 	
-	private void onCancelButtonClicked() {
-		
-	}
-
-	private void onSaveButtonClicked() {
-		
-	}
-
 	private void onBeaconGroupSelected(int position) {
+		mBeaconGroup = mBeaconGroupAdapter.getItem(position);
+		
 		try {
 			mBeaconsInGroup = new ArrayList<Beacon>(
-					mWiseManager.getBeacons(mBeaconGroupAdapter.getItem(position).getCode()));
+					mWiseManager.getBeacons(mBeaconGroup.getCode()));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -145,6 +121,10 @@ public class DetailServiceActivity extends Activity {
 	}
 	
 	private void onTopologyTypeSelected(int position) {
+		changeFragment(position);
+	}
+	
+	private void changeFragment(int position) {
 		switch(position) {
 		case TOPOLOGY_TYPE_LOCATION: mFragment = new LocationTopologyFragment(); break;
 		case TOPOLOGY_TYPE_PROXIMITY: mFragment = new ProximityTopologyFragment(); break;
@@ -153,6 +133,9 @@ public class DetailServiceActivity extends Activity {
 
 		Bundle args = new Bundle();
 		args.putParcelableArrayList(BUNDLE_BEACONS, mBeaconsInGroup);
+		args.putParcelable(BUNDLE_TOPOLOGY, mTopology);
+		args.putParcelable(BUNDLE_SERVICE, mService);
+		args.putParcelable(BUNDLE_GROUP, mBeaconGroup);
 		mFragment.setArguments(args);
 
 		FragmentManager fm = getFragmentManager();

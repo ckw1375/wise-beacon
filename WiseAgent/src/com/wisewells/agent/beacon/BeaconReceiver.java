@@ -13,8 +13,9 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.Region;
+import com.wisewells.sdk.BeaconTracker;
+import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.utils.BeaconUtils;
 
 public class BeaconReceiver {

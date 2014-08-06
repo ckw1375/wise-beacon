@@ -6,7 +6,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.wisebeacon.common.BaseArrayAdapter;
 
 public class DetailBeaconGroupBeaconListAdapter extends BaseArrayAdapter<Beacon> {

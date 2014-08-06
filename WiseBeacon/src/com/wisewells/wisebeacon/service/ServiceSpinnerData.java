@@ -1,6 +1,7 @@
 package com.wisewells.wisebeacon.service;
 
-import com.wisewells.sdk.datas.Service;
+import com.wisewells.sdk.service.Service;
+
 
 public class ServiceSpinnerData {
 	private String spinnerContent;

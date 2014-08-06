@@ -2,11 +2,9 @@ package com.wisewells.wisebeacon.topology;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.wisebeacon.R;
 
 public class SectorTopologyListRow extends FrameLayout {

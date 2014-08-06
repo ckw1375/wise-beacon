@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.wisewells.sdk.datas.Service;
 import com.wisewells.wisebeacon.common.BaseArrayAdapter;
 
 public class ServiceListAdapter extends BaseArrayAdapter<ServiceListData> {

@@ -1,14 +1,11 @@
 package com.wisewells.wisebeacon.beacongroup;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Checkable;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.wisebeacon.R;
 
 public class DetailBeaconGroupBeaconListRow extends FrameLayout {

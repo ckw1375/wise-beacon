@@ -8,7 +8,7 @@ import android.widget.Checkable;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.wisebeacon.R;
 
 public class AddBeaconToGroupBeaconListRow extends FrameLayout implements Checkable {

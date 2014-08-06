@@ -2,7 +2,7 @@ package com.wisewells.wisebeacon.topology;
 
 import android.graphics.Point;
 
-import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.beacon.Beacon;
 
 public class LocationTopologyListData {
 	private Beacon beacon;

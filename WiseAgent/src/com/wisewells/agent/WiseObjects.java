@@ -2,19 +2,18 @@ package com.wisewells.agent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.BeaconGroup;
-import com.wisewells.sdk.datas.MajorGroup;
-import com.wisewells.sdk.datas.MinorGroup;
-import com.wisewells.sdk.datas.Service;
-import com.wisewells.sdk.datas.Topology;
-import com.wisewells.sdk.datas.UuidGroup;
+import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.beacon.MajorGroup;
+import com.wisewells.sdk.beacon.MinorGroup;
+import com.wisewells.sdk.beacon.UuidGroup;
+import com.wisewells.sdk.service.Service;
+import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.IpcUtils;
 
 /**

@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.wisewells.sdk.datas.BeaconGroup;
+import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.wisebeacon.R;
 
 public class BeaconGroupListRow extends FrameLayout {

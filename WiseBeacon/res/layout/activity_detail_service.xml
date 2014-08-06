@@ -4,20 +4,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.wisewells.wisebeacon.service.DetailServiceActivity" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="서비스 정보"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+    <LinearLayout
+        style="@style/title_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="서비스 정보"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/img_modify_service_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:src="@drawable/ic_launcher" />
+    </LinearLayout>
 
     <LinearLayout
+        style="@style/box_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
@@ -32,10 +48,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView" />
-
     </LinearLayout>
 
     <LinearLayout
+        style="@style/box_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
@@ -50,10 +66,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView" />
-
     </LinearLayout>
 
     <LinearLayout
+        style="@style/box_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
@@ -72,19 +88,20 @@
                 android:id="@+id/txt_beacon_group_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
                 android:text="TextView" />
 
-            <Spinner
-                android:id="@+id/spinner_beacon_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+            <com.wisewells.wisebeacon.common.TitleDialogSpinner
+                android:id="@+id/custom_spinner_beacon_group"
+                style="@style/spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TitleDialogSpinner" />
 
         </FrameLayout>
-
     </LinearLayout>
 
     <LinearLayout
+        style="@style/box_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
@@ -106,13 +123,13 @@
                 android:layout_gravity="center_vertical"
                 android:text="TextView" />
 
-            <Spinner
-                android:id="@+id/spinner_topology_type"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
+            <com.wisewells.wisebeacon.common.TitleDialogSpinner
+                android:id="@+id/custom_spinner_topology_type"
+                style="@style/spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TitleDialogSpinner" />
         </FrameLayout>
-
     </LinearLayout>
 
     <FrameLayout
@@ -120,31 +137,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
-
     </FrameLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <Button
-            android:id="@+id/btn_save_topology"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/string_save" />
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/btn_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/string_cancel" />
-
-    </LinearLayout>
 
 </LinearLayout>

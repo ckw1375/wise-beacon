@@ -16,12 +16,12 @@ import android.os.RemoteException;
 
 import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.sdk.aidl.IWiseAgent;
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.BeaconGroup;
-import com.wisewells.sdk.datas.MajorGroup;
-import com.wisewells.sdk.datas.Service;
-import com.wisewells.sdk.datas.Topology;
-import com.wisewells.sdk.datas.UuidGroup;
+import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.beacon.MajorGroup;
+import com.wisewells.sdk.beacon.UuidGroup;
+import com.wisewells.sdk.service.Service;
+import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.L;
 
 public class WiseManager {
@@ -151,10 +151,6 @@ public class WiseManager {
 	public void deleteService(String code) {
 
 	}
-
-	public void addTopology(Topology topology) {
-		
-	}
 	
 	public void modifyTopology(Topology topology) {
 		
@@ -165,11 +161,11 @@ public class WiseManager {
 	}
 	
 	public List<Service> getRootServices() throws RemoteException {
-		return mAgent.getServices(null);
+		return mAgent.getRootServices();
 	}
 	
-	public List<Service> getServices(String parentCode) throws RemoteException {
-		return mAgent.getServices(parentCode);
+	public List<Service> getChildServices(String parentCode) throws RemoteException {
+		return mAgent.getChildServices(parentCode);
 	}
 	
 	public List<UuidGroup> getUuidGroups() throws RemoteException {
@@ -204,8 +200,30 @@ public class WiseManager {
 		return bundle.getParcelable(IPC.BUNDLE_DATA1);
 	}
 	
-	public IWiseAgent getAgent() {
-		return mAgent;
+	public void addLocationTopology(String serviceCode, String groupCode) throws RemoteException {
+		
+	}
+
+	public void addProximityTopology(String serviceCode, String groupCode, 
+			String[] beaconCodes, double[] ranges) throws RemoteException {
+		
+		mAgent.addProximityTopology(serviceCode, groupCode, beaconCodes, ranges);
+	}
+
+	public void addSectorTopology() throws RemoteException {
+		
+	}
+	
+	public void startReceiving() throws RemoteException {
+		mAgent.startReceiving();
+	}
+	
+	public void stopReceiving() throws RemoteException {
+		mAgent.stopReceiving();
+	}
+	
+	public List<Beacon> getAllNearbyBeacons() throws RemoteException {
+		return mAgent.getAllNearbyBeacons();
 	}
 	
 	private class InternalServiceConnection implements ServiceConnection {

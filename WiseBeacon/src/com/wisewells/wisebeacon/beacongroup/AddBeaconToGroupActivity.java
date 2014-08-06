@@ -16,19 +16,17 @@ import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.aidl.IWiseAgent;
-import com.wisewells.sdk.aidl.RangingListener;
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.MajorGroup;
-import com.wisewells.sdk.datas.Region;
+import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.MajorGroup;
+import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.common.dialog.OneEditTwoButtonsDialog;
-import com.wisewells.wisebeacon.common.dialog.OneEditTwoButtonsDialog.ConfirmListener;
+import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
+import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;
 
 public class AddBeaconToGroupActivity extends Activity {
 
 	private WiseManager mWiseManager;
-	private IWiseAgent mAgent;
 	private MajorGroup mSelectedBeaconGroup;
 	
 	private TextView mUuidGroupNameView;
@@ -44,7 +42,6 @@ public class AddBeaconToGroupActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_beacon_to_group);
 		mWiseManager = WiseManager.getInstance(this);
-		mAgent = mWiseManager.getAgent();
 		
 		String uuidGroupName = getIntent().getStringExtra(DetailBeaconGroupActivity.EXTRA_UUID_GROUP_NAME);
 		mSelectedBeaconGroup = getIntent().getParcelableExtra(DetailBeaconGroupActivity.EXTRA_MAJOR_GROUP);
@@ -94,7 +91,7 @@ public class AddBeaconToGroupActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		try {
-			mAgent.startReceiving();
+			mWiseManager.startReceiving();
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -106,7 +103,7 @@ public class AddBeaconToGroupActivity extends Activity {
 	protected void onPause() {
 		super.onPause();
 		try {
-			mAgent.stopReceiving();
+			mWiseManager.stopReceiving();
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -118,9 +115,9 @@ public class AddBeaconToGroupActivity extends Activity {
 		@Override
 		public void run() {
 			try {
-				List<Beacon> beacons = mAgent.getAllNearbyBeacons();
+				List<Beacon> beacons = mWiseManager.getAllNearbyBeacons();
 				L.i(beacons.size() + " beacons are found");
-				mAdapter.replaceWith(mAgent.getAllNearbyBeacons());
+				mAdapter.replaceWith(mWiseManager.getAllNearbyBeacons());
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
@@ -129,25 +126,13 @@ public class AddBeaconToGroupActivity extends Activity {
 		}
 	};
 	
-	RangingListener listener = new RangingListener.Stub() {
-		@Override
-		public void onBeaconsDiscovered(Region region, final List<Beacon> beacons)
-				throws RemoteException {
-			
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					mAdapter.replaceWith(beacons);
-				}
-			});
-		}		
-	};
-	
 	private void onAddBeaconClicked() {
 		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
-		dialog.setConfirmListener(new ConfirmListener() {
+		dialog.setPrompt("비콘 추가");
+		dialog.setEditTitle("비콘명");
+		dialog.setListener(new DialogListener() {
 			@Override
-			public void onConfirmButtonClicked(String str) {
+			public void onOkButtonClicked(String str) {
 				Beacon beacon = mAdapter.getItem(mListView.getCheckedItemPosition());				
 				beacon.setName(str);
 				try {

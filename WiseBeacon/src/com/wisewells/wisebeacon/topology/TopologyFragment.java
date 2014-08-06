@@ -6,8 +6,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.widget.BaseAdapter;
 
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.wisebeacon.common.BaseArrayAdapter;
+import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.wisebeacon.service.DetailServiceActivity;
 
 public abstract class TopologyFragment extends Fragment {

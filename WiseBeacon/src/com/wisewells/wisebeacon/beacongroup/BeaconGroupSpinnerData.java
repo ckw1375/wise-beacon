@@ -1,6 +1,6 @@
 package com.wisewells.wisebeacon.beacongroup;
 
-import com.wisewells.sdk.datas.BeaconGroup;
+import com.wisewells.sdk.beacon.BeaconGroup;
 
 public class BeaconGroupSpinnerData {
 	private BeaconGroup uuidGroup;

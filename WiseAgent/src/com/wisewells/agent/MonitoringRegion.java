@@ -1,6 +1,7 @@
 package com.wisewells.agent;
 
-import com.wisewells.sdk.datas.Region;
+import com.wisewells.sdk.beacon.Region;
+
  
  
 class MonitoringRegion extends RangingRegion

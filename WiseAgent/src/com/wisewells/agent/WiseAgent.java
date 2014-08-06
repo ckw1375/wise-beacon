@@ -2,6 +2,7 @@ package com.wisewells.agent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import android.content.Intent;
@@ -16,18 +17,20 @@ import android.os.RemoteException;
 
 import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.agent.beacon.BeaconReceiver;
-import com.wisewells.agent.beacon.BeaconTracker;
-import com.wisewells.agent.beacon.BeaconTracker.Filter;
+import com.wisewells.sdk.BeaconTracker;
+import com.wisewells.sdk.BeaconTracker.Filter;
 import com.wisewells.sdk.IPC;
 import com.wisewells.sdk.aidl.IWiseAgent;
 import com.wisewells.sdk.aidl.IWiseAgent.Stub;
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.BeaconGroup;
-import com.wisewells.sdk.datas.MajorGroup;
-import com.wisewells.sdk.datas.MinorGroup;
-import com.wisewells.sdk.datas.Region;
-import com.wisewells.sdk.datas.Service;
-import com.wisewells.sdk.datas.UuidGroup;
+import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.beacon.BeaconVector;
+import com.wisewells.sdk.beacon.MajorGroup;
+import com.wisewells.sdk.beacon.MinorGroup;
+import com.wisewells.sdk.beacon.Region;
+import com.wisewells.sdk.beacon.UuidGroup;
+import com.wisewells.sdk.service.ProximityTopology;
+import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.utils.L;
 
 public class WiseAgent extends android.app.Service {
@@ -41,7 +44,7 @@ public class WiseAgent extends android.app.Service {
 	private final WiseObjects mWiseObjects;
 	private final HandlerThread mHandlerThread;
 	private final Handler mHandler;
-	private final BeaconTracker mBeaconTracker;
+	private final BeaconTracker mTracker;
 	private BeaconReceiver mBeaconReceiver;
 
 	private void makeDummyData() {
@@ -54,12 +57,12 @@ public class WiseAgent extends android.app.Service {
 		mHandlerThread = new HandlerThread(THREAD_NAME_AGENT, 10);
 		mHandlerThread.start();
 		mHandler = new Handler(mHandlerThread.getLooper());
-		mBeaconTracker = new BeaconTracker();
+		mTracker = new BeaconTracker();
 		
 		BeaconTracker.Filter filter = new Filter();
 		filter.add(new Region(null, null, null));
 		
-		mBeaconTracker.setFilter(filter);
+		mTracker.setFilter(filter);
 
 		makeDummyData();
 	}
@@ -70,7 +73,7 @@ public class WiseAgent extends android.app.Service {
 			android.os.Debug.waitForDebugger();
 		L.i("Creating service");
 
-		mBeaconReceiver = new BeaconReceiver(this, mHandler, mBeaconTracker);
+		mBeaconReceiver = new BeaconReceiver(this, mHandler, mTracker);
 	}
 
 	public void onDestroy() {
@@ -180,7 +183,10 @@ public class WiseAgent extends android.app.Service {
 				throws RemoteException {
 
 			BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
-
+			if(!(group instanceof MajorGroup)) {
+				throw new RuntimeException("Only Major Group can add beacon. Maybe this group code is uuid or minor group's code");
+			}
+			
 			beacon.setCode(WiseServer.requestCode());
 
 			int minor = WiseServer.requestMinor();
@@ -234,26 +240,31 @@ public class WiseAgent extends android.app.Service {
 			Service service = new Service(name);
 			service.setCode(code);
 
-			mWiseObjects.getService(parentCode).addChild(service);
+			if(parentCode != null) mWiseObjects.getService(parentCode).addChild(service);
 			mWiseObjects.putService(service);
 		}
 
 		@Override
-		public List<Service> getServices(String parentCode)
-				throws RemoteException {
-
+		public List<Service> getRootServices() throws RemoteException {
 			ArrayList<Service> services = mWiseObjects.getServices();
 			ArrayList<Service> willReturn = new ArrayList<Service>();
 
 			for (Service service : services) {
-				if (parentCode == null) {
 					if (service.getTreeLevel() == Service.SERVICE_TREE_ROOT)
 						willReturn.add(service);
-				} else if (service.getParentCode() != null
-						&& service.getParentCode().equals(parentCode))
-					willReturn.add(service);
 			}
 
+			return willReturn;
+		}
+		
+		@Override
+		public List<Service> getChildServices(String parentCode) throws RemoteException {
+			Set<String> codes = mWiseObjects.getService(parentCode).getChildCodes();
+			ArrayList<Service> willReturn = new ArrayList<Service>();
+			for(String code : codes) {
+				willReturn.add(mWiseObjects.getService(code));
+			}
+			
 			return willReturn;
 		}
 
@@ -290,7 +301,62 @@ public class WiseAgent extends android.app.Service {
 
 		@Override
 		public List<Beacon> getAllNearbyBeacons() throws RemoteException {
-			return mBeaconTracker.getAllNearbyBeacons();
+			return mTracker.getAllNearbyBeacons();
+		}
+
+		@Override
+		public BeaconVector getBeaconVector(String groupCode) throws RemoteException {
+			List<Beacon> beacons = getBeacons(groupCode);
+			ArrayList<Region> regions = new ArrayList<Region>();
+			for(Beacon beacon : beacons) {
+				regions.add(beacon.getRegion());
+			}
+			
+			BeaconVector beaconVector = new BeaconVector(regions.size());
+			beaconVector.setAll(regions);
+			return beaconVector;
+		}
+
+		@Override
+		public void addLocationTopology() throws RemoteException {
+			
+		}
+
+		@Override
+		public void addProximityTopology(String serviceCode, String groupCode, 
+				String[] beaconCodes, double[] ranges) throws RemoteException {
+			
+			if(beaconCodes.length != ranges.length) 
+				throw new RuntimeException("Beacon and range pair is not same");
+			
+			Double[] temp = new Double[ranges.length];
+			for(int i=0; i<ranges.length; i++) {
+				temp[i] = ranges[i];
+			}
+						
+			ProximityTopology t = new ProximityTopology(makeBeaconVector(beaconCodes), temp, mTracker);
+			t.setCode(WiseServer.requestCode());
+			
+			mWiseObjects.getService(serviceCode).attachTo(t);
+			mWiseObjects.getBeaconGroup(groupCode).attachTo(t);
+			mWiseObjects.putTopology(t);
+		}
+		
+		private BeaconVector makeBeaconVector(String[] beaconCodes) {
+			int size = beaconCodes.length;
+			BeaconVector beaconVector = new BeaconVector(size);
+			for(int i=0; i<size; i++) {
+				Beacon b = mWiseObjects.getBeacon(beaconCodes[i]);
+				Region r = new Region(b.getProximityUUID(), b.getMajor(), b.getMinor());
+				beaconVector.set(i, r);
+			}
+			
+			return beaconVector;
+		}
+
+		@Override
+		public void addSectorTopology() throws RemoteException {
+			
 		}
 	};
 }

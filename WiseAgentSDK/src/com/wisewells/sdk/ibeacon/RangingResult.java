@@ -10,8 +10,8 @@ import android.os.Parcelable;
 
 import com.estimote.sdk.internal.Objects;
 import com.estimote.sdk.internal.Preconditions;
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.Region;
+import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.Region;
 
 public final class RangingResult implements Parcelable
 {

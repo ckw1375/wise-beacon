@@ -1,8 +1,8 @@
 package com.wisewells.wisebeacon.service;
 
-import com.wisewells.sdk.datas.BeaconGroup;
-import com.wisewells.sdk.datas.Service;
-import com.wisewells.sdk.datas.Topology;
+import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.service.Service;
+import com.wisewells.sdk.service.Topology;
 
 public class ServiceListData {
 	private Service service;

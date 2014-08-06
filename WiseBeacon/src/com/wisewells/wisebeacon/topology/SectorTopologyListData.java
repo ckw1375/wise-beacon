@@ -1,6 +1,6 @@
 package com.wisewells.wisebeacon.topology;
 
-import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.beacon.Beacon;
 
 public class SectorTopologyListData {
 	private Beacon beacon;

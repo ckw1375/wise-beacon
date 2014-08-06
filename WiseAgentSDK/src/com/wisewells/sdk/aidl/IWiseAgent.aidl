@@ -1,14 +1,14 @@
 package com.wisewells.sdk.aidl;
-import com.wisewells.sdk.datas.UuidGroup;
-import com.wisewells.sdk.datas.MajorGroup;
-import com.wisewells.sdk.datas.BeaconGroup;
-import com.wisewells.sdk.datas.Beacon;
-import com.wisewells.sdk.datas.Topology;
-import com.wisewells.sdk.datas.Service;
-import com.wisewells.sdk.datas.Region;
 
-import com.wisewells.sdk.aidl.RangingListener;
-import com.wisewells.sdk.aidl.MonitoringListener;
+import com.wisewells.sdk.beacon.UuidGroup;
+import com.wisewells.sdk.beacon.MajorGroup;
+import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.Region;
+import com.wisewells.sdk.beacon.BeaconVector;
+import com.wisewells.sdk.service.Topology;
+import com.wisewells.sdk.service.Service;
+
 
 /*
  *	AIDL에서는 Parcel.CREATOR을 클래스에서 직접 지정해줘서, 다형성을 살릴 수 없다.
@@ -30,13 +30,18 @@ interface IWiseAgent {
 	
 	// Beacon
 	List<Beacon> getBeacons(String groupCode);
+	BeaconVector getBeaconVector(String groupCode);
 	
 	// Topology
 	Bundle getTopology(String code);
+	void addProximityTopology(String serviceCode, String groupCode, in String[] beaconCodes, in double[] ranges);
+	void addLocationTopology();
+	void addSectorTopology();
 	
 	// Service
 	void addService(String name, String parentCode);
-	List<Service> getServices(String parentCode);
+	List<Service> getRootServices();
+	List<Service> getChildServices(String parentCode);
 	
 	// Receive Beacon
 	void startReceiving();

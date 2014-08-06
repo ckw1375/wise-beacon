@@ -19,12 +19,12 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.datas.BeaconGroup;
-import com.wisewells.sdk.datas.MajorGroup;
-import com.wisewells.sdk.datas.UuidGroup;
+import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.beacon.MajorGroup;
+import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.common.dialog.OneEditTwoButtonsDialog;
-import com.wisewells.wisebeacon.common.dialog.OneEditTwoButtonsDialog.ConfirmListener;
+import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
+import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;
 
 public class BeaconGroupActivity extends Activity {
 
@@ -120,9 +120,11 @@ public class BeaconGroupActivity extends Activity {
 	
 	private void onAddUuidButtonClicked() {
 		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
-		dialog.setConfirmListener(new ConfirmListener() {
+		dialog.setPrompt("비콘 그룹 생성");
+		dialog.setEditTitle("그룹명");
+		dialog.setListener(new DialogListener() {
 			@Override
-			public void onConfirmButtonClicked(String str) {
+			public void onOkButtonClicked(String str) {
 				try {
 					mWiseManager.addUuidGroup(str);
 					
@@ -143,9 +145,11 @@ public class BeaconGroupActivity extends Activity {
 
 	private void onAddMajorButtonClicked() {		
 		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
-		dialog.setConfirmListener(new ConfirmListener() {
+		dialog.setPrompt("비콘 그룹 생성");
+		dialog.setEditTitle("그룹명");
+		dialog.setListener(new DialogListener() {
 			@Override
-			public void onConfirmButtonClicked(String str) {
+			public void onOkButtonClicked(String str) {
 				try {
 					mWiseManager.addMajorGroup(str, mSelectedUuidGroup.getCode());
 					

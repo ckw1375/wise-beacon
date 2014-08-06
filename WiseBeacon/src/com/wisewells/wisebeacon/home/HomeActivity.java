@@ -11,8 +11,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.datas.BeaconGroup;
-import com.wisewells.sdk.datas.Service;
+import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.beacongroup.BeaconGroupActivity;
@@ -67,10 +66,6 @@ public class HomeActivity extends Activity {
 				L.w(group.toString() + " children : " + group.getChildCodes().size());
 			}
 			
-			List<Service> services = WiseManager.getInstance(this).getServices(null);
-			for(Service service : services) {
-				L.w(service.toString());
-			}
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

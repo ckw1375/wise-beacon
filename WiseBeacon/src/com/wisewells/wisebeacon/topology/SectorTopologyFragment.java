@@ -2,14 +2,13 @@ package com.wisewells.wisebeacon.topology;
 
 import java.util.List;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.wisewells.sdk.datas.Beacon;
+import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.service.DetailServiceActivity;
 

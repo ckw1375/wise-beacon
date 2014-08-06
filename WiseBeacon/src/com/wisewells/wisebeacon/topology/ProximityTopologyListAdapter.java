@@ -4,11 +4,22 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.wisewells.sdk.datas.Beacon;
 import com.wisewells.wisebeacon.common.BaseArrayAdapter;
 
 public class ProximityTopologyListAdapter extends BaseArrayAdapter<ProximityTopologyListData> {
 
+	private EditMode mMode;
+	
+	public void setMode(EditMode mode) {
+		mMode = mode;
+		
+	}
+	
+	public void changeMode(EditMode mode) {
+		mMode = mode;
+		notifyDataSetChanged();
+	}
+	
 	public ProximityTopologyListAdapter(Context context) {
 		super(context);
 	}
@@ -18,6 +29,8 @@ public class ProximityTopologyListAdapter extends BaseArrayAdapter<ProximityTopo
 		ProximityTopologyListRow view = (ProximityTopologyListRow) convertView;
 		if(view == null) view = new ProximityTopologyListRow(mContext);
 		view.setData(getItem(position));
+		view.setMode(mMode);
 		return view;
 	}
 }
+
