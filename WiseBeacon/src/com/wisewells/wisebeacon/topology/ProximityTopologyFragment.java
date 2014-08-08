@@ -7,15 +7,19 @@ import android.os.RemoteException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.service.ProximityTopology;
 import com.wisewells.sdk.service.Service;
+import com.wisewells.sdk.service.LocationTopology.Coordinate;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.service.DetailServiceActivity;
@@ -58,8 +62,59 @@ public class ProximityTopologyFragment extends TopologyFragment {
 		}
 		if(mTopology == null) mMode = EditMode.MAKE_NEW;
 		else mMode = EditMode.DISPLAY;
-		
+	}	
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		if(mMode == EditMode.DISPLAY) {
+			try {
+				mWiseManager.startTracking(getActivity().getPackageName(), mService.getCode(), listener);
+			} catch (Exception e) {
+				L.e("Start Tacking Error");
+			}
+		}
 	}
+	
+	@Override
+	public void onStop() {
+		try {
+			mWiseManager.stopTracking(getActivity().getPackageName());
+		} catch (RemoteException e) {
+			L.e("Stop Tracking Error");
+		}
+		super.onStop();
+	};
+	
+	
+	private int mPosition = -1;
+	TopologyStateChangeListener listener = new TopologyStateChangeListener.Stub() {
+		@Override
+		public void onSectorChanged(String sector) throws RemoteException {
+		}
+		@Override
+		public void onProximityChanged(Region region) throws RemoteException {
+			List<ProximityTopologyListData> datas = mAdapter.getItems();
+
+			for(int i=0; i<mAdapter.getCount(); i++) {
+				if(mAdapter.getItem(i).getBeacon().getRegion().equals(region)) {
+					mPosition = i;
+					 break;
+				}
+			}
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					mAdapter.setBackgoundPosition(mPosition);
+				}
+			});
+			
+		}
+		@Override
+		public void onLocationChanged(Coordinate coord) throws RemoteException {
+			
+		}
+	};
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -92,9 +147,10 @@ public class ProximityTopologyFragment extends TopologyFragment {
 		mAdapter = new ProximityTopologyListAdapter(getActivity());		
 		mListView = (ListView) v.findViewById(R.id.list_proximity_topology);
 		mListView.setAdapter(mAdapter);
+		mListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		
 		initAdapterDatas();
-		setVisibleDueToMode();
+		setVisibleAccordingToMode();
 		return v;
 	}
 	
@@ -106,7 +162,7 @@ public class ProximityTopologyFragment extends TopologyFragment {
 		mAdapter.changeMode(mMode);
 	}
 	
-	private void setVisibleDueToMode() {
+	private void setVisibleAccordingToMode() {
 		switch(mMode) {
 		case MAKE_NEW:
 			mModifyView.setVisibility(View.INVISIBLE);
@@ -145,10 +201,12 @@ public class ProximityTopologyFragment extends TopologyFragment {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+		
+		getActivity().finish();
 	}
 	
 	@Override
-	public void updateListViewWith(List<Beacon> beacons) {
+	public void replaceListViewData(List<Beacon> beacons) {
 		mBeaconsInGroup = beacons;
 		initAdapterDatas();
 	}

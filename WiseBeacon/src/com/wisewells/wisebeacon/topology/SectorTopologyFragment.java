@@ -44,7 +44,7 @@ public class SectorTopologyFragment extends TopologyFragment {
 	}
 	
 	@Override
-	public void updateListViewWith(List<Beacon> beacons) {
+	public void replaceListViewData(List<Beacon> beacons) {
 		mBeaconsInGroup = beacons;
 		initListDatas();
 	}

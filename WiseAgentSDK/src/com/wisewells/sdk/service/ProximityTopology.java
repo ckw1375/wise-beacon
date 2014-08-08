@@ -13,7 +13,6 @@ import com.wisewells.sdk.beacon.Region;
 public class ProximityTopology extends Topology implements Parcelable {
 	
 	private Double[] mRange; //Ranges in meters
-	private int mSize;
 	
 	public static final Creator<ProximityTopology> CREATOR = new Creator<ProximityTopology>() {
 		@Override
@@ -26,23 +25,22 @@ public class ProximityTopology extends Topology implements Parcelable {
 		}
 	};
 	
-	public ProximityTopology(BeaconVector beaconVector, BeaconTracker tracker) {
-		super(TYPE_PROXIMITY, beaconVector, tracker);	
-		mSize = mBeaconVector.getSize();
-		mRange = new Double[mSize];
-		for(int ind = 0; ind < mSize; ind++)
+	public ProximityTopology(BeaconVector beaconVector) {
+		super(TYPE_PROXIMITY, beaconVector);	
+		int size = mBeaconVector.getSize();
+		mRange = new Double[size];
+		for(int ind = 0; ind < size; ind++)
 			mRange[ind] = Double.valueOf(Double.POSITIVE_INFINITY);
 	}
 	
-	public ProximityTopology(BeaconVector beaconVector, Double[] ranges, BeaconTracker tracker) {
-		super(TYPE_PROXIMITY, beaconVector, tracker);
-		mRange = ranges;
+	public ProximityTopology(BeaconVector beaconVector, Double[] ranges) {
+		super(TYPE_PROXIMITY, beaconVector);
+		mRange = ranges;		
 	}
 	
 	private ProximityTopology(Parcel in) {
 		super(in);
 		mRange = (Double[]) in.readSerializable();
-		mSize = in.readInt();
 	}
 	
 	@Override
@@ -54,7 +52,6 @@ public class ProximityTopology extends Topology implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		super.writeToParcel(dest, flags);
 		dest.writeSerializable(mRange);
-		dest.writeInt(mSize);
 	}
 	
 	public Double getRange(Region beacon)
@@ -71,13 +68,14 @@ public class ProximityTopology extends Topology implements Parcelable {
 		return true;
 	}
 	
+	@Override
 	public Region getResult() {
 		Double minDist = Double.valueOf(Double.POSITIVE_INFINITY); 
 		Region result = null;
 		DistanceVector dv = mTracker.getAvgDist(mBeaconVector);
 		ArrayList<Boolean> nb = mTracker.isNearby(mBeaconVector);
 				
-		for(int ind = 0; ind < mSize; ind++) {
+		for(int ind = 0; ind < mBeaconVector.getSize(); ind++) {
 			if(nb.get(ind)) {
 				Double dist = dv.get(ind);
 				if(dist.compareTo(mRange[ind]) <= 0 && dist.compareTo(minDist) <= 0) {

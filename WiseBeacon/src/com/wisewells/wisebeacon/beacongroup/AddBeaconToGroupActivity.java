@@ -1,7 +1,5 @@
 package com.wisewells.wisebeacon.beacongroup;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,11 +13,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.aidl.IWiseAgent;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.MajorGroup;
-import com.wisewells.sdk.beacon.Region;
-import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;
@@ -95,9 +90,8 @@ public class AddBeaconToGroupActivity extends Activity {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		
 		h.post(mUpdateBeaconList);
-	}	
+	}
 	
 	@Override
 	protected void onPause() {
@@ -115,8 +109,6 @@ public class AddBeaconToGroupActivity extends Activity {
 		@Override
 		public void run() {
 			try {
-				List<Beacon> beacons = mWiseManager.getAllNearbyBeacons();
-				L.i(beacons.size() + " beacons are found");
 				mAdapter.replaceWith(mWiseManager.getAllNearbyBeacons());
 			} catch (RemoteException e) {
 				e.printStackTrace();

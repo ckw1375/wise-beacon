@@ -20,14 +20,16 @@ public abstract class Topology implements Parcelable {
 	protected String mServiceCode;
 	protected int mType;
 	
+	/**
+	 * BeaconVector, BeaconTracker는 Agent에서만 생성된다.
+	 */
 	protected BeaconVector mBeaconVector;
 	protected BeaconTracker mTracker;
 	
-	protected Topology(int type, BeaconVector beaconVector, BeaconTracker tracker) {
+	protected Topology(int type, BeaconVector beaconVector) {
 		
 		mType = type;
 		mBeaconVector = beaconVector;
-		mTracker = tracker;
 	}
 
 	protected Topology(Parcel p) {
@@ -95,6 +97,10 @@ public abstract class Topology implements Parcelable {
 	
 	public void setBeaconVector(BeaconVector beaconVector) {
 		this.mBeaconVector = beaconVector;
+	}
+	
+	public void setBeaconTracker(BeaconTracker tracker) {
+		mTracker = tracker;
 	}
 	
 	public int getType() {

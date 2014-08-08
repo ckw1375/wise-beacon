@@ -8,6 +8,7 @@ import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.beacon.BeaconVector;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.service.Service;
+import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 
 
 /*
@@ -24,9 +25,9 @@ interface IWiseAgent {
 	void addBeaconToBeaconGroup(String groupCode, in Beacon beacon);
 	List<UuidGroup> getUuidGroups();
 	List<MajorGroup> getMajorGroups(String uuidGroupCode);
-	List<BeaconGroup> getBeaconGroups(in List<String> codes);
+	//List<BeaconGroup> getBeaconGroups(in List<String> codes);
 	Bundle getBeaconGroupsInAuthority();
-	BeaconGroup getBeaconGroup(String code);
+	Bundle getBeaconGroup(String code);
 	
 	// Beacon
 	List<Beacon> getBeacons(String groupCode);
@@ -49,4 +50,6 @@ interface IWiseAgent {
 	List<Beacon> getAllNearbyBeacons();
 		
 	// Callback
+	void startTracking(String packageName, String serviceCode, in TopologyStateChangeListener listener);
+	void stopTracking(String packageName);
 }

@@ -1,6 +1,7 @@
 package com.wisewells.agent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -10,18 +11,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.RemoteException;
 
-import com.estimote.sdk.internal.Preconditions;
-import com.wisewells.agent.beacon.BeaconReceiver;
+import com.wisewells.agent.beaconreceiver.BeaconReceiver;
+import com.wisewells.agent.connector.ApplicationConnector;
 import com.wisewells.sdk.BeaconTracker;
 import com.wisewells.sdk.BeaconTracker.Filter;
 import com.wisewells.sdk.IPC;
 import com.wisewells.sdk.aidl.IWiseAgent;
 import com.wisewells.sdk.aidl.IWiseAgent.Stub;
+import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.beacon.BeaconVector;
@@ -31,6 +30,7 @@ import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.sdk.service.ProximityTopology;
 import com.wisewells.sdk.service.Service;
+import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.L;
 
 public class WiseAgent extends android.app.Service {
@@ -41,30 +41,25 @@ public class WiseAgent extends android.app.Service {
 
 	private static final String THREAD_NAME_AGENT = "WiseAgentThread";
 
+	private final HashMap<String, ApplicationConnector> mConnectorMap;
 	private final WiseObjects mWiseObjects;
 	private final HandlerThread mHandlerThread;
 	private final Handler mHandler;
 	private final BeaconTracker mTracker;
 	private BeaconReceiver mBeaconReceiver;
 
-	private void makeDummyData() {
-		mWiseObjects.putService(Dummy.getRootService());
-		mWiseObjects.putService(Dummy.getRootService2());
-	}
-
 	public WiseAgent() {
-		mWiseObjects = WiseObjects.getInstance();
+		mConnectorMap = new HashMap<String, ApplicationConnector>();
+		mWiseObjects = new WiseObjects();
 		mHandlerThread = new HandlerThread(THREAD_NAME_AGENT, 10);
 		mHandlerThread.start();
 		mHandler = new Handler(mHandlerThread.getLooper());
-		mTracker = new BeaconTracker();
+		mTracker = BeaconTracker.getInstance();
 		
 		BeaconTracker.Filter filter = new Filter();
 		filter.add(new Region(null, null, null));
 		
 		mTracker.setFilter(filter);
-
-		makeDummyData();
 	}
 
 	public void onCreate() {
@@ -84,49 +79,11 @@ public class WiseAgent extends android.app.Service {
 	}
 
 	public IBinder onBind(Intent intent) {
+		String name = intent.getStringExtra("package name");
+		ApplicationConnector connector = new ApplicationConnector(name, mHandler);
+		mConnectorMap.put(name, connector);
+		
 		return mBinder;
-	}
-
-	private void checkNotOnUiThread() {
-		Preconditions
-				.checkArgument(Looper.getMainLooper().getThread() != Thread
-						.currentThread(),
-						"This cannot be run on UI thread, starting BLE scan can be expensive");
-		Preconditions
-				.checkNotNull(
-						Boolean.valueOf(mHandlerThread.getLooper() == Looper
-								.myLooper()),
-						"It must be executed on service's handlerThread");
-	}
-
-	public void startTracking() {
-
-	}
-
-	public void stopTracking() {
-
-	}
-
-	private class IncomingHandler extends Handler {
-		private IncomingHandler() {
-
-		}
-
-		public void handleMessage(Message msg) {
-			final int what = msg.what;
-			final Object obj = msg.obj;
-			final Messenger replyTo = msg.replyTo;
-			final Bundle data = msg.getData();
-
-			WiseAgent.this.mHandler.post(new Runnable() {
-				public void run() {
-					switch (what) {
-					default:
-						L.d("Unknown message: what=" + what + " obj=" + obj);
-					}
-				}
-			});
-		}
 	}
 
 	IWiseAgent.Stub mBinder = new Stub() {
@@ -212,7 +169,7 @@ public class WiseAgent extends android.app.Service {
 			return mWiseObjects.getMajorGroups(uuidGroupCode);
 		}
 
-		@Override
+		/*@Override
 		public List<BeaconGroup> getBeaconGroups(List<String> codes)
 				throws RemoteException {
 
@@ -222,12 +179,11 @@ public class WiseAgent extends android.app.Service {
 			}
 
 			return groups;
-		}
+		}*/
 
 		@Override
 		public List<Beacon> getBeacons(String groupCode) throws RemoteException {
-			ArrayList<Beacon> beacons = mWiseObjects
-					.getBeaconsInGroup(groupCode);
+			ArrayList<Beacon> beacons = mWiseObjects.getAllBeaconsInGroup(groupCode);
 			return beacons;
 		}
 
@@ -246,15 +202,7 @@ public class WiseAgent extends android.app.Service {
 
 		@Override
 		public List<Service> getRootServices() throws RemoteException {
-			ArrayList<Service> services = mWiseObjects.getServices();
-			ArrayList<Service> willReturn = new ArrayList<Service>();
-
-			for (Service service : services) {
-					if (service.getTreeLevel() == Service.SERVICE_TREE_ROOT)
-						willReturn.add(service);
-			}
-
-			return willReturn;
+			return mWiseObjects.getRootServices();
 		}
 		
 		@Override
@@ -269,23 +217,23 @@ public class WiseAgent extends android.app.Service {
 		}
 
 		@Override
-		public BeaconGroup getBeaconGroup(String code) throws RemoteException {
-			return new MajorGroup("test group");
+		public Bundle getBeaconGroup(String code) throws RemoteException {
+			Bundle bundle = new Bundle();
+			bundle.putParcelable(IPC.BUNDLE_DATA1, mWiseObjects.getBeaconGroup(code));
+			return bundle;
 		}
 
 		@Override
 		public Bundle getTopology(String code) throws RemoteException {
 			Bundle bundle = new Bundle();
-			bundle.putParcelable(IPC.BUNDLE_DATA1,
-					mWiseObjects.getTopology(code));
+			bundle.putParcelable(IPC.BUNDLE_DATA1, mWiseObjects.getTopology(code));
 			return bundle;
 		}
 
 		@Override
 		public Bundle getBeaconGroupsInAuthority() throws RemoteException {
 			Bundle bundle = new Bundle();
-			bundle.putParcelableArrayList(IPC.BUNDLE_DATA1,
-					mWiseObjects.getBeaconGroupsInAuthority());
+			bundle.putParcelableArrayList(IPC.BUNDLE_DATA1, mWiseObjects.getBeaconGroupsInAuthority());
 			return bundle;
 		}
 
@@ -334,7 +282,7 @@ public class WiseAgent extends android.app.Service {
 				temp[i] = ranges[i];
 			}
 						
-			ProximityTopology t = new ProximityTopology(makeBeaconVector(beaconCodes), temp, mTracker);
+			ProximityTopology t = new ProximityTopology(makeBeaconVector(beaconCodes), temp);
 			t.setCode(WiseServer.requestCode());
 			
 			mWiseObjects.getService(serviceCode).attachTo(t);
@@ -356,7 +304,27 @@ public class WiseAgent extends android.app.Service {
 
 		@Override
 		public void addSectorTopology() throws RemoteException {
+			L.e(Thread.currentThread().getName());
+		}
+		
+		@Override
+		public void startTracking(String packageName, String serviceCode, TopologyStateChangeListener listener) 
+				throws RemoteException {
+			mBeaconReceiver.activate();
+			ApplicationConnector connector = mConnectorMap.get(packageName);
+			List<Topology> topologies = mWiseObjects.getAllTopologiesInService(serviceCode);
+			for(Topology t : topologies) 
+				t.setBeaconTracker(mTracker);
 			
+			L.i(topologies.size() + "");
+			connector.startTopologyChecker(listener, topologies);
+		}
+		
+		@Override
+		public void stopTracking(String packageName) throws RemoteException {
+			ApplicationConnector connector = mConnectorMap.get(packageName);
+			connector.stopTopologyChecker();
+			mBeaconReceiver.deactivate();
 		}
 	};
 }

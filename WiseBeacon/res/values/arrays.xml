@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="topology_type">
+        <item >Proximity</item>
+        <item >Sector</item>
+        <item >Location</item>
+    </string-array>
+    
+</resources>

@@ -7,7 +7,6 @@ import android.os.Parcelable;
 
 public class BeaconVector implements Parcelable {
 	private Region[] beacons;
-	private int size;
 	
 	public static final Creator<BeaconVector> CREATOR = new Creator<BeaconVector>() {
 		@Override
@@ -20,8 +19,7 @@ public class BeaconVector implements Parcelable {
 		}
 	};
 
-	public BeaconVector(int nSize) {
-		size = nSize;
+	public BeaconVector(int size) {
 		beacons = new Region[size];
 	}
 
@@ -32,22 +30,22 @@ public class BeaconVector implements Parcelable {
 	}
 
 	public int getSize() {
-		return size;
+		return beacons.length;
 	}
 
 	public boolean setAll(ArrayList<Region> nBeacons) {
-		if (nBeacons.size() != size)
+		if (nBeacons.size() != beacons.length)
 			return false;
 		for (Region it : nBeacons)
 			if (checkValidity(it) == false)
 				return false;
-		for (int ind = 0; ind < size; ind++)
+		for (int ind = 0; ind < beacons.length; ind++)
 			beacons[ind] = nBeacons.get(ind);
 		return true;
 	}
 
 	public boolean set(int ind, Region nBeacon) {
-		if (ind < 0 || ind > size)
+		if (ind < 0 || ind > beacons.length)
 			return false;
 		if (checkValidity(nBeacon) == false)
 			return false;
@@ -56,13 +54,13 @@ public class BeaconVector implements Parcelable {
 	}
 
 	public Region get(int ind) {
-		if (ind < 0 || ind > size)
+		if (ind < 0 || ind > beacons.length)
 			return null;
 		return beacons[ind];
 	}
 
 	public int indexOf(Region r) {
-		for (int ind = 0; ind < size; ind++)
+		for (int ind = 0; ind < beacons.length; ind++)
 			if (beacons[ind].equals(r))
 				return ind;
 		return -1;
@@ -70,7 +68,6 @@ public class BeaconVector implements Parcelable {
 	
 	private BeaconVector(Parcel in) {
 		in.readTypedArray(beacons, Region.CREATOR);
-		size = in.readInt();
 	}
 
 	@Override
@@ -81,6 +78,5 @@ public class BeaconVector implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeTypedArray(beacons, 0);
-		dest.writeInt(size);
 	}
 }

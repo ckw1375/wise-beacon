@@ -33,8 +33,8 @@ public class LocationTopology extends Topology implements Parcelable {
 		}
 	};
 
-	public LocationTopology(BeaconVector beaconVector, BeaconTracker tracker) {
-		super(TYPE_LOCATION, beaconVector, tracker);		
+	public LocationTopology(BeaconVector beaconVector) {
+		super(TYPE_LOCATION, beaconVector);		
 		
 		int size = mBeaconVector.getSize();
 		mCoordinates = new Coordinate[size];
@@ -83,6 +83,7 @@ public class LocationTopology extends Topology implements Parcelable {
 		return "Location";
 	}
 	
+	@Override
 	public Coordinate getResult()
 	{
 		DistanceVector dv = mTracker.getAvgDist(mBeaconVector);
@@ -152,7 +153,17 @@ public class LocationTopology extends Topology implements Parcelable {
 
 	public static class Coordinate implements Parcelable{
 		private double x, y;
-
+		public static final Creator<Coordinate> CREATOR = new Creator<LocationTopology.Coordinate>() {
+			@Override
+			public Coordinate[] newArray(int size) {
+				return new Coordinate[size];
+			}
+			@Override
+			public Coordinate createFromParcel(Parcel source) {
+				return new Coordinate(source);
+			}
+		};
+		
 		public Coordinate(double nX, double nY) {
 			x = nX;
 			y = nY;
@@ -183,17 +194,6 @@ public class LocationTopology extends Topology implements Parcelable {
 			x = in.readDouble();
 			y = in.readDouble();
 		}
-		
-		public static final Creator<Coordinate> CREATOR = new Creator<LocationTopology.Coordinate>() {
-			@Override
-			public Coordinate[] newArray(int size) {
-				return new Coordinate[size];
-			}
-			@Override
-			public Coordinate createFromParcel(Parcel source) {
-				return new Coordinate(source);
-			}
-		};
 
 		@Override
 		public int describeContents() {

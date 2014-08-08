@@ -30,8 +30,8 @@ public class SectorTopology extends Topology implements Parcelable {
 		}
 	};
 	
-	public SectorTopology(BeaconVector beaconVector, BeaconTracker tracker) {
-		super(TYPE_SECTOR, beaconVector, tracker);
+	public SectorTopology(BeaconVector beaconVector) {
+		super(TYPE_SECTOR, beaconVector);
 		mSectors = new ArrayList<Sector>();
 //		sectors = new HashMap<String,SampleList>();
 	}
@@ -131,6 +131,7 @@ public class SectorTopology extends Topology implements Parcelable {
 	
 	//Return the sector name of the sector that the user is currently in (by using the KNN algorithm)
 	//In case of an error, return null.
+	@Override
 	public String getResult() {
 		if(mSectors.size() == 0) return null;		
 //		if(sectors.size() == 0) return null;

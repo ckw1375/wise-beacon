@@ -19,5 +19,5 @@ public abstract class TopologyFragment extends Fragment {
 		mBeaconsInGroup = getArguments().getParcelableArrayList(DetailServiceActivity.BUNDLE_BEACONS);
 	}
 	
-	public abstract void updateListViewWith(List<Beacon> beacons);
+	public abstract void replaceListViewData(List<Beacon> beacons);
 }

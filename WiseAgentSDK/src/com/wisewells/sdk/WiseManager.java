@@ -16,6 +16,7 @@ import android.os.RemoteException;
 
 import com.estimote.sdk.internal.Preconditions;
 import com.wisewells.sdk.aidl.IWiseAgent;
+import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.beacon.MajorGroup;
@@ -82,7 +83,9 @@ public class WiseManager {
 			callback.onServiceReady();
 		}
 
-		boolean bound = mContext.bindService(new Intent(ACTION_NAME_WISE_AGENT), mServiceConnection, 1);
+		Intent intent = new Intent(ACTION_NAME_WISE_AGENT);
+		intent.putExtra("package name", mContext.getPackageName());
+		boolean bound = mContext.bindService(intent, mServiceConnection, 1);
 
 		if (!bound)
 			L.w("Fail to bind service");
@@ -102,12 +105,13 @@ public class WiseManager {
 		return mAgent != null;
 	}
 	
-	public void startTracking() {
-		
+	public void startTracking(String packageName, String serviceCode, TopologyStateChangeListener listener)
+			throws RemoteException {
+		mAgent.startTracking(packageName, serviceCode, listener);
 	}
 	
-	public void stopTracking() {
-		
+	public void stopTracking(String packageName) throws RemoteException{
+		mAgent.stopTracking(packageName);
 	}
 	
 	public void addUuidGroup(String name) throws RemoteException {
@@ -176,16 +180,18 @@ public class WiseManager {
 		return mAgent.getMajorGroups(uuidGroupCode);
 	}
 	
-	public List<BeaconGroup> getBeaconGroups(ArrayList<String> codes) throws RemoteException {
+	/*public List<BeaconGroup> getBeaconGroups(ArrayList<String> codes) throws RemoteException {
 		return  mAgent.getBeaconGroups(codes);
-	}
+	}*/
 	
 	public List<Beacon> getBeacons(String groupCode) throws RemoteException {
 		return mAgent.getBeacons(groupCode);
 	}
 	
 	public BeaconGroup getBeaconGroup(String code) throws RemoteException {
-		return mAgent.getBeaconGroup(code);
+		Bundle bundle = mAgent.getBeaconGroup(code);
+		bundle.setClassLoader(BeaconGroup.class.getClassLoader());
+		return bundle.getParcelable(IPC.BUNDLE_DATA1);
 	}
 	
 	public List<BeaconGroup> getBeaconGroupsInAuthority() throws RemoteException {
@@ -211,7 +217,7 @@ public class WiseManager {
 	}
 
 	public void addSectorTopology() throws RemoteException {
-		
+		mAgent.addSectorTopology();
 	}
 	
 	public void startReceiving() throws RemoteException {

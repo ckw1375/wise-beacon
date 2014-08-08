@@ -5,6 +5,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Checkable;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -12,9 +14,10 @@ import android.widget.TextView;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 
-public class ProximityTopologyListRow extends FrameLayout {
+public class ProximityTopologyListRow extends FrameLayout{
 
 	private ProximityTopologyListData mData;
+	private ViewGroup mBackground;
 	private TextView mBeaconName;
 	private EditText mRangeEdit;
 	private TextView mRangeText;
@@ -22,6 +25,8 @@ public class ProximityTopologyListRow extends FrameLayout {
 	public ProximityTopologyListRow(Context context) {
 		super(context);
 		LayoutInflater.from(context).inflate(R.layout.list_row_proximity_topology, this);
+		
+		mBackground = (ViewGroup) findViewById(R.id.layout_row_background);
 		mBeaconName = (TextView) findViewById(R.id.txt_beacon_name);
 		mRangeEdit = (EditText) findViewById(R.id.edit_range);
 		mRangeEdit.addTextChangedListener(new TextWatcher() {
@@ -73,4 +78,8 @@ public class ProximityTopologyListRow extends FrameLayout {
 		mData = data;
 		mBeaconName.setText(data.getBeacon().getName());
 	}
+	
+//	public void setBackgroundColor(int color) {
+//		mBackground.setBackgroundColor(color);
+//	}
 }

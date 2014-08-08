@@ -2,10 +2,12 @@ package com.wisewells.agent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.os.RemoteException;
 
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
@@ -21,7 +23,8 @@ import com.wisewells.sdk.utils.IpcUtils;
  * @author 	Mingook
  * @date	2014. 7. 7.
  * @description
- * This class is for managing all objects made tree structure.
+ * Beacon, Group, Service, Topology와 같이 WiseAgent가 관리하는 모든객체를 관리하는 클래스.
+ * Database에 모든 객체를 저장, 관리하며 필요한 객체를 찾아 리턴해준다.
  */
 
 public class WiseObjects implements Parcelable {
@@ -30,44 +33,16 @@ public class WiseObjects implements Parcelable {
 	private HashMap<String, BeaconGroup> mBeaconGroups;
 	private HashMap<String, Service> mServices;
 	private HashMap<String, Topology> mTopologies;
-	
-	public static WiseObjects instance;
-	public static Parcelable.Creator<WiseObjects> CREATOR = new Creator<WiseObjects>() {
 		
-		@Override
-		public WiseObjects[] newArray(int size) {
-			return new WiseObjects[size];
-		}
-		
-		@Override
-		public WiseObjects createFromParcel(Parcel source) {
-			return new WiseObjects(source);
-		}
-	};
-	
-	public static WiseObjects getInstance() {
-		if(instance == null)
-			instance = new WiseObjects();
-		
-		return instance;
-	}
-	
-	private WiseObjects() {
+	public WiseObjects() {
 		init();
 	}
-
-	private WiseObjects(Parcel p) {
-		mBeacons = (HashMap<String, Beacon>) IpcUtils.readMapFromParcel(p, Beacon.class.getClassLoader());;
-		mBeaconGroups = (HashMap<String, BeaconGroup>) IpcUtils.readMapFromParcel(p, BeaconGroup.class.getClassLoader());
-		mServices = (HashMap<String, Service>) IpcUtils.readMapFromParcel(p, Service.class.getClassLoader());
-		mTopologies = (HashMap<String, Topology>) IpcUtils.readMapFromParcel(p, Topology.class.getClassLoader());
-	}
-		
-	private void init() {
-		mBeacons = new HashMap<String, Beacon>();
-		mBeaconGroups = new HashMap<String, BeaconGroup>();
-		mServices = new HashMap<String, Service>();
-		mTopologies = new HashMap<String, Topology>();
+	
+	private WiseObjects(Parcel in) {
+		mBeacons = (HashMap<String, Beacon>) IpcUtils.readMapFromParcel(in, Beacon.class.getClassLoader());
+		mBeaconGroups = (HashMap<String, BeaconGroup>) IpcUtils.readMapFromParcel(in, BeaconGroup.class.getClassLoader());
+		mServices = (HashMap<String, Service>) IpcUtils.readMapFromParcel(in, Service.class.getClassLoader());
+		mTopologies = (HashMap<String, Topology>) IpcUtils.readMapFromParcel(in, Topology.class.getClassLoader());
 	}
 	
 	@Override
@@ -75,12 +50,18 @@ public class WiseObjects implements Parcelable {
 		return 0;
 	}
 	
-	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		IpcUtils.writeMapToParcel(dest, mBeacons);
 		IpcUtils.writeMapToParcel(dest, mBeaconGroups);
+		IpcUtils.writeMapToParcel(dest, mBeacons);
 		IpcUtils.writeMapToParcel(dest, mServices);
 		IpcUtils.writeMapToParcel(dest, mTopologies);
+	};
+		
+	private void init() {
+		mBeacons = new HashMap<String, Beacon>();
+		mBeaconGroups = new HashMap<String, BeaconGroup>();
+		mServices = new HashMap<String, Service>();
+		mTopologies = new HashMap<String, Topology>();
 	}
 	
 	public Beacon getBeacon(String code) {
@@ -99,18 +80,17 @@ public class WiseObjects implements Parcelable {
 		return (Topology) mTopologies.get(code);
 	}
 	
-	public ArrayList<Beacon> getBeacons() {
-		ArrayList<Beacon> beacons = new ArrayList<Beacon>(mBeacons.values());
-		return beacons;
-	}
-	
-	public ArrayList<Beacon> getBeaconsInGroup(String groupCode) {
+	/**
+	 * @param groupCode
+	 * @return 비콘그룹에 포함된 모든 비콘
+	 */
+	public ArrayList<Beacon> getAllBeaconsInGroup(String groupCode) {
 		ArrayList<Beacon> beaconsInGroup = new ArrayList<Beacon>();
 		BeaconGroup group = mBeaconGroups.get(groupCode);
 		
 		if(group instanceof UuidGroup) {
 			for(String code : group.getChildCodes()) {
-				beaconsInGroup.addAll(getBeaconsInGroup(code));
+				beaconsInGroup.addAll(getAllBeaconsInGroup(code));
 			}
 		}
 		
@@ -125,14 +105,12 @@ public class WiseObjects implements Parcelable {
 		return beaconsInGroup;
 	}
 	
-	public ArrayList<BeaconGroup> getBeaconGroups() {
-		ArrayList<BeaconGroup> beaconGroups = new ArrayList<BeaconGroup>(mBeaconGroups.values());
-		return beaconGroups;
-	}
-	
+	/**
+	 * @return 모든 UuidGroup
+	 */
 	public ArrayList<UuidGroup> getUuidGroups() {
 		ArrayList<UuidGroup> uuidGroups = new ArrayList<UuidGroup>();
-		ArrayList<BeaconGroup> beaconGroups = getBeaconGroups();
+		ArrayList<BeaconGroup> beaconGroups = new ArrayList<BeaconGroup>(mBeaconGroups.values());
 		for(BeaconGroup beaconGroup : beaconGroups) {
 			if(beaconGroup instanceof UuidGroup) uuidGroups.add((UuidGroup) beaconGroup);
 		}
@@ -140,6 +118,10 @@ public class WiseObjects implements Parcelable {
 		return uuidGroups;
 	}
 	
+	/**
+	 * @param uuidGroupCode
+	 * @return 인자로 넘어온 UUID 그룹의 모든 자식 그룹(MajorGroup)
+	 */
 	public ArrayList<MajorGroup> getMajorGroups(String uuidGroupCode) {	
 		Set<String> majorCodes = mBeaconGroups.get(uuidGroupCode).getChildCodes();
 		
@@ -151,6 +133,10 @@ public class WiseObjects implements Parcelable {
 		return majorGroups;
 	}
 	
+	/*
+	 * Parameter로 로그인 정보를 받아서 권한에 맞는 그룹만 넘겨줘야 함.
+	 * 현재는 Uuid, Major 모든 그룹을 다 리턴해줌.
+	 */
 	public ArrayList<BeaconGroup> getBeaconGroupsInAuthority() {
 		ArrayList<BeaconGroup> groups = new ArrayList<BeaconGroup>(mBeaconGroups.values());
 		ArrayList<BeaconGroup> willReturn = new ArrayList<BeaconGroup>();
@@ -164,6 +150,35 @@ public class WiseObjects implements Parcelable {
 		return willReturn;
 	}
 	
+	public List<Topology> getAllTopologiesInService(String serviceCode) {
+		Service service = mServices.get(serviceCode);
+		ArrayList<Topology> topologies = new ArrayList<Topology>();
+		String topologyCode = service.getTopologyCode();
+		if(topologyCode != null) topologies.add(mTopologies.get(topologyCode));
+		
+		Set<String> codes = service.getChildCodes();
+		for(String code : codes) {
+			Service s = mServices.get(code);
+			topologyCode = s.getTopologyCode();
+			
+			if(topologyCode == null) continue;
+			topologies.add(mTopologies.get(topologyCode));
+		}
+		
+		return topologies;
+	}
+	
+	public List<Service> getRootServices() throws RemoteException {
+		ArrayList<Service> services = getServices();
+		ArrayList<Service> rootServices = new ArrayList<Service>();
+
+		for (Service service : services) {
+				if (service.getTreeLevel() == Service.SERVICE_TREE_ROOT)
+					rootServices.add(service);
+		}
+
+		return rootServices;
+	}
 	
 	public ArrayList<Service> getServices() {
 		ArrayList<Service> s = new ArrayList<Service>(mServices.values());

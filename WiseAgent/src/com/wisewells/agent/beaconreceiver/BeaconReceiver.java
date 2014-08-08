@@ -1,4 +1,4 @@
-package com.wisewells.agent.beacon;
+package com.wisewells.agent.beaconreceiver;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -17,6 +17,7 @@ import com.wisewells.sdk.BeaconTracker;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.utils.BeaconUtils;
+import com.wisewells.sdk.utils.L;
 
 public class BeaconReceiver {
 	
@@ -92,12 +93,14 @@ public class BeaconReceiver {
 		mActive = true;
 		removeAlarm();
 		startScan();
+		L.w("Beacon Receiver Activate");
 	}
 
 	public void deactivate() {
 		mActive = false;
 		removeAlarm();
 		startIdel();
+		L.w("Beacon Receiver Deactivate");
 	}
 
 	void startScan() {
@@ -170,7 +173,7 @@ public class BeaconReceiver {
 		}
 
 		public void run() {
-			Log.d("BluetoothReceiver", "ScanProcessing, " + "Thread:" + Thread.currentThread().getId());
+			Log.d("BluetoothReceiver", "ScanProcessing, " + "Thread:" + Thread.currentThread().getId() + " Name:" + Thread.currentThread().getName());
 			Beacon beacon = BeaconUtils.beaconFromLeScan(device, rssi, scanRecord);
 			Region r = new Region(beacon.getProximityUUID(), beacon.getMajor(), beacon.getMinor());
 			tracker.update(r, beacon.getMacAddress(), (double) rssi, (double) beacon.getMeasuredPower());

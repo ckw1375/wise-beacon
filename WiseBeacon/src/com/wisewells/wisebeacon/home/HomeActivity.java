@@ -61,10 +61,7 @@ public class HomeActivity extends Activity {
 	
 	private void onSettingButtonClicked() {
 		try {
-			List<BeaconGroup> groups = WiseManager.getInstance(this).getBeaconGroupsInAuthority();
-			for(BeaconGroup group : groups) {
-				L.w(group.toString() + " children : " + group.getChildCodes().size());
-			}
+			WiseManager.getInstance(this).addSectorTopology();
 			
 		} catch (RemoteException e) {
 			e.printStackTrace();

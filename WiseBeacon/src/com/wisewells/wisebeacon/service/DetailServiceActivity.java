@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.view.Menu;
@@ -25,6 +26,7 @@ import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.TitleDialogSpinner;
+import com.wisewells.wisebeacon.topology.EditMode;
 import com.wisewells.wisebeacon.topology.LocationTopologyFragment;
 import com.wisewells.wisebeacon.topology.ProximityTopologyFragment;
 import com.wisewells.wisebeacon.topology.SectorTopologyFragment;
@@ -36,14 +38,8 @@ public class DetailServiceActivity extends Activity {
 	public static final String BUNDLE_TOPOLOGY = "topology";
 	public static final String BUNDLE_SERVICE = "service";
 	public static final String BUNDLE_GROUP = "group";
-
-	private static final int TOPOLOGY_TYPE_PROXIMITY = 0;
-	private static final int TOPOLOGY_TYPE_SECTOR = 1;
-	private static final int TOPOLOGY_TYPE_LOCATION = 2;
 	
-	private static final String[] TOPOLOGY_TYPE = {
-		"Proximity", "Sector", "Location"
-	};
+	private EditMode mMode;
 	
 	private WiseManager mWiseManager;
 	private Service mService;
@@ -82,6 +78,8 @@ public class DetailServiceActivity extends Activity {
 		mTopologyType = (TextView) findViewById(R.id.txt_topology_type);
 			
 		mBeaconGroupAdapter = new ArrayAdapter<BeaconGroup>(this, android.R.layout.simple_spinner_dropdown_item);
+		mBeaconGroupAdapter.addAll(receiveBeaconGroups());
+		
 		mBeaconGroupSpinner = (TitleDialogSpinner) findViewById(R.id.custom_spinner_beacon_group);
 		mBeaconGroupSpinner.setAdapter(mBeaconGroupAdapter);
 		mBeaconGroupSpinner.setFragmentManager(getFragmentManager());
@@ -92,7 +90,9 @@ public class DetailServiceActivity extends Activity {
 			}
 		});
 		
-		mTopologyTypeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item);
+		mTopologyTypeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,
+				getResources().getStringArray(R.array.topology_type));
+		
 		mTopologyTypeSpinner = (TitleDialogSpinner) findViewById(R.id.custom_spinner_topology_type);
 		mTopologyTypeSpinner.setAdapter(mTopologyTypeAdapter);
 		mTopologyTypeSpinner.setFragmentManager(getFragmentManager());
@@ -103,21 +103,55 @@ public class DetailServiceActivity extends Activity {
 			}
 		});
 		
-		initBeaconGroupView();
-		initTopologyTypeView();
+		initMode();
+		setVisibleAccordingToMode();
+		if(mMode != EditMode.MAKE_NEW) {
+			mBeaconsInGroup = new ArrayList<Beacon>(receiveBeaconsInGroup(mBeaconGroup));			
+			changeFragmentAccordingToType();
+		}
+	}
+	
+	private void initMode() {
+		if(mBeaconGroup == null && mTopology == null) mMode = EditMode.MAKE_NEW;
+		else mMode = EditMode.DISPLAY;
+	}
+	
+	private void changeFragmentAccordingToType() {
+		switch(mTopology.getType()) {
+		case Topology.TYPE_PROXIMITY: changeFragment(0); break;
+		case Topology.TYPE_SECTOR: changeFragment(1); break;
+		case Topology.TYPE_LOCATION: changeFragment(2); break;
+		}
+	}
+	
+	private void setVisibleAccordingToMode() {
+		switch(mMode) {
+		case DISPLAY:
+			mBeaconGroupSpinner.setVisibility(View.INVISIBLE);
+			mBeaconGroupName.setVisibility(View.VISIBLE);
+			mBeaconGroupName.setText(mBeaconGroup.getName());
+			
+			mTopologyTypeSpinner.setVisibility(View.INVISIBLE);
+			mTopologyType.setVisibility(View.VISIBLE);
+			mTopologyType.setText(mTopology.getTypeName());
+			break;
+		case MAKE_NEW:
+		case MODIFY:
+			mBeaconGroupName.setVisibility(View.INVISIBLE);
+			mBeaconGroupSpinner.setVisibility(View.VISIBLE);
+			
+			mTopologyType.setVisibility(View.INVISIBLE);
+			mTopologyTypeSpinner.setVisibility(View.VISIBLE);
+			break;
+		}
 	}
 	
 	private void onBeaconGroupSelected(int position) {
 		mBeaconGroup = mBeaconGroupAdapter.getItem(position);
-		
-		try {
-			mBeaconsInGroup = new ArrayList<Beacon>(
-					mWiseManager.getBeacons(mBeaconGroup.getCode()));
-		} catch (RemoteException e) {
-			e.printStackTrace();
+		mBeaconsInGroup = new ArrayList<Beacon>(receiveBeaconsInGroup(mBeaconGroup));
+		if(mFragment != null) {
+			mFragment.replaceListViewData(mBeaconsInGroup);
 		}
-		
-		if(mFragment != null) mFragment.updateListViewWith(mBeaconsInGroup);
 	}
 	
 	private void onTopologyTypeSelected(int position) {
@@ -126,9 +160,9 @@ public class DetailServiceActivity extends Activity {
 	
 	private void changeFragment(int position) {
 		switch(position) {
-		case TOPOLOGY_TYPE_LOCATION: mFragment = new LocationTopologyFragment(); break;
-		case TOPOLOGY_TYPE_PROXIMITY: mFragment = new ProximityTopologyFragment(); break;
-		case TOPOLOGY_TYPE_SECTOR: mFragment = new SectorTopologyFragment(); break;
+		case 0: mFragment = new ProximityTopologyFragment(); break;
+		case 1: mFragment = new SectorTopologyFragment(); break;
+		case 2: mFragment = new LocationTopologyFragment(); break;
 		}
 
 		Bundle args = new Bundle();
@@ -144,34 +178,17 @@ public class DetailServiceActivity extends Activity {
 		ft.commit();
 	}
 	
-	private void initBeaconGroupView() {
-		if(mBeaconGroup == null) {
-			mBeaconGroupName.setVisibility(View.GONE);
-			mBeaconGroupSpinner.setVisibility(View.VISIBLE);
-			mBeaconGroupAdapter.clear();
-			mBeaconGroupAdapter.addAll(receiveBeaconGroups());
+	private List<Beacon> receiveBeaconsInGroup(BeaconGroup group) {
+		if(group == null) return null;
+		
+		List<Beacon> beacons = new ArrayList<Beacon>();
+		try {
+			beacons = mWiseManager.getBeacons(mBeaconGroup.getCode());
+		} catch (RemoteException e) {
+			e.printStackTrace();
 		}
-		else {
-			mBeaconGroupSpinner.setVisibility(View.GONE);
-			mBeaconGroupName.setVisibility(View.VISIBLE);
-			mBeaconGroupName.setText(mBeaconGroup.getName());
-		}
-	}
-	
-	private void initTopologyTypeView() {
-		if(mTopology == null) {
-			mTopologyType.setVisibility(View.GONE);
-			mTopologyTypeSpinner.setVisibility(View.VISIBLE);
-			mTopologyTypeAdapter.clear();
-			mTopologyTypeAdapter.add("Proximity");
-			mTopologyTypeAdapter.add("Sector");
-			mTopologyTypeAdapter.add("Location");
-		}
-		else {
-			mTopologyTypeSpinner.setVisibility(View.GONE);
-			mTopologyType.setVisibility(View.VISIBLE);
-			mTopologyType.setText(mTopology.getTypeName());
-		}
+		
+		return beacons;
 	}
 	
 	private List<BeaconGroup> receiveBeaconGroups() {

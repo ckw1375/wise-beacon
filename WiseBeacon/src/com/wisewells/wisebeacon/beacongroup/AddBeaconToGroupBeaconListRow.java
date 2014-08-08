@@ -17,6 +17,7 @@ public class AddBeaconToGroupBeaconListRow extends FrameLayout implements Checka
 	private TextView mUuidView;
 	private TextView mMajorView;
 	private TextView mMinorView;
+	private TextView mDistanceView;
 	
 	private boolean mChecked;
 	
@@ -28,12 +29,14 @@ public class AddBeaconToGroupBeaconListRow extends FrameLayout implements Checka
 		mUuidView = (TextView) findViewById(R.id.row_uuid);
 		mMajorView = (TextView) findViewById(R.id.row_major);
 		mMinorView = (TextView) findViewById(R.id.row_minor);
+		mDistanceView = (TextView) findViewById(R.id.row_distance);
 	}
 	
 	public void setData(Beacon beacon) {
 		mUuidView.setText(beacon.getProximityUUID());
 		mMajorView.setText(beacon.getMajor() + "");
 		mMinorView.setText(beacon.getMinor() + "");
+		mDistanceView.setText(beacon.getDistance() + "");;
 	}
 
 	@Override

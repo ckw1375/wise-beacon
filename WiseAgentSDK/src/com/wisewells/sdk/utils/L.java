@@ -91,9 +91,11 @@ public class L
 	{
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		String className = stackTrace[4].getClassName();
-		String methodName = Thread.currentThread().getStackTrace()[4].getMethodName();
+//		String methodName = Thread.currentThread().getStackTrace()[4].getMethodName();
 		int lineNumber = stackTrace[4].getLineNumber();
-		return className + "." + methodName + ":" + lineNumber + ">>>";
+//		return className + "." + methodName + ":" + lineNumber + ">>>";
+		Thread t = Thread.currentThread();
+		return "[" + t.getName() + "]" + "[" + className + ":" + lineNumber + "]";
 	}
 
 	private static void logCrashlytics(String msg)
