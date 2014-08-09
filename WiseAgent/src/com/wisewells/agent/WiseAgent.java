@@ -17,7 +17,7 @@ import com.wisewells.agent.beaconreceiver.BeaconReceiver;
 import com.wisewells.agent.connector.ApplicationConnector;
 import com.wisewells.sdk.BeaconTracker;
 import com.wisewells.sdk.BeaconTracker.Filter;
-import com.wisewells.sdk.IPC;
+import com.wisewells.sdk.aidl.EditObjectListener;
 import com.wisewells.sdk.aidl.IWiseAgent;
 import com.wisewells.sdk.aidl.IWiseAgent.Stub;
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
@@ -31,6 +31,7 @@ import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.sdk.service.ProximityTopology;
 import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
+import com.wisewells.sdk.utils.IpcUtils;
 import com.wisewells.sdk.utils.L;
 
 public class WiseAgent extends android.app.Service {
@@ -188,16 +189,18 @@ public class WiseAgent extends android.app.Service {
 		}
 
 		@Override
-		public void addService(String name, String parentCode)
+		public void addService(String name, String parentCode, EditObjectListener listener)
 				throws RemoteException {
 
-			String code = WiseServer.requestCode();
-
 			Service service = new Service(name);
-			service.setCode(code);
+			service.setCode(WiseServer.requestCode());
 
 			if(parentCode != null) mWiseObjects.getService(parentCode).addChild(service);
 			mWiseObjects.putService(service);
+			
+			Bundle b = new Bundle();
+			b.putParcelable(IpcUtils.BUNDLE_KEY, service);
+			listener.onEditSuccess("Success Add Service", b);
 		}
 
 		@Override
@@ -219,21 +222,21 @@ public class WiseAgent extends android.app.Service {
 		@Override
 		public Bundle getBeaconGroup(String code) throws RemoteException {
 			Bundle bundle = new Bundle();
-			bundle.putParcelable(IPC.BUNDLE_DATA1, mWiseObjects.getBeaconGroup(code));
+			bundle.putParcelable(IpcUtils.BUNDLE_KEY, mWiseObjects.getBeaconGroup(code));
 			return bundle;
 		}
 
 		@Override
 		public Bundle getTopology(String code) throws RemoteException {
 			Bundle bundle = new Bundle();
-			bundle.putParcelable(IPC.BUNDLE_DATA1, mWiseObjects.getTopology(code));
+			bundle.putParcelable(IpcUtils.BUNDLE_KEY, mWiseObjects.getTopology(code));
 			return bundle;
 		}
 
 		@Override
 		public Bundle getBeaconGroupsInAuthority() throws RemoteException {
 			Bundle bundle = new Bundle();
-			bundle.putParcelableArrayList(IPC.BUNDLE_DATA1, mWiseObjects.getBeaconGroupsInAuthority());
+			bundle.putParcelableArrayList(IpcUtils.BUNDLE_KEY, mWiseObjects.getBeaconGroupsInAuthority());
 			return bundle;
 		}
 

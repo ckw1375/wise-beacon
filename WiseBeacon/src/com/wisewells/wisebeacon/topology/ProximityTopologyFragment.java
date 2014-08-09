@@ -70,7 +70,7 @@ public class ProximityTopologyFragment extends TopologyFragment {
 		if(mMode == EditMode.DISPLAY) {
 			try {
 				mWiseManager.startTracking(getActivity().getPackageName(), mService.getCode(), listener);
-			} catch (Exception e) {
+			} catch (Exception e) { 
 				L.e("Start Tacking Error");
 			}
 		}

@@ -9,7 +9,7 @@ import com.wisewells.sdk.beacon.BeaconVector;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
-
+import com.wisewells.sdk.aidl.EditObjectListener;
 
 /*
  *	AIDL에서는 Parcel.CREATOR을 클래스에서 직접 지정해줘서, 다형성을 살릴 수 없다.
@@ -40,7 +40,7 @@ interface IWiseAgent {
 	void addSectorTopology();
 	
 	// Service
-	void addService(String name, String parentCode);
+	void addService(String name, String parentCode, in EditObjectListener listener);
 	List<Service> getRootServices();
 	List<Service> getChildServices(String parentCode);
 	

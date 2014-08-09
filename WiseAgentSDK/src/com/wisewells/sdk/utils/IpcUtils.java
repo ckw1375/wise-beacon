@@ -1,22 +1,21 @@
 package com.wisewells.sdk.utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.estimote.sdk.internal.Preconditions;
-import com.wisewells.sdk.IPC;
-
 import android.os.Bundle;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.RemoteException;
 
 public class IpcUtils {
+	
+	public static final String BUNDLE_KEY = "bundlekey";
+	
+	public static <T extends Parcelable> T getParcelableFromBundle(Class<T> clz, Bundle bundle) {
+		bundle.setClassLoader(clz.getClassLoader());
+		return bundle.getParcelable(BUNDLE_KEY);
+	}
 	
 	public static void writeMapToParcel(Parcel dest, Map<String, ? extends Parcelable> map) {
 		Bundle bundle = new Bundle();

@@ -3,18 +3,17 @@ package com.wisewells.sdk;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 
 import com.estimote.sdk.internal.Preconditions;
+import com.wisewells.sdk.aidl.EditObjectListener;
 import com.wisewells.sdk.aidl.IWiseAgent;
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
@@ -23,20 +22,22 @@ import com.wisewells.sdk.beacon.MajorGroup;
 import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
+import com.wisewells.sdk.utils.IpcUtils;
 import com.wisewells.sdk.utils.L;
 
 public class WiseManager {
 	
 	private static final String ACTION_NAME_WISE_AGENT = "com.wisewells.agent.WiseAgent";
-	private static final String ANDROID_MANIFEST_CONDITIONS_MSG = 
-			"AndroidManifest.xml does not contain android.permission.BLUETOOTH or "
-			+ "android.permission.BLUETOOTH_ADMIN permissions. ";			
-	
+	private static final String EXCEPTION_MSG = "AIDL ERROR : ";
 	private final Context mContext;
 	private final InternalServiceConnection mServiceConnection;
 
 	private IWiseAgent mAgent;
 	private ServiceReadyCallback mReadyCallback;
+	private EditBeaconGroupListener mGroupListener;
+	private EditBeaconListener mBeaconListener;
+	private EditServiceListener mServiceListener;
+	private EditTopologyListener mTopologyListener;
 	
 	private static WiseManager sInstance;
 	
@@ -50,34 +51,7 @@ public class WiseManager {
 		mServiceConnection = new InternalServiceConnection();
 	}
 
-	public boolean hasBluetooth() {
-		return mContext.getPackageManager().hasSystemFeature("android.hardware.bluetooth_le");
-	}
-
-	public boolean isBluetoothEnabled() {
-		if (!checkPermissions()) {
-			L.e(ANDROID_MANIFEST_CONDITIONS_MSG);
-			return false;
-		}
-
-		BluetoothManager bluetoothManager = (BluetoothManager)mContext.getSystemService("bluetooth");
-		BluetoothAdapter adapter = bluetoothManager.getAdapter();
-		return (adapter != null) && (adapter.isEnabled());
-	}
-	
-	public boolean checkPermissions() {
-		PackageManager pm = mContext.getPackageManager();
-		int bluetoothPermission = pm.checkPermission("android.permission.BLUETOOTH", mContext.getPackageName());
-		int bluetoothAdminPermission = pm.checkPermission("android.permission.BLUETOOTH_ADMIN", mContext.getPackageName());
-
-		return (bluetoothPermission == PackageManager.PERMISSION_GRANTED) && 
-				(bluetoothAdminPermission == PackageManager.PERMISSION_GRANTED);
-	}
-
 	public void connect(ServiceReadyCallback callback) {
-		if (!checkPermissions()) {
-			L.e(ANDROID_MANIFEST_CONDITIONS_MSG);
-		}
 		mReadyCallback = ((ServiceReadyCallback)Preconditions.checkNotNull(callback, "callback cannot be null"));
 		if (isConnectedToService()) {
 			callback.onServiceReady();
@@ -144,8 +118,24 @@ public class WiseManager {
 
 	}
 	
-	public void addService(String name, String parentCode) throws RemoteException {
-		mAgent.addService(name, parentCode);
+	public void addService(String name, String parentCode, EditServiceListener listener) {
+		mServiceListener = Preconditions.checkNotNull(listener, "Listener must be not null");
+		try {
+		mAgent.addService(name, parentCode, new EditObjectListener.Stub() {
+			
+			@Override
+			public void onEditSuccess(String result, Bundle data) throws RemoteException {
+				final Service s = IpcUtils.getParcelableFromBundle(Service.class, data);
+				mServiceListener.onEditSuccess(s);
+			}
+			@Override
+			public void onEditFail(String result) throws RemoteException {
+				
+			}
+		});
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "addService");
+		}
 	}
 
 	public void modifyService(Service service) {
@@ -164,12 +154,22 @@ public class WiseManager {
 		
 	}
 	
-	public List<Service> getRootServices() throws RemoteException {
-		return mAgent.getRootServices();
+	public List<Service> getRootServices() {
+		try {
+			return mAgent.getRootServices();
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "getRootServices"); 
+			return null;
+		}
 	}
 	
-	public List<Service> getChildServices(String parentCode) throws RemoteException {
-		return mAgent.getChildServices(parentCode);
+	public List<Service> getChildServices(String parentCode) {
+		try {
+			return mAgent.getChildServices(parentCode);
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "getChildServices");
+			return null;
+		}
 	}
 	
 	public List<UuidGroup> getUuidGroups() throws RemoteException {
@@ -188,22 +188,32 @@ public class WiseManager {
 		return mAgent.getBeacons(groupCode);
 	}
 	
-	public BeaconGroup getBeaconGroup(String code) throws RemoteException {
+	public BeaconGroup getBeaconGroup(String code) {
+		try {
 		Bundle bundle = mAgent.getBeaconGroup(code);
 		bundle.setClassLoader(BeaconGroup.class.getClassLoader());
-		return bundle.getParcelable(IPC.BUNDLE_DATA1);
+		return bundle.getParcelable(IpcUtils.BUNDLE_KEY);
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "getBeaconGroup");
+			return null;
+		}
 	}
 	
 	public List<BeaconGroup> getBeaconGroupsInAuthority() throws RemoteException {
 		Bundle bundle = mAgent.getBeaconGroupsInAuthority();
 		bundle.setClassLoader(BeaconGroup.class.getClassLoader());
-		return bundle.getParcelableArrayList(IPC.BUNDLE_DATA1);
+		return bundle.getParcelableArrayList(IpcUtils.BUNDLE_KEY);
 	}
 
-	public Topology getTopology(String code) throws RemoteException {
+	public Topology getTopology(String code) {
+		try {
 		Bundle bundle = mAgent.getTopology(code);
 		bundle.setClassLoader(Topology.class.getClassLoader());
-		return bundle.getParcelable(IPC.BUNDLE_DATA1);
+		return bundle.getParcelable(IpcUtils.BUNDLE_KEY); 
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "getTopology");
+			return null;
+		}
 	}
 	
 	public void addLocationTopology(String serviceCode, String groupCode) throws RemoteException {
@@ -229,6 +239,7 @@ public class WiseManager {
 	}
 	
 	public List<Beacon> getAllNearbyBeacons() throws RemoteException {
+		
 		return mAgent.getAllNearbyBeacons();
 	}
 	
@@ -246,8 +257,28 @@ public class WiseManager {
 			WiseManager.this.mAgent = null;
 		}
 	}
+	
+	public interface ServiceReadyCallback {
+		public void onServiceReady();
+	}
+	
+	public interface EditServiceListener {
+		public void onEditSuccess(Service service); 
+		public void onEditFail();
+	}
+	
+	public interface EditBeaconGroupListener {
+		public void onEditSuccess(BeaconGroup service); 
+		public void onEditFail();
+	}
+	
+	public interface EditBeaconListener {
+		public void onEditSuccess(Beacon service); 
+		public void onEditFail();
+	}
 
-	public static abstract interface ServiceReadyCallback {
-		public abstract void onServiceReady();
+	public interface EditTopologyListener {
+		public void onEditSuccess(Topology service); 
+		public void onEditFail();
 	}
 }

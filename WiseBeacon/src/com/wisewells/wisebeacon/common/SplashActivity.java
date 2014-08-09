@@ -15,42 +15,18 @@ import com.wisewells.wisebeacon.home.HomeActivity;
 
 public class SplashActivity extends Activity {
 
-	private WiseManager manager;
+	private WiseManager mManager;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash);
-		
-		manager = WiseManager.getInstance(this);
-		if (!manager.hasBluetooth()) {
-			Toast.makeText(this, "Device does not have Bluetooth Low Energy", Toast.LENGTH_LONG).show();
-			return;
-		}
-
-		if (!manager.isBluetoothEnabled()) {
-			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBtIntent, 1234);
-		} else {
-			connectToService();
-		}
-	}
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 1234) {
-			if (resultCode == Activity.RESULT_OK) {
-				connectToService();
-			} else {
-				Toast.makeText(this, "Bluetooth not enabled", Toast.LENGTH_LONG).show();
-				getActionBar().setSubtitle("Bluetooth not enabled");
-			}
-		}
-		super.onActivityResult(requestCode, resultCode, data);
+		mManager = WiseManager.getInstance(this);
+		connectToService();
 	}
 	
 	private void connectToService() {
-		manager.connect(new WiseManager.ServiceReadyCallback() {
+		mManager.connect(new WiseManager.ServiceReadyCallback() {
 			@Override
 			public void onServiceReady() {
 				new Handler().postDelayed(new Runnable() {
