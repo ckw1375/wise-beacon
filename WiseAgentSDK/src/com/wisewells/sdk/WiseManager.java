@@ -18,6 +18,7 @@ import com.wisewells.sdk.aidl.IWiseAgent;
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.beacon.DistanceVector;
 import com.wisewells.sdk.beacon.MajorGroup;
 import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.sdk.service.Service;
@@ -31,7 +32,15 @@ public class WiseManager {
 	private static final String EXCEPTION_MSG = "AIDL ERROR : ";
 	private final Context mContext;
 	private final InternalServiceConnection mServiceConnection;
-
+	
+	/**
+	 *	Agent와 RPC를 통해 함수가 호출 되면, Bind Thread가 실행 된다.
+	 *	이 때 UI를 업데이트하는 행동을 CalledFromWrongThreadException 이 발생한다.
+	 *	그러므로 Callback으로 결과를 알려줄 때에는 메인 Handler를 통해 알려주자.
+	 *	(당연히 Callback이 아닌 그냥 Return을 해줄때에는 함수를 부르는 쪽의 쓰레드에서 동작하므로 신경 쓸 필요 없다.)
+	 */
+	private final Handler mHandler;
+	
 	private IWiseAgent mAgent;
 	private ServiceReadyCallback mReadyCallback;
 	private EditBeaconGroupListener mGroupListener;
@@ -49,6 +58,7 @@ public class WiseManager {
 	private WiseManager(Context context) {
 		mContext = ((Context)Preconditions.checkNotNull(context));
 		mServiceConnection = new InternalServiceConnection();
+		mHandler = new Handler(mContext.getMainLooper());
 	}
 
 	public void connect(ServiceReadyCallback callback) {
@@ -120,17 +130,22 @@ public class WiseManager {
 	
 	public void addService(String name, String parentCode, EditServiceListener listener) {
 		mServiceListener = Preconditions.checkNotNull(listener, "Listener must be not null");
+
 		try {
 		mAgent.addService(name, parentCode, new EditObjectListener.Stub() {
-			
 			@Override
 			public void onEditSuccess(String result, Bundle data) throws RemoteException {
 				final Service s = IpcUtils.getParcelableFromBundle(Service.class, data);
-				mServiceListener.onEditSuccess(s);
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mServiceListener.onEditSuccess(s);
+					}
+				});
 			}
 			@Override
 			public void onEditFail(String result) throws RemoteException {
-				
+				L.e(result);
 			}
 		});
 		} catch(RemoteException e) {
@@ -238,9 +253,23 @@ public class WiseManager {
 		mAgent.stopReceiving();
 	}
 	
-	public List<Beacon> getAllNearbyBeacons() throws RemoteException {
-		
-		return mAgent.getAllNearbyBeacons();
+	public List<Beacon> getAllNearbyBeacons() {
+		try {
+			return mAgent.getAllNearbyBeacons();
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "getAllNearByBeacons");
+			return null;
+		}
+	}
+	
+	public DistanceVector getBeaconDistance(List<String> codes) {
+		try {
+			DistanceVector dv = mAgent.getBeaconDistance(codes); 
+			return dv;
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "getBeaconDistance");
+			return null;
+		}
 	}
 	
 	private class InternalServiceConnection implements ServiceConnection {

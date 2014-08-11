@@ -120,6 +120,10 @@ public class Beacon implements Parcelable {
 	public double getDistance() {
 		return this.distance;
 	}
+	
+	public void setDistance(double distance) {
+		this.distance = distance;
+	}
 
 	public Region getRegion() {
 		return new Region(proximityUUID, major, minor);

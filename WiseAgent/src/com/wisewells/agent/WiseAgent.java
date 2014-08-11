@@ -2,6 +2,7 @@ package com.wisewells.agent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +25,7 @@ import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.beacon.BeaconVector;
+import com.wisewells.sdk.beacon.DistanceVector;
 import com.wisewells.sdk.beacon.MajorGroup;
 import com.wisewells.sdk.beacon.MinorGroup;
 import com.wisewells.sdk.beacon.Region;
@@ -43,14 +45,18 @@ public class WiseAgent extends android.app.Service {
 	private static final String THREAD_NAME_AGENT = "WiseAgentThread";
 
 	private final HashMap<String, ApplicationConnector> mConnectorMap;
+	private final HashSet<String> mApplicationRequestingFindBeacon;
 	private final WiseObjects mWiseObjects;
 	private final HandlerThread mHandlerThread;
 	private final Handler mHandler;
 	private final BeaconTracker mTracker;
 	private BeaconReceiver mBeaconReceiver;
+	
+	
 
 	public WiseAgent() {
 		mConnectorMap = new HashMap<String, ApplicationConnector>();
+		mApplicationRequestingFindBeacon = new HashSet<String>();
 		mWiseObjects = new WiseObjects();
 		mHandlerThread = new HandlerThread(THREAD_NAME_AGENT, 10);
 		mHandlerThread.start();
@@ -329,5 +335,9 @@ public class WiseAgent extends android.app.Service {
 			connector.stopTopologyChecker();
 			mBeaconReceiver.deactivate();
 		}
+		
+		public DistanceVector getBeaconDistance(List<String> beaconCodes) throws RemoteException {
+			return mTracker.getAvgDist(makeBeaconVector((String[]) beaconCodes.toArray()));
+		};
 	};
 }

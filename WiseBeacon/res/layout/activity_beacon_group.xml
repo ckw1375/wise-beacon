@@ -5,33 +5,36 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/txt_service_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="상위 비콘 그룹" />
-
     <LinearLayout
+        style="@style/title_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <Spinner
-            android:id="@+id/group_spin_uuigroup"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/btn_add_uuid_group"
+        <TextView
+            android:id="@+id/txt_service_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="생성" />
+            android:text="상위비콘그룹"
+            android:textColor="@android:color/white" />
 
+        <com.wisewells.wisebeacon.common.TitleDialogSpinner
+            android:id="@+id/custom_spinner_uuidgroup"
+            style="@style/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="선택하세요" />
+
+        <ImageView
+            android:id="@+id/img_add_uuid_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical" >
 
         <TextView
             android:id="@+id/textView2"
@@ -45,11 +48,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <Button
-            android:id="@+id/btn_add_major_group"
+        <ImageView
+            android:id="@+id/img_add_major_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Group 생성" />
+            android:src="@drawable/ic_launcher" />
     </LinearLayout>
 
     <ListView

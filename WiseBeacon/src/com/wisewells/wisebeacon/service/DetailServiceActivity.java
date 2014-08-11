@@ -6,17 +6,12 @@ import java.util.List;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
@@ -26,6 +21,7 @@ import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.TitleDialogSpinner;
+import com.wisewells.wisebeacon.common.TitleDialogSpinnerAdapter;
 import com.wisewells.wisebeacon.topology.EditMode;
 import com.wisewells.wisebeacon.topology.LocationTopologyFragment;
 import com.wisewells.wisebeacon.topology.ProximityTopologyFragment;
@@ -56,8 +52,8 @@ public class DetailServiceActivity extends Activity {
 	
 	private TitleDialogSpinner mBeaconGroupSpinner;
 	private TitleDialogSpinner mTopologyTypeSpinner;
-	private ArrayAdapter<BeaconGroup> mBeaconGroupAdapter;
-	private ArrayAdapter<String> mTopologyTypeAdapter;
+	private TitleDialogSpinnerAdapter<BeaconGroup> mBeaconGroupAdapter;
+	private TitleDialogSpinnerAdapter<String> mTopologyTypeAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,26 +73,25 @@ public class DetailServiceActivity extends Activity {
 		
 		mTopologyType = (TextView) findViewById(R.id.txt_topology_type);
 			
-		mBeaconGroupAdapter = new ArrayAdapter<BeaconGroup>(this, android.R.layout.simple_spinner_dropdown_item);
+		mBeaconGroupAdapter = new TitleDialogSpinnerAdapter<BeaconGroup>(this);
 		mBeaconGroupAdapter.addAll(receiveBeaconGroups());
 		
 		mBeaconGroupSpinner = (TitleDialogSpinner) findViewById(R.id.custom_spinner_beacon_group);
 		mBeaconGroupSpinner.setAdapter(mBeaconGroupAdapter);
 		mBeaconGroupSpinner.setFragmentManager(getFragmentManager());
-		mBeaconGroupSpinner.setListener(new TitleDialogSpinner.TitleSpinnerListener() {
+		mBeaconGroupSpinner.setOnItemSelectedListener(new TitleDialogSpinner.OnSpinnerItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				onBeaconGroupSelected(position);
 			}
 		});
 		
-		mTopologyTypeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,
-				getResources().getStringArray(R.array.topology_type));
+		mTopologyTypeAdapter = new TitleDialogSpinnerAdapter<String>(this, getResources().getStringArray(R.array.topology_type));
 		
 		mTopologyTypeSpinner = (TitleDialogSpinner) findViewById(R.id.custom_spinner_topology_type);
 		mTopologyTypeSpinner.setAdapter(mTopologyTypeAdapter);
 		mTopologyTypeSpinner.setFragmentManager(getFragmentManager());
-		mTopologyTypeSpinner.setListener(new TitleDialogSpinner.TitleSpinnerListener() {
+		mTopologyTypeSpinner.setOnItemSelectedListener(new TitleDialogSpinner.OnSpinnerItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				onTopologyTypeSelected(position);

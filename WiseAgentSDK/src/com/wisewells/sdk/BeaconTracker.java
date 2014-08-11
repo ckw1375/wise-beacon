@@ -102,7 +102,7 @@ public class BeaconTracker {
 		return n;
 	}
 	//Get Beacon objects corresponding to BeaconVector b. (null is returned for not-found beacons)
-	public ArrayList<Beacon> getBeacon(BeaconVector b) {
+	public ArrayList<Beacon> getAvailableBeacon(BeaconVector b) { //getBeacon(BeaconVector b) {
 		int size = b.getSize();
 		ArrayList<Beacon> beacons = new ArrayList<Beacon>(size);
 		for(int ind = 0; ind < size; ind ++) {

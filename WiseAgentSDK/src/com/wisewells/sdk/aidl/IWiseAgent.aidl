@@ -6,6 +6,7 @@ import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.beacon.BeaconVector;
+import com.wisewells.sdk.beacon.DistanceVector;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
@@ -48,6 +49,7 @@ interface IWiseAgent {
 	void startReceiving();
 	void stopReceiving();
 	List<Beacon> getAllNearbyBeacons();
+	DistanceVector getBeaconDistance(in List<String> beaconCodes);
 		
 	// Callback
 	void startTracking(String packageName, String serviceCode, in TopologyStateChangeListener listener);

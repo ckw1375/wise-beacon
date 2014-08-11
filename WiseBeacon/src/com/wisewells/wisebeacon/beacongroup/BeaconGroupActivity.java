@@ -15,6 +15,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 
@@ -25,6 +26,9 @@ import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;
+import com.wisewells.wisebeacon.common.TitleDialogSpinner;
+import com.wisewells.wisebeacon.common.TitleDialogSpinner.OnSpinnerItemSelectedListener;
+import com.wisewells.wisebeacon.common.TitleDialogSpinnerAdapter;
 
 public class BeaconGroupActivity extends Activity {
 
@@ -36,10 +40,10 @@ public class BeaconGroupActivity extends Activity {
 	private WiseManager mWiseManager;
 	private ListView mListView;
 	private BeaconGroupListAdapter mListAdapter;
-	private Button mAddMajorButton;
-	private Button mAddUuidButton;
-	private Spinner mSpinner;
-	private ArrayAdapter<BeaconGroupSpinnerData> mSpinnerAdapter;
+	private ImageView mAddMajorButton;
+	private ImageView mAddUuidButton;
+	private TitleDialogSpinner mSpinner;
+	private TitleDialogSpinnerAdapter<BeaconGroupSpinnerData> mSpinnerAdapter;
 		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +63,7 @@ public class BeaconGroupActivity extends Activity {
 			}
 		});
 		
-		mAddMajorButton = (Button) findViewById(R.id.btn_add_major_group);
+		mAddMajorButton = (ImageView) findViewById(R.id.img_add_major_group);
 		mAddMajorButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -67,7 +71,7 @@ public class BeaconGroupActivity extends Activity {
 			}
 		});
 		
-		mAddUuidButton = (Button) findViewById(R.id.btn_add_uuid_group);
+		mAddUuidButton = (ImageView) findViewById(R.id.img_add_uuid_group);
 		mAddUuidButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -75,18 +79,15 @@ public class BeaconGroupActivity extends Activity {
 			}
 		});
 
-		mSpinnerAdapter = new ArrayAdapter<BeaconGroupSpinnerData>(this, android.R.layout.simple_spinner_dropdown_item);		
+		mSpinnerAdapter = new TitleDialogSpinnerAdapter<BeaconGroupSpinnerData>(this);		
 		
-		mSpinner = (Spinner) findViewById(R.id.group_spin_uuigroup);
+		mSpinner = (TitleDialogSpinner) findViewById(R.id.custom_spinner_uuidgroup);
 		mSpinner.setAdapter(mSpinnerAdapter);
-		
-		mSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+		mSpinner.setFragmentManager(getFragmentManager());
+		mSpinner.setOnItemSelectedListener(new OnSpinnerItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				onSpinnerItemSelected(position);
-			}
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
 			}
 		});
 	}

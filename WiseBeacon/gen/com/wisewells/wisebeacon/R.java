@@ -49,8 +49,6 @@ public final class R {
         public static final int add_topology_txt_child_number=0x7f0a0035;
         public static final int add_topology_txt_group_name=0x7f0a0034;
         public static final int btn_add_beacon_to_group=0x7f0a0006;
-        public static final int btn_add_major_group=0x7f0a000b;
-        public static final int btn_add_uuid_group=0x7f0a000a;
         public static final int btn_beacon_group=0x7f0a001c;
         public static final int btn_cancel=0x7f0a0031;
         public static final int btn_display_list=0x7f0a002e;
@@ -59,6 +57,7 @@ public final class R {
         public static final int btn_setting=0x7f0a001e;
         public static final int custom_spinner_beacon_group=0x7f0a0017;
         public static final int custom_spinner_topology_type=0x7f0a001a;
+        public static final int custom_spinner_uuidgroup=0x7f0a0009;
         public static final int custom_title_spinner=0x7f0a001f;
         public static final int done=0x7f0a0048;
         public static final int edit_1=0x7f0a0026;
@@ -66,12 +65,13 @@ public final class R {
         public static final int edit_x_coordinate=0x7f0a003f;
         public static final int edit_y_coordinate=0x7f0a0040;
         public static final int group_listview=0x7f0a000c;
-        public static final int group_spin_uuigroup=0x7f0a0009;
         public static final int group_txt_child_count=0x7f0a003e;
         public static final int group_txt_name=0x7f0a003d;
         public static final int imageView1=0x7f0a0020;
+        public static final int img_add_major_group=0x7f0a000b;
         public static final int img_add_root_service=0x7f0a0021;
         public static final int img_add_service=0x7f0a0022;
+        public static final int img_add_uuid_group=0x7f0a000a;
         public static final int img_cancel=0x7f0a0028;
         public static final int img_done=0x7f0a002c;
         public static final int img_modify=0x7f0a002b;

@@ -23,6 +23,6 @@ public class DetailBeaconGroupBeaconListRow extends FrameLayout {
 	
 	public void setData(Beacon beacon) {
 		mBeaconName.setText(beacon.getName());
-		mBeaconDistance.setText("xx m");
+		mBeaconDistance.setText(beacon.getDistance() + "");
 	}
 }

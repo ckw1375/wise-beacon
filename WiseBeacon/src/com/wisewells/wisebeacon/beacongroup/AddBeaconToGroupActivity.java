@@ -1,5 +1,7 @@
 package com.wisewells.wisebeacon.beacongroup;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.DistanceVector;
 import com.wisewells.sdk.beacon.MajorGroup;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
@@ -108,13 +111,8 @@ public class AddBeaconToGroupActivity extends Activity {
 	private Runnable mUpdateBeaconList = new Runnable() {
 		@Override
 		public void run() {
-			try {
-				mAdapter.replaceWith(mWiseManager.getAllNearbyBeacons());
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-			
-			h.postDelayed(this, 100);
+			mAdapter.replaceWith(mWiseManager.getAllNearbyBeacons());
+			h.postDelayed(mUpdateBeaconList, 100);
 		}
 	};
 	

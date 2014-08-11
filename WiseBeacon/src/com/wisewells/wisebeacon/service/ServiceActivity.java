@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.view.View;
 import android.widget.AdapterView;
@@ -23,6 +24,7 @@ import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
 import com.wisewells.wisebeacon.common.TitleDialogSpinner;
+import com.wisewells.wisebeacon.common.TitleDialogSpinnerAdapter;
 
 public class ServiceActivity extends Activity {
 
@@ -36,9 +38,9 @@ public class ServiceActivity extends Activity {
 	
 	private ImageView mAddRootServiceButton;
 	private ImageView mAddServiceButton;
-	private	TitleDialogSpinner mTitleSpinner;
-	private ArrayAdapter<ServiceSpinnerData> mSpinnerAdapter;
-	private ListView mListView;
+	private	TitleDialogSpinner mRootServiceSpinner;
+	private TitleDialogSpinnerAdapter<ServiceSpinnerData> mSpinnerAdapter;
+	private ListView mChildSerivceListView;
 	private ServiceListAdapter mListAdapter;
 	
 	@Override
@@ -64,26 +66,27 @@ public class ServiceActivity extends Activity {
 			}
 		});
 		
-		mSpinnerAdapter = new ArrayAdapter<ServiceSpinnerData>(this, android.R.layout.simple_spinner_dropdown_item);
+		mSpinnerAdapter = new TitleDialogSpinnerAdapter<ServiceSpinnerData>(this);
 		
 		mListAdapter = new ServiceListAdapter(this);		
 		
-		mListView = (ListView) findViewById(R.id.list_low_rank_service);
-		mListView.setAdapter(mListAdapter);
-		mListView.setOnItemClickListener(new OnItemClickListener() {
+		mChildSerivceListView = (ListView) findViewById(R.id.list_low_rank_service);
+		mChildSerivceListView.setAdapter(mListAdapter);
+		mChildSerivceListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				onListItemClicked(position);
 			}
 		});
 		
-		mTitleSpinner = (TitleDialogSpinner) findViewById(R.id.custom_title_spinner);
-		mTitleSpinner.setFragmentManager(getFragmentManager());
-		mTitleSpinner.setPrompt("상위서비스");
-		mTitleSpinner.setAdapter(mSpinnerAdapter);
-		mTitleSpinner.setListener(new TitleDialogSpinner.TitleSpinnerListener() {
+		mRootServiceSpinner = (TitleDialogSpinner) findViewById(R.id.custom_title_spinner);
+		mRootServiceSpinner.setFragmentManager(getFragmentManager());
+		mRootServiceSpinner.setPrompt("상위서비스");
+		mRootServiceSpinner.setAdapter(mSpinnerAdapter);
+		mRootServiceSpinner.setOnItemSelectedListener(new TitleDialogSpinner.OnSpinnerItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,int position, long id) {
+				L.d("ServiceActivity item select");
 				onRootServiceSelected(position);
 			}
 		});
@@ -106,8 +109,8 @@ public class ServiceActivity extends Activity {
 				mWiseManager.addService(str, null, new EditServiceListener() {
 					@Override
 					public void onEditSuccess(Service service) {
+						L.d("on edit success");
 						mSpinnerAdapter.add(new ServiceSpinnerData(service));
-						L.i(service.getName());
 					}
 					@Override
 					public void onEditFail() {
