@@ -9,7 +9,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Pair;
 
-import com.wisewells.sdk.BeaconTracker;
 import com.wisewells.sdk.beacon.BeaconVector;
 import com.wisewells.sdk.beacon.RssiVector;
 

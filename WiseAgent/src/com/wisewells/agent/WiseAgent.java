@@ -31,6 +31,7 @@ import com.wisewells.sdk.beacon.MinorGroup;
 import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.sdk.service.ProximityTopology;
+import com.wisewells.sdk.service.SectorTopology;
 import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.IpcUtils;
@@ -338,6 +339,37 @@ public class WiseAgent extends android.app.Service {
 		
 		public DistanceVector getBeaconDistance(List<String> beaconCodes) throws RemoteException {
 			return mTracker.getAvgDist(makeBeaconVector((String[]) beaconCodes.toArray()));
+		}
+
+		@Override
+		public boolean addSector(String topologyCode, String sectorName) throws RemoteException {
+			SectorTopology topology = null;
+			try {
+				topology = (SectorTopology) mWiseObjects.getTopology(topologyCode);
+			} catch(ClassCastException e) {
+				L.e("topologyCode is not sector topology's code.");
+			}
+			
+			if(topology == null)
+				return false;
+			
+			return topology.addSector(sectorName);
+		}
+
+		@Override
+		public void addSectorSample(String topologyCode, String sectorName) throws RemoteException {
+			SectorTopology topology = null;
+			try {
+				topology = (SectorTopology) mWiseObjects.getTopology(topologyCode);
+				topology.setBeaconTracker(mTracker);
+			} catch(ClassCastException e) {
+				L.e("topologyCode is not sector topology's code.");
+			}
+			
+			if(topology == null)
+				return;
+			
+			topology.addSample(sectorName);			
 		};
 	};
 }

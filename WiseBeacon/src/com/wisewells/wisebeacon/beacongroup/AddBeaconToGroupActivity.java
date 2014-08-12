@@ -63,7 +63,7 @@ public class AddBeaconToGroupActivity extends Activity {
 		mListView = (ListView) findViewById(R.id.list_beacon_list);
 		mListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 		mListView.setAdapter(mAdapter);
-		
+
 		mBeaconInGroupAdapter = new DetailBeaconGroupBeaconListAdapter(this);
 		
 		mBeaconInGroupList = (ListView) findViewById(R.id.list_beacon_in_group);

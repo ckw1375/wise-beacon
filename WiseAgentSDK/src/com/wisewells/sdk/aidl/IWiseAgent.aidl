@@ -39,6 +39,8 @@ interface IWiseAgent {
 	void addProximityTopology(String serviceCode, String groupCode, in String[] beaconCodes, in double[] ranges);
 	void addLocationTopology();
 	void addSectorTopology();
+	void addSectorSample(String topologyCode, String sectorName);
+	boolean addSector(String topologyCode, String sectorName);
 	
 	// Service
 	void addService(String name, String parentCode, in EditObjectListener listener);

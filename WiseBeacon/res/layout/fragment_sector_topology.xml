@@ -4,17 +4,67 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        style="@style/title_section"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/string_sector_information"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:background="@null" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Sector 정보" />
+
+        <ImageView
+            android:id="@+id/img_modify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/black"
+            android:src="@android:drawable/ic_menu_edit" />
+
+    </LinearLayout>
 
     <ListView
         android:id="@+id/list_sector"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+
     </ListView>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/btn_display_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="목 록" />
+
+        <LinearLayout
+            android:id="@+id/layout_save_cancel_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/btn_save"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="저 장" />
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="취 소" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </LinearLayout>

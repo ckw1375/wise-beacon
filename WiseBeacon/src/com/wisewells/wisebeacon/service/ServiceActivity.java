@@ -96,6 +96,8 @@ public class ServiceActivity extends Activity {
 	protected void onStart() {
 		super.onStart();
 		receiveRootService();
+		if(mSelectedRootService != null)
+			receiveRowLankService();
 	}
 	
 	private void onAddRootServiceClicked() {

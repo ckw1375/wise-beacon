@@ -2,6 +2,8 @@ package com.wisewells.wisebeacon.home;
 
 import java.util.List;
 
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -60,12 +62,7 @@ public class HomeActivity extends Activity {
     }
 	
 	private void onSettingButtonClicked() {
-		try {
-			WiseManager.getInstance(this).addSectorTopology();
-			
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		
 	}
 	
 

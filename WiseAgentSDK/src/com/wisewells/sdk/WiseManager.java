@@ -89,14 +89,27 @@ public class WiseManager {
 		return mAgent != null;
 	}
 	
-	public void startTracking(String packageName, String serviceCode, TopologyStateChangeListener listener)
-			throws RemoteException {
-		mAgent.startTracking(packageName, serviceCode, listener);
-	}
+	@SuppressWarnings("unused")
+	private int _______________Beacon_______________;
 	
-	public void stopTracking(String packageName) throws RemoteException{
-		mAgent.stopTracking(packageName);
+	public void addBeaconsToBeaconGroup(String groupCode, ArrayList<Beacon> beacons) throws RemoteException {
+		mAgent.addBeaconsToBeaconGroup(groupCode, beacons);
 	}
+
+	public void addBeaconToBeaconGroup(String groupCode, Beacon beacon) throws RemoteException {
+		mAgent.addBeaconToBeaconGroup(groupCode, beacon);
+	}
+
+	public void modifyBeacon(Beacon beacon) {
+
+	}
+
+	public void deleteBeacon(String code) {
+
+	}
+
+	@SuppressWarnings("unused")
+	private int _______________BeaconGroup_______________;
 	
 	public void addUuidGroup(String name) throws RemoteException {
 		mAgent.addUuidGroup(name);
@@ -105,50 +118,124 @@ public class WiseManager {
 	public void addMajorGroup(String name, String parentCode) throws RemoteException {
 		mAgent.addMajorGroup(name, parentCode);
 	}
-	
-	public void addBeaconsToBeaconGroup(String groupCode, ArrayList<Beacon> beacons) throws RemoteException {
-		mAgent.addBeaconsToBeaconGroup(groupCode, beacons);
-	}
-	
-	public void addBeaconToBeaconGroup(String groupCode, Beacon beacon) throws RemoteException {
-		mAgent.addBeaconToBeaconGroup(groupCode, beacon);
-	}
-	
+
 	public void modifyBeaconGroup(BeaconGroup group) throws RemoteException {
 	}
 
 	public void deleteBeaconGroup(String code) {
 	}
-	
-	public void modifyBeacon(Beacon beacon) {
-		
+
+	public List<Beacon> getBeacons(String groupCode) throws RemoteException {
+		return mAgent.getBeacons(groupCode);
 	}
 
-	public void deleteBeacon(String code) {
+	public BeaconGroup getBeaconGroup(String code) {
+		try {
+			Bundle bundle = mAgent.getBeaconGroup(code);
+			bundle.setClassLoader(BeaconGroup.class.getClassLoader());
+			return bundle.getParcelable(IpcUtils.BUNDLE_KEY);
+		} catch (RemoteException e) {
+			L.e(EXCEPTION_MSG + "getBeaconGroup");
+			return null;
+		}
+	}
+
+	public List<BeaconGroup> getBeaconGroupsInAuthority()
+			throws RemoteException {
+		Bundle bundle = mAgent.getBeaconGroupsInAuthority();
+		bundle.setClassLoader(BeaconGroup.class.getClassLoader());
+		return bundle.getParcelableArrayList(IpcUtils.BUNDLE_KEY);
+	}
+
+	@SuppressWarnings("unused")
+	private int _______________Topology_______________;
+	
+	public void modifyTopology(Topology topology) {
 
 	}
+
+	public void deleteTopology(String code) {
+
+	}
+
+	public List<UuidGroup> getUuidGroups() throws RemoteException {
+		return mAgent.getUuidGroups();
+	}
+
+	public List<MajorGroup> getMajorGroups(String uuidGroupCode)
+			throws RemoteException {
+		return mAgent.getMajorGroups(uuidGroupCode);
+	}
+
+	public Topology getTopology(String code) {
+		try {
+			Bundle bundle = mAgent.getTopology(code);
+			bundle.setClassLoader(Topology.class.getClassLoader());
+			return bundle.getParcelable(IpcUtils.BUNDLE_KEY);
+		} catch (RemoteException e) {
+			L.e(EXCEPTION_MSG + "getTopology");
+			return null;
+		}
+	}
+
+	public void addLocationTopology(String serviceCode, String groupCode)
+			throws RemoteException {
+
+	}
+
+	public void addProximityTopology(String serviceCode, String groupCode,
+			String[] beaconCodes, double[] ranges) throws RemoteException {
+
+		mAgent.addProximityTopology(serviceCode, groupCode, beaconCodes, ranges);
+	}
+
+	public void addSectorTopology() throws RemoteException {
+		mAgent.addSectorTopology();
+	}
 	
-	public void addService(String name, String parentCode, EditServiceListener listener) {
-		mServiceListener = Preconditions.checkNotNull(listener, "Listener must be not null");
+	public void addSectorSample(String topologyCode, String sectorName) {
+		try {
+			mAgent.addSectorSample(topologyCode, sectorName);
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "addSectorSample");
+		}
+	}
+	
+	public void addSector(String topologyCode, String sectorName) {
+		try {
+			mAgent.addSector(topologyCode, sectorName);
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "addSector");
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private int _______________Service_______________;
+	
+	public void addService(String name, String parentCode,
+			EditServiceListener listener) {
+		mServiceListener = Preconditions.checkNotNull(listener,
+				"Listener must be not null");
 
 		try {
-		mAgent.addService(name, parentCode, new EditObjectListener.Stub() {
-			@Override
-			public void onEditSuccess(String result, Bundle data) throws RemoteException {
-				final Service s = IpcUtils.getParcelableFromBundle(Service.class, data);
-				mHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						mServiceListener.onEditSuccess(s);
-					}
-				});
-			}
-			@Override
-			public void onEditFail(String result) throws RemoteException {
-				L.e(result);
-			}
-		});
-		} catch(RemoteException e) {
+			mAgent.addService(name, parentCode, new EditObjectListener.Stub() {
+				@Override
+				public void onEditSuccess(String result, Bundle data) throws RemoteException {
+					final Service s = IpcUtils.getParcelableFromBundle(Service.class, data);
+					mHandler.post(new Runnable() {
+						@Override
+						public void run() {
+							mServiceListener.onEditSuccess(s);
+						}
+					});
+				}
+
+				@Override
+				public void onEditFail(String result) throws RemoteException {
+					L.e(result);
+				}
+			});
+		} catch (RemoteException e) {
 			L.e(EXCEPTION_MSG + "addService");
 		}
 	}
@@ -160,113 +247,59 @@ public class WiseManager {
 	public void deleteService(String code) {
 
 	}
-	
-	public void modifyTopology(Topology topology) {
-		
-	}
 
-	public void deleteTopology(String code) {
-		
-	}
-	
 	public List<Service> getRootServices() {
 		try {
 			return mAgent.getRootServices();
-		} catch(RemoteException e) {
-			L.e(EXCEPTION_MSG + "getRootServices"); 
+		} catch (RemoteException e) {
+			L.e(EXCEPTION_MSG + "getRootServices");
 			return null;
 		}
 	}
-	
+
 	public List<Service> getChildServices(String parentCode) {
 		try {
 			return mAgent.getChildServices(parentCode);
-		} catch(RemoteException e) {
+		} catch (RemoteException e) {
 			L.e(EXCEPTION_MSG + "getChildServices");
 			return null;
 		}
 	}
+
+	@SuppressWarnings("unused")
+	private int _______________Use_Agent_Function_______________;
 	
-	public List<UuidGroup> getUuidGroups() throws RemoteException {
-		return mAgent.getUuidGroups();
+	public void startTracking(String packageName, String serviceCode,
+			TopologyStateChangeListener listener) throws RemoteException {
+		mAgent.startTracking(packageName, serviceCode, listener);
 	}
 
-	public List<MajorGroup> getMajorGroups(String uuidGroupCode) throws RemoteException {
-		return mAgent.getMajorGroups(uuidGroupCode);
-	}
-	
-	/*public List<BeaconGroup> getBeaconGroups(ArrayList<String> codes) throws RemoteException {
-		return  mAgent.getBeaconGroups(codes);
-	}*/
-	
-	public List<Beacon> getBeacons(String groupCode) throws RemoteException {
-		return mAgent.getBeacons(groupCode);
-	}
-	
-	public BeaconGroup getBeaconGroup(String code) {
-		try {
-		Bundle bundle = mAgent.getBeaconGroup(code);
-		bundle.setClassLoader(BeaconGroup.class.getClassLoader());
-		return bundle.getParcelable(IpcUtils.BUNDLE_KEY);
-		} catch(RemoteException e) {
-			L.e(EXCEPTION_MSG + "getBeaconGroup");
-			return null;
-		}
-	}
-	
-	public List<BeaconGroup> getBeaconGroupsInAuthority() throws RemoteException {
-		Bundle bundle = mAgent.getBeaconGroupsInAuthority();
-		bundle.setClassLoader(BeaconGroup.class.getClassLoader());
-		return bundle.getParcelableArrayList(IpcUtils.BUNDLE_KEY);
+	public void stopTracking(String packageName) throws RemoteException {
+		mAgent.stopTracking(packageName);
 	}
 
-	public Topology getTopology(String code) {
-		try {
-		Bundle bundle = mAgent.getTopology(code);
-		bundle.setClassLoader(Topology.class.getClassLoader());
-		return bundle.getParcelable(IpcUtils.BUNDLE_KEY); 
-		} catch(RemoteException e) {
-			L.e(EXCEPTION_MSG + "getTopology");
-			return null;
-		}
-	}
-	
-	public void addLocationTopology(String serviceCode, String groupCode) throws RemoteException {
-		
-	}
-
-	public void addProximityTopology(String serviceCode, String groupCode, 
-			String[] beaconCodes, double[] ranges) throws RemoteException {
-		
-		mAgent.addProximityTopology(serviceCode, groupCode, beaconCodes, ranges);
-	}
-
-	public void addSectorTopology() throws RemoteException {
-		mAgent.addSectorTopology();
-	}
-	
 	public void startReceiving() throws RemoteException {
 		mAgent.startReceiving();
 	}
-	
+
 	public void stopReceiving() throws RemoteException {
 		mAgent.stopReceiving();
 	}
-	
+
 	public List<Beacon> getAllNearbyBeacons() {
 		try {
 			return mAgent.getAllNearbyBeacons();
-		} catch(RemoteException e) {
+		} catch (RemoteException e) {
 			L.e(EXCEPTION_MSG + "getAllNearByBeacons");
 			return null;
 		}
 	}
-	
+
 	public DistanceVector getBeaconDistance(List<String> codes) {
 		try {
-			DistanceVector dv = mAgent.getBeaconDistance(codes); 
+			DistanceVector dv = mAgent.getBeaconDistance(codes);
 			return dv;
-		} catch(RemoteException e) {
+		} catch (RemoteException e) {
 			L.e(EXCEPTION_MSG + "getBeaconDistance");
 			return null;
 		}
