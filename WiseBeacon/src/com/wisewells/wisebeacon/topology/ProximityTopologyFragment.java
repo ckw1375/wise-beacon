@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.WiseManager.TopologyStateListener;
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
@@ -22,9 +23,8 @@ import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.LocationTopology.Coordinate;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.service.DetailServiceActivity;
 
-public class ProximityTopologyFragment extends TopologyFragment {
+public class ProximityTopologyFragment extends BaseTopologyFragment {
 	
 	private EditMode mMode;
 	
@@ -34,15 +34,9 @@ public class ProximityTopologyFragment extends TopologyFragment {
 	private BeaconGroup mBeaconGroup;
 	private Service mService;
 	
-	private ImageView mModifyView;
-	private ImageView mDoneView;
+	private ImageView mModifyButton;
+	private ImageView mDoneButton;
 	
-	private ViewGroup mSaveCancelGroup;
-	private Button mSaveButton;
-	private Button mCancelButton;
-	private Button mDisplayListButton;
-	
- 	
 	private ProximityTopologyListAdapter mAdapter;
 	private ListView mListView;
 	
@@ -87,31 +81,26 @@ public class ProximityTopologyFragment extends TopologyFragment {
 	};
 	
 	
-	private int mPosition = -1;
-	TopologyStateChangeListener listener = new TopologyStateChangeListener.Stub() {
+	private int mPosition;
+	TopologyStateListener listener = new TopologyStateListener() {
 		@Override
-		public void onSectorChanged(String sector) throws RemoteException {
+		public void onSectorChanged(String sector) {
+			
 		}
 		@Override
-		public void onProximityChanged(Region region) throws RemoteException {
+		public void onProximityChanged(Region region) {
 			List<ProximityTopologyListData> datas = mAdapter.getItems();
-
+			mPosition = -1;
 			for(int i=0; i<mAdapter.getCount(); i++) {
 				if(mAdapter.getItem(i).getBeacon().getRegion().equals(region)) {
 					mPosition = i;
 					 break;
 				}
 			}
-			getActivity().runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					mAdapter.setBackgoundPosition(mPosition);
-				}
-			});
-			
+			mAdapter.setBackgoundPosition(mPosition);
 		}
 		@Override
-		public void onLocationChanged(Coordinate coord) throws RemoteException {
+		public void onLocationChanged(Coordinate coord) {
 			
 		}
 	};
@@ -120,29 +109,9 @@ public class ProximityTopologyFragment extends TopologyFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_proximity_topology, container, false);
 		
-		mModifyView = (ImageView) v.findViewById(R.id.img_modify);
+		mModifyButton = (ImageView) v.findViewById(R.id.img_modify);
 		
-		mDoneView = (ImageView) v.findViewById(R.id.img_done);
-		
-		mSaveCancelGroup = (ViewGroup) v.findViewById(R.id.layout_save_cancel_group);
-		
-		mSaveButton = (Button) v.findViewById(R.id.btn_save);
-		mSaveButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onSaveButtonClicked();
-			}
-		});
-		
-		mCancelButton = (Button) v.findViewById(R.id.btn_cancel);
-		mCancelButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getActivity().finish();
-			}
-		});
-		
-		mDisplayListButton = (Button) v.findViewById(R.id.btn_display_list);
+		mDoneButton = (ImageView) v.findViewById(R.id.img_done);
 		
 		mAdapter = new ProximityTopologyListAdapter(getActivity());		
 		mListView = (ListView) v.findViewById(R.id.list_proximity_topology);
@@ -165,27 +134,22 @@ public class ProximityTopologyFragment extends TopologyFragment {
 	private void setVisibleAccordingToMode() {
 		switch(mMode) {
 		case MAKE_NEW:
-			mModifyView.setVisibility(View.INVISIBLE);
-			mDoneView.setVisibility(View.INVISIBLE);
-			mDisplayListButton.setVisibility(View.INVISIBLE);
-			mSaveCancelGroup.setVisibility(View.VISIBLE);
+			mModifyButton.setVisibility(View.INVISIBLE);
+			mDoneButton.setVisibility(View.INVISIBLE);
 			break;
 		case DISPLAY:
-			mModifyView.setVisibility(View.VISIBLE);
-			mDoneView.setVisibility(View.INVISIBLE);
-			mDisplayListButton.setVisibility(View.VISIBLE);
-			mSaveCancelGroup.setVisibility(View.INVISIBLE);
+			mModifyButton.setVisibility(View.VISIBLE);
+			mDoneButton.setVisibility(View.INVISIBLE);
 			break;
 		case MODIFY:
-			mModifyView.setVisibility(View.INVISIBLE);
-			mDoneView.setVisibility(View.VISIBLE);
-			mDisplayListButton.setVisibility(View.INVISIBLE);
-			mSaveCancelGroup.setVisibility(View.INVISIBLE);
+			mModifyButton.setVisibility(View.INVISIBLE);
+			mDoneButton.setVisibility(View.VISIBLE);
 			break;
 		}
 	}
 	
-	private void onSaveButtonClicked() {
+	@Override
+	public void saveTopology() {
 		int size = mAdapter.getCount();
 		String[] beaconCodes = new String[size];
 		double[] ranges = new double[size];

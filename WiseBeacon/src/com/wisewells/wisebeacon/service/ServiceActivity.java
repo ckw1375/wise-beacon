@@ -25,6 +25,7 @@ import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
 import com.wisewells.wisebeacon.common.TitleDialogSpinner;
 import com.wisewells.wisebeacon.common.TitleDialogSpinnerAdapter;
+import com.wisewells.wisebeacon.topology.DetailServiceActivity;
 
 public class ServiceActivity extends Activity {
 

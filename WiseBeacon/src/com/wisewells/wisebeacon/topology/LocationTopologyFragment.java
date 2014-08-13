@@ -10,9 +10,8 @@ import android.widget.ListView;
 
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.service.DetailServiceActivity;
 
-public class LocationTopologyFragment extends TopologyFragment {
+public class LocationTopologyFragment extends BaseTopologyFragment {
 	
 	private List<Beacon> mBeaconsInGroup;
 	
@@ -47,5 +46,11 @@ public class LocationTopologyFragment extends TopologyFragment {
 	public void replaceListViewData(List<Beacon> beacons) {
 		mBeaconsInGroup = beacons;
 		initListDatas();
+	}
+	
+	@Override
+	public void saveTopology() {
+		// TODO Auto-generated method stub
+		
 	}
 }

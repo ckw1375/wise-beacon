@@ -20,7 +20,10 @@ import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.beacon.DistanceVector;
 import com.wisewells.sdk.beacon.MajorGroup;
+import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.beacon.UuidGroup;
+import com.wisewells.sdk.service.LocationTopology;
+import com.wisewells.sdk.service.LocationTopology.Coordinate;
 import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.IpcUtils;
@@ -43,10 +46,11 @@ public class WiseManager {
 	
 	private IWiseAgent mAgent;
 	private ServiceReadyCallback mReadyCallback;
-	private EditBeaconGroupListener mGroupListener;
-	private EditBeaconListener mBeaconListener;
-	private EditServiceListener mServiceListener;
-	private EditTopologyListener mTopologyListener;
+	private EditBeaconGroupListener mEditGroupListener;
+	private EditBeaconListener mEditBeaconListener;
+	private EditServiceListener mEditServiceListener;
+	private EditTopologyListener mEditTopologyListener;
+	private TopologyStateListener mTopologyStateListener;
 	
 	private static WiseManager sInstance;
 	
@@ -212,10 +216,8 @@ public class WiseManager {
 	@SuppressWarnings("unused")
 	private int _______________Service_______________;
 	
-	public void addService(String name, String parentCode,
-			EditServiceListener listener) {
-		mServiceListener = Preconditions.checkNotNull(listener,
-				"Listener must be not null");
+	public void addService(String name, String parentCode, EditServiceListener listener) {
+		mEditServiceListener = Preconditions.checkNotNull(listener, "Listener must be not null");
 
 		try {
 			mAgent.addService(name, parentCode, new EditObjectListener.Stub() {
@@ -225,7 +227,7 @@ public class WiseManager {
 					mHandler.post(new Runnable() {
 						@Override
 						public void run() {
-							mServiceListener.onEditSuccess(s);
+							mEditServiceListener.onEditSuccess(s);
 						}
 					});
 				}
@@ -269,9 +271,39 @@ public class WiseManager {
 	@SuppressWarnings("unused")
 	private int _______________Use_Agent_Function_______________;
 	
-	public void startTracking(String packageName, String serviceCode,
-			TopologyStateChangeListener listener) throws RemoteException {
-		mAgent.startTracking(packageName, serviceCode, listener);
+	public void startTracking(String packageName, String serviceCode, TopologyStateListener listener) 
+			throws RemoteException {
+		
+		mTopologyStateListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
+		mAgent.startTracking(packageName, serviceCode, new TopologyStateChangeListener.Stub() {
+			@Override
+			public void onSectorChanged(final String sectorName) throws RemoteException {
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mTopologyStateListener.onSectorChanged(sectorName);
+					}
+				});
+			}
+			@Override
+			public void onProximityChanged(final Region region) throws RemoteException {
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mTopologyStateListener.onProximityChanged(region);
+					}
+				});
+			}
+			@Override
+			public void onLocationChanged(final Coordinate coordinate) throws RemoteException {
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mTopologyStateListener.onLocationChanged(coordinate);
+					}
+				});
+			}
+		});
 	}
 
 	public void stopTracking(String packageName) throws RemoteException {
@@ -304,6 +336,9 @@ public class WiseManager {
 			return null;
 		}
 	}
+	
+	@SuppressWarnings("unused")
+	private int _______________Interface_______________;
 	
 	private class InternalServiceConnection implements ServiceConnection {
 		private InternalServiceConnection() {
@@ -342,5 +377,11 @@ public class WiseManager {
 	public interface EditTopologyListener {
 		public void onEditSuccess(Topology service); 
 		public void onEditFail();
+	}
+	
+	public interface TopologyStateListener {
+		void onSectorChanged(String sectorName);
+		void onProximityChanged(Region region);
+		void onLocationChanged(LocationTopology.Coordinate coordinate);
 	}
 }

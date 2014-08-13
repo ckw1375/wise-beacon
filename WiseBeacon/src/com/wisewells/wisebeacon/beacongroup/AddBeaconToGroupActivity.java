@@ -1,6 +1,6 @@
 package com.wisewells.wisebeacon.beacongroup;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -16,8 +16,8 @@ import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.beacon.Beacon;
-import com.wisewells.sdk.beacon.DistanceVector;
 import com.wisewells.sdk.beacon.MajorGroup;
+import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;

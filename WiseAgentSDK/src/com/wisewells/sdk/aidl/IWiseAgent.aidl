@@ -47,13 +47,11 @@ interface IWiseAgent {
 	List<Service> getRootServices();
 	List<Service> getChildServices(String parentCode);
 	
-	// Receive Beacon
+	// Use Agent Fuction
 	void startReceiving();
 	void stopReceiving();
 	List<Beacon> getAllNearbyBeacons();
 	DistanceVector getBeaconDistance(in List<String> beaconCodes);
-		
-	// Callback
 	void startTracking(String packageName, String serviceCode, in TopologyStateChangeListener listener);
 	void stopTracking(String packageName);
 }

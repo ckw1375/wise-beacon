@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.service;
+package com.wisewells.wisebeacon.topology;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,9 @@ import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
@@ -22,11 +24,7 @@ import com.wisewells.sdk.service.Topology;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.TitleDialogSpinner;
 import com.wisewells.wisebeacon.common.TitleDialogSpinnerAdapter;
-import com.wisewells.wisebeacon.topology.EditMode;
-import com.wisewells.wisebeacon.topology.LocationTopologyFragment;
-import com.wisewells.wisebeacon.topology.ProximityTopologyFragment;
-import com.wisewells.wisebeacon.topology.SectorTopologyFragment;
-import com.wisewells.wisebeacon.topology.TopologyFragment;
+import com.wisewells.wisebeacon.service.ServiceActivity;
 
 public class DetailServiceActivity extends Activity {
 
@@ -43,7 +41,7 @@ public class DetailServiceActivity extends Activity {
 	private BeaconGroup mBeaconGroup;
 	private Service mParentService;
 	private ArrayList<Beacon> mBeaconsInGroup;
-	private TopologyFragment mFragment;
+	private BaseTopologyFragment mFragment;
 	
 	private TextView mParentServiceName;
 	private TextView mChildServiceName;
@@ -54,6 +52,11 @@ public class DetailServiceActivity extends Activity {
 	private TitleDialogSpinner mTopologyTypeSpinner;
 	private TitleDialogSpinnerAdapter<BeaconGroup> mBeaconGroupAdapter;
 	private TitleDialogSpinnerAdapter<String> mTopologyTypeAdapter;
+	
+	private ViewGroup mSaveCancelGroup;
+	private Button mSaveButton;
+	private Button mCancelButton;
+	private Button mDisplayListButton;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +101,26 @@ public class DetailServiceActivity extends Activity {
 			}
 		});
 		
+		mSaveCancelGroup = (ViewGroup) findViewById(R.id.layout_save_cancel_group);
+
+		mSaveButton = (Button) findViewById(R.id.btn_save);
+		mSaveButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mFragment.saveTopology();
+			}
+		});
+
+		mCancelButton = (Button) findViewById(R.id.btn_cancel);
+		mCancelButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+//				mFragment.saveTopology();
+			}
+		});
+
+		mDisplayListButton = (Button) findViewById(R.id.btn_display_list);
+		
 		initMode();
 		setVisibleAccordingToMode();
 		if(mMode != EditMode.MAKE_NEW) {
@@ -129,14 +152,29 @@ public class DetailServiceActivity extends Activity {
 			mTopologyTypeSpinner.setVisibility(View.INVISIBLE);
 			mTopologyType.setVisibility(View.VISIBLE);
 			mTopologyType.setText(mTopology.getTypeName());
+			
+			mDisplayListButton.setVisibility(View.VISIBLE);
+			mSaveCancelGroup.setVisibility(View.INVISIBLE);
 			break;
 		case MAKE_NEW:
+			mBeaconGroupName.setVisibility(View.INVISIBLE);
+			mBeaconGroupSpinner.setVisibility(View.VISIBLE);
+			
+			mTopologyType.setVisibility(View.INVISIBLE);
+			mTopologyTypeSpinner.setVisibility(View.VISIBLE);
+			
+			mDisplayListButton.setVisibility(View.INVISIBLE);
+			mSaveCancelGroup.setVisibility(View.VISIBLE);
+			break;
 		case MODIFY:
 			mBeaconGroupName.setVisibility(View.INVISIBLE);
 			mBeaconGroupSpinner.setVisibility(View.VISIBLE);
 			
 			mTopologyType.setVisibility(View.INVISIBLE);
 			mTopologyTypeSpinner.setVisibility(View.VISIBLE);
+			
+			mDisplayListButton.setVisibility(View.INVISIBLE);
+			mSaveCancelGroup.setVisibility(View.INVISIBLE);
 			break;
 		}
 	}

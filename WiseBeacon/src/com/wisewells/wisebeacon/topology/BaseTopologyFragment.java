@@ -7,9 +7,8 @@ import android.os.Bundle;
 import android.widget.BaseAdapter;
 
 import com.wisewells.sdk.beacon.Beacon;
-import com.wisewells.wisebeacon.service.DetailServiceActivity;
 
-public abstract class TopologyFragment extends Fragment {
+public abstract class BaseTopologyFragment extends Fragment {
 	protected List<Beacon> mBeaconsInGroup;
 	protected BaseAdapter mAdapter;
 	
@@ -20,4 +19,5 @@ public abstract class TopologyFragment extends Fragment {
 	}
 	
 	public abstract void replaceListViewData(List<Beacon> beacons);
+	public abstract void saveTopology();
 }

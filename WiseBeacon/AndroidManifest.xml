@@ -37,7 +37,7 @@
             android:label="@string/title_activity_add_beacon_to_group" >
         </activity>
         <activity
-            android:name=".service.DetailServiceActivity"
+            android:name="com.wisewells.wisebeacon.topology.DetailServiceActivity"
             android:label="@string/title_activity_detail_service" >
         </activity>
         <activity

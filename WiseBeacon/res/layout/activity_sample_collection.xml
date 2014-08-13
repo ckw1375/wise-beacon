@@ -8,14 +8,14 @@
         android:layout_height="wrap_content" >
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/btn_add_sector"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Sector 추가" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btn_reset_all_samples"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -24,7 +24,7 @@
     </LinearLayout>
 
     <ListView
-        android:id="@+id/list_sector_collection"
+        android:id="@+id/list_sample_collection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ListView>

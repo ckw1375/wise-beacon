@@ -47,37 +47,4 @@
 
     </ListView>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <Button
-            android:id="@+id/btn_display_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="목 록" />
-
-        <LinearLayout
-            android:id="@+id/layout_save_cancel_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-            <Button
-                android:id="@+id/btn_save"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="저 장" />
-
-            <Button
-                android:id="@+id/btn_cancel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="취 소" />
-
-        </LinearLayout>
-
-    </FrameLayout>
-
 </LinearLayout>
