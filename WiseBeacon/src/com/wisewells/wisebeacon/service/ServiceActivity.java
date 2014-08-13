@@ -87,7 +87,6 @@ public class ServiceActivity extends Activity {
 		mRootServiceSpinner.setOnItemSelectedListener(new TitleDialogSpinner.OnSpinnerItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,int position, long id) {
-				L.d("ServiceActivity item select");
 				onRootServiceSelected(position);
 			}
 		});
@@ -105,14 +104,13 @@ public class ServiceActivity extends Activity {
 		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
 		dialog.setPrompt("서비스 생성");
 		dialog.setEditTitle("서비스 명");
-		dialog.setListener(new OneEditTwoButtonsDialog.DialogListener() {
+		dialog.setDialogListener(new OneEditTwoButtonsDialog.DialogListener() {
 			@Override
 			public void onOkButtonClicked(String str) {
 
 				mWiseManager.addService(str, null, new EditServiceListener() {
 					@Override
 					public void onEditSuccess(Service service) {
-						L.d("on edit success");
 						mSpinnerAdapter.add(new ServiceSpinnerData(service));
 					}
 					@Override
@@ -131,7 +129,7 @@ public class ServiceActivity extends Activity {
 		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
 		dialog.setPrompt("서비스 생성");
 		dialog.setEditTitle("서비스 명");
-		dialog.setListener(new OneEditTwoButtonsDialog.DialogListener() {
+		dialog.setDialogListener(new OneEditTwoButtonsDialog.DialogListener() {
 			@Override
 			public void onOkButtonClicked(String str) {
 				mWiseManager.addService(str, mSelectedRootService.getCode(), new EditServiceListener() {

@@ -70,11 +70,25 @@ public class OneEditTwoButtonsDialog extends DialogFragment {
 		mEditTitle = title;
 	}
 	
-	public void setListener(DialogListener listener) {
+	public void setDialogListener(DialogListener listener) {
 		mConfirmListener = listener;
 	}
 	
 	public interface DialogListener {
 		void onOkButtonClicked(String str);
+	}
+	
+	/*
+	 * Builder 패턴 공부해보자.. 
+	 * 나중에 시간나면 생각해 보쟈 : )
+	 */
+	static public class Builder {
+		public OneEditTwoButtonsDialog create(String prompt, String editTitle, DialogListener listener) {
+			OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
+			dialog.setPrompt(prompt);
+			dialog.setEditTitle(editTitle);
+			dialog.setDialogListener(listener);
+			return dialog;
+		}
 	}
 }

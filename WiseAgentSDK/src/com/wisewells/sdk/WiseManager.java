@@ -21,9 +21,11 @@ import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.beacon.DistanceVector;
 import com.wisewells.sdk.beacon.MajorGroup;
 import com.wisewells.sdk.beacon.Region;
+import com.wisewells.sdk.beacon.RssiVector;
 import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.sdk.service.LocationTopology;
 import com.wisewells.sdk.service.LocationTopology.Coordinate;
+import com.wisewells.sdk.service.Sector;
 import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.IpcUtils;
@@ -193,8 +195,14 @@ public class WiseManager {
 		mAgent.addProximityTopology(serviceCode, groupCode, beaconCodes, ranges);
 	}
 
-	public void addSectorTopology() throws RemoteException {
-		mAgent.addSectorTopology();
+	public void addSectorTopology(String serviceCode, String groupCode, 
+			List<String> beaconCodes, List<Sector> sectors) {
+		
+		try {
+			mAgent.addSectorTopology(serviceCode, groupCode, beaconCodes, sectors);
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "addSectorTopology");
+		}
 	}
 	
 	public void addSectorSample(String topologyCode, String sectorName) {
@@ -310,12 +318,22 @@ public class WiseManager {
 		mAgent.stopTracking(packageName);
 	}
 
-	public void startReceiving() throws RemoteException {
-		mAgent.startReceiving();
+	public void startReceiving() {
+		try {
+			mAgent.startReceiving();
+		} catch (RemoteException e) {
+			L.e(EXCEPTION_MSG + "startReceiving");
+			e.printStackTrace();
+		}
 	}
 
-	public void stopReceiving() throws RemoteException {
-		mAgent.stopReceiving();
+	public void stopReceiving() {
+		try {
+			mAgent.stopReceiving();
+		} catch (RemoteException e) {
+			L.e(EXCEPTION_MSG + "stopReceiving");
+			e.printStackTrace();
+		}
 	}
 
 	public List<Beacon> getAllNearbyBeacons() {
@@ -333,6 +351,15 @@ public class WiseManager {
 			return dv;
 		} catch (RemoteException e) {
 			L.e(EXCEPTION_MSG + "getBeaconDistance");
+			return null;
+		}
+	}
+	
+	public RssiVector getAverageRssiVector(List<String> beaconCodes) {
+		try {
+			return mAgent.getAverageRssiVector(beaconCodes);
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "getAverageRssiVector");
 			return null;
 		}
 	}

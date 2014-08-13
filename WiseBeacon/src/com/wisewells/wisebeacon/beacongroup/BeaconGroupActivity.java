@@ -123,7 +123,7 @@ public class BeaconGroupActivity extends Activity {
 		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
 		dialog.setPrompt("비콘 그룹 생성");
 		dialog.setEditTitle("그룹명");
-		dialog.setListener(new DialogListener() {
+		dialog.setDialogListener(new DialogListener() {
 			@Override
 			public void onOkButtonClicked(String str) {
 				try {
@@ -148,7 +148,7 @@ public class BeaconGroupActivity extends Activity {
 		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
 		dialog.setPrompt("비콘 그룹 생성");
 		dialog.setEditTitle("그룹명");
-		dialog.setListener(new DialogListener() {
+		dialog.setDialogListener(new DialogListener() {
 			@Override
 			public void onOkButtonClicked(String str) {
 				try {

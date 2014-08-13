@@ -20,13 +20,33 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="전체초기화" />
-
     </LinearLayout>
 
     <ListView
         android:id="@+id/list_sample_collection"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+
     </ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="저 장" />
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="취 소" />
+    </LinearLayout>
 
 </LinearLayout>

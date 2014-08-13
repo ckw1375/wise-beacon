@@ -59,7 +59,6 @@ public class TitleDialogSpinner extends TextView implements View.OnClickListener
 		mAdapter.setAddItemListener(new AddItemListener() {
 			@Override
 			public void onItemAdded(int position) {
-				L.d("Item Add!!!");
 				mDialog.onItemClicked(null, null, position, position);
 			}
 		});

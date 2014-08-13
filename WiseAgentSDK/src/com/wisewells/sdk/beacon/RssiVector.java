@@ -7,7 +7,6 @@ import android.os.Parcelable;
 
 public class RssiVector implements Parcelable {
 	private Double[] rssi;
-	private int size;
 	
 	public static final Creator<RssiVector> CREATOR = new Creator<RssiVector>() {
 		
@@ -22,37 +21,35 @@ public class RssiVector implements Parcelable {
 		}
 	};
 
-	public RssiVector(int nSize) {
-		size = nSize;
+	public RssiVector(int size) {
 		rssi = new Double[size];
 	}
 	
 	private RssiVector(Parcel in) {
-		rssi = (Double[]) in.readArray(Double.class.getClassLoader());
-		size = rssi.length;
+		rssi = (Double[]) in.readSerializable();
 	}
 
 	public int getSize() {
-		return size;
+		return rssi.length;
 	}
 
 	public boolean setAll(ArrayList<Double> nRssi) {
-		if (nRssi.size() != size)
+		if (nRssi.size() != rssi.length)
 			return false;
-		for (int ind = 0; ind < size; ind++)
+		for (int ind = 0; ind < rssi.length; ind++)
 			rssi[ind] = nRssi.get(ind);
 		return true;
 	}
 
 	public boolean set(int ind, Double nRssi) {
-		if (ind < 0 || ind > size)
+		if (ind < 0 || ind > rssi.length)
 			return false;
 		rssi[ind] = nRssi;
 		return true;
 	}
 
 	public Double get(int ind) {
-		if (ind < 0 || ind > size)
+		if (ind < 0 || ind > rssi.length)
 			return null;
 		return rssi[ind];
 	}
@@ -62,7 +59,7 @@ public class RssiVector implements Parcelable {
 		if (this.getSize() != x.getSize())
 			return null;
 		Double result = 0D;
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < rssi.length; i++) {
 			Double a = this.get(i);
 			Double b = x.get(i);
 			if (a != null && b != null) {
@@ -83,6 +80,17 @@ public class RssiVector implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeArray(rssi);
+		dest.writeSerializable(rssi);
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("[");
+		for(int i=0; i<rssi.length; i++) {
+			sb.append(rssi[i] +",");
+		}
+		sb.append("]");
+			
+		return sb.toString();
 	}
 }

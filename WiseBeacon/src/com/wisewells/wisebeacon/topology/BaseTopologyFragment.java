@@ -9,15 +9,6 @@ import android.widget.BaseAdapter;
 import com.wisewells.sdk.beacon.Beacon;
 
 public abstract class BaseTopologyFragment extends Fragment {
-	protected List<Beacon> mBeaconsInGroup;
-	protected BaseAdapter mAdapter;
-	
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		mBeaconsInGroup = getArguments().getParcelableArrayList(DetailServiceActivity.BUNDLE_BEACONS);
-	}
-	
 	public abstract void replaceListViewData(List<Beacon> beacons);
 	public abstract void saveTopology();
 }

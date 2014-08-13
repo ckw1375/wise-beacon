@@ -1,5 +1,6 @@
 package com.wisewells.wisebeacon.topology;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Bundle;
@@ -7,20 +8,17 @@ import android.os.RemoteException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.WiseManager.TopologyStateListener;
-import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.beacon.Region;
+import com.wisewells.sdk.service.LocationTopology.Coordinate;
 import com.wisewells.sdk.service.ProximityTopology;
 import com.wisewells.sdk.service.Service;
-import com.wisewells.sdk.service.LocationTopology.Coordinate;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 
@@ -29,7 +27,7 @@ public class ProximityTopologyFragment extends BaseTopologyFragment {
 	private EditMode mMode;
 	
 	private WiseManager mWiseManager;	
-	private List<Beacon> mBeaconsInGroup;
+	private ArrayList<Beacon> mBeaconsInGroup;
 	private ProximityTopology mTopology;
 	private BeaconGroup mBeaconGroup;
 	private Service mService;
@@ -171,7 +169,8 @@ public class ProximityTopologyFragment extends BaseTopologyFragment {
 	
 	@Override
 	public void replaceListViewData(List<Beacon> beacons) {
-		mBeaconsInGroup = beacons;
+		mBeaconsInGroup.clear();
+		mBeaconsInGroup.addAll(beacons);		
 		initAdapterDatas();
 	}
 }

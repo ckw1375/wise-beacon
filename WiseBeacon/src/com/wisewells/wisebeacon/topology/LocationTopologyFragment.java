@@ -1,5 +1,6 @@
 package com.wisewells.wisebeacon.topology;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Bundle;
@@ -13,7 +14,7 @@ import com.wisewells.wisebeacon.R;
 
 public class LocationTopologyFragment extends BaseTopologyFragment {
 	
-	private List<Beacon> mBeaconsInGroup;
+	private ArrayList<Beacon> mBeaconsInGroup;
 	
 	private LocationTopologyListAdapter mAdapter;
 	private ListView mListView;
@@ -44,7 +45,8 @@ public class LocationTopologyFragment extends BaseTopologyFragment {
 	
 	@Override
 	public void replaceListViewData(List<Beacon> beacons) {
-		mBeaconsInGroup = beacons;
+		mBeaconsInGroup.clear();
+		mBeaconsInGroup.addAll(beacons);
 		initListDatas();
 	}
 	

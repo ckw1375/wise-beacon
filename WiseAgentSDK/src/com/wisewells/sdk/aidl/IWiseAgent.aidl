@@ -7,8 +7,10 @@ import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.beacon.BeaconVector;
 import com.wisewells.sdk.beacon.DistanceVector;
+import com.wisewells.sdk.beacon.RssiVector;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.service.Service;
+import com.wisewells.sdk.service.Sector;
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.aidl.EditObjectListener;
 
@@ -38,7 +40,7 @@ interface IWiseAgent {
 	Bundle getTopology(String code);
 	void addProximityTopology(String serviceCode, String groupCode, in String[] beaconCodes, in double[] ranges);
 	void addLocationTopology();
-	void addSectorTopology();
+	void addSectorTopology(String serviceCode, String groupCode, in List<String> beaconCodes, in List<Sector> sectors);
 	void addSectorSample(String topologyCode, String sectorName);
 	boolean addSector(String topologyCode, String sectorName);
 	
@@ -54,4 +56,5 @@ interface IWiseAgent {
 	DistanceVector getBeaconDistance(in List<String> beaconCodes);
 	void startTracking(String packageName, String serviceCode, in TopologyStateChangeListener listener);
 	void stopTracking(String packageName);
+	RssiVector getAverageRssiVector(in List<String> beaconCodes);
 }

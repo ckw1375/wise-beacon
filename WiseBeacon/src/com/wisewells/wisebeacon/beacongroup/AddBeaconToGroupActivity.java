@@ -88,22 +88,14 @@ public class AddBeaconToGroupActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		try {
-			mWiseManager.startReceiving();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		mWiseManager.startReceiving();
 		h.post(mUpdateBeaconList);
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
-		try {
-			mWiseManager.stopReceiving();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		mWiseManager.stopReceiving();
 		h.removeCallbacks(mUpdateBeaconList);
 	}
 	
@@ -120,7 +112,7 @@ public class AddBeaconToGroupActivity extends Activity {
 		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
 		dialog.setPrompt("비콘 추가");
 		dialog.setEditTitle("비콘명");
-		dialog.setListener(new DialogListener() {
+		dialog.setDialogListener(new DialogListener() {
 			@Override
 			public void onOkButtonClicked(String str) {
 				Beacon beacon = mAdapter.getItem(mListView.getCheckedItemPosition());				

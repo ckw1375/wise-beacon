@@ -1,6 +1,9 @@
 package com.wisewells.agent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,8 +32,10 @@ import com.wisewells.sdk.beacon.DistanceVector;
 import com.wisewells.sdk.beacon.MajorGroup;
 import com.wisewells.sdk.beacon.MinorGroup;
 import com.wisewells.sdk.beacon.Region;
+import com.wisewells.sdk.beacon.RssiVector;
 import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.sdk.service.ProximityTopology;
+import com.wisewells.sdk.service.Sector;
 import com.wisewells.sdk.service.SectorTopology;
 import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
@@ -292,7 +297,7 @@ public class WiseAgent extends android.app.Service {
 				temp[i] = ranges[i];
 			}
 						
-			ProximityTopology t = new ProximityTopology(makeBeaconVector(beaconCodes), temp);
+			ProximityTopology t = new ProximityTopology(makeBeaconVector(Arrays.asList(beaconCodes)), temp);
 			t.setCode(WiseServer.requestCode());
 			
 			mWiseObjects.getService(serviceCode).attachTo(t);
@@ -300,11 +305,11 @@ public class WiseAgent extends android.app.Service {
 			mWiseObjects.putTopology(t);
 		}
 		
-		private BeaconVector makeBeaconVector(String[] beaconCodes) {
-			int size = beaconCodes.length;
+		private BeaconVector makeBeaconVector(List<String> beaconCodes) {
+			int size = beaconCodes.size();
 			BeaconVector beaconVector = new BeaconVector(size);
 			for(int i=0; i<size; i++) {
-				Beacon b = mWiseObjects.getBeacon(beaconCodes[i]);
+				Beacon b = mWiseObjects.getBeacon(beaconCodes.get(i));
 				Region r = new Region(b.getProximityUUID(), b.getMajor(), b.getMinor());
 				beaconVector.set(i, r);
 			}
@@ -313,8 +318,18 @@ public class WiseAgent extends android.app.Service {
 		}
 
 		@Override
-		public void addSectorTopology() throws RemoteException {
-			L.e(Thread.currentThread().getName());
+		public void addSectorTopology(String serviceCode, String groupCode, 
+				List<String> beaconCodes, List<Sector> sectors) throws RemoteException {
+			
+			SectorTopology t = new SectorTopology(makeBeaconVector(beaconCodes));
+			t.setCode(WiseServer.requestCode());
+			
+			/*
+			 * Builder pattern 써보자.. 시간되면
+			 */
+			mWiseObjects.getService(serviceCode).attachTo(t);
+			mWiseObjects.getBeaconGroup(groupCode).attachTo(t);
+			mWiseObjects.putTopology(t);
 		}
 		
 		@Override
@@ -331,6 +346,11 @@ public class WiseAgent extends android.app.Service {
 		}
 		
 		@Override
+		public RssiVector getAverageRssiVector(List<String> beaconCodes) throws RemoteException {
+			return mTracker.getAvgRssi(makeBeaconVector(beaconCodes));
+		}
+		
+		@Override
 		public void stopTracking(String packageName) throws RemoteException {
 			ApplicationConnector connector = mConnectorMap.get(packageName);
 			connector.stopTopologyChecker();
@@ -338,7 +358,7 @@ public class WiseAgent extends android.app.Service {
 		}
 		
 		public DistanceVector getBeaconDistance(List<String> beaconCodes) throws RemoteException {
-			return mTracker.getAvgDist(makeBeaconVector((String[]) beaconCodes.toArray()));
+			return mTracker.getAvgDist(makeBeaconVector(beaconCodes));
 		}
 
 		@Override
@@ -349,7 +369,7 @@ public class WiseAgent extends android.app.Service {
 			} catch(ClassCastException e) {
 				L.e("topologyCode is not sector topology's code.");
 			}
-			
+			 
 			if(topology == null)
 				return false;
 			

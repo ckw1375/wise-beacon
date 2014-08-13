@@ -1,7 +1,9 @@
 package com.wisewells.wisebeacon.topology;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,15 +13,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.wisewells.sdk.beacon.Beacon;
-import com.wisewells.sdk.service.ProximityTopology;
 import com.wisewells.sdk.service.SectorTopology;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 
 public class SectorTopologyFragment extends BaseTopologyFragment {
 	
+	public static final String BUNDLE_BEACONS = "beacons";
+	
 	private EditMode mMode;
 	private SectorTopology mTopology;
+	private ArrayList<Beacon> mBeaconsInGroup;
 	
 	private SectorTopologyListAdapter mAdapter;
 	private ListView mListView;
@@ -29,6 +33,8 @@ public class SectorTopologyFragment extends BaseTopologyFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mBeaconsInGroup = getArguments().getParcelableArrayList(DetailServiceActivity.BUNDLE_BEACONS);
+		
 		try {
 			mTopology = (SectorTopology )getArguments().getParcelable(DetailServiceActivity.BUNDLE_TOPOLOGY);
 		} catch(ClassCastException e) {
@@ -47,8 +53,8 @@ public class SectorTopologyFragment extends BaseTopologyFragment {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(getActivity(), SampleCollectionActivity.class);
-				
-				startActivity(intent);
+				intent.putParcelableArrayListExtra(BUNDLE_BEACONS, mBeaconsInGroup);
+				startActivityForResult(intent, 1234);
 			}
 		});
 		
@@ -57,6 +63,13 @@ public class SectorTopologyFragment extends BaseTopologyFragment {
 		mListView.setAdapter(mAdapter);
 		return v;
 	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode != 1234 || resultCode != Activity.RESULT_OK)
+			return;
+		
+	};
 	
 	@Override
 	public void replaceListViewData(List<Beacon> beacons) {

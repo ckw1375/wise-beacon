@@ -1,15 +1,18 @@
 package com.wisewells.wisebeacon.topology;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.widget.Checkable;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 
 public class SampleCollectionListRow extends FrameLayout {
-
+	
 	private TextView mSectorName;
 	private TextView mSampleNumber;
 	private ImageView mSectorState;
@@ -25,5 +28,8 @@ public class SampleCollectionListRow extends FrameLayout {
 		mSampleReset = (ImageView) findViewById(R.id.Img_sample_reset);
 	}
 	
-	
+	public void setData(SampleCollectionListData data) {
+		mSectorName.setText(data.getName());
+		mSampleNumber.setText(data.getNumber() + "");		
+	}
 }
