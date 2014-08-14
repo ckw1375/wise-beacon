@@ -48,7 +48,7 @@ public class ProximityTopologyFragment extends BaseTopologyFragment {
 		mService = getArguments().getParcelable(DetailServiceActivity.BUNDLE_SERVICE);
 		
 		try {
-		mTopology = (ProximityTopology )getArguments().getParcelable(DetailServiceActivity.BUNDLE_TOPOLOGY);
+			mTopology = (ProximityTopology )getArguments().getParcelable(DetailServiceActivity.BUNDLE_TOPOLOGY);
 		} catch(ClassCastException e) {
 			L.e("Topoloy type error");
 		}
@@ -60,21 +60,13 @@ public class ProximityTopologyFragment extends BaseTopologyFragment {
 	public void onResume() {
 		super.onResume();
 		if(mMode == EditMode.DISPLAY) {
-			try {
-				mWiseManager.startTracking(getActivity().getPackageName(), mService.getCode(), listener);
-			} catch (Exception e) { 
-				L.e("Start Tacking Error");
-			}
+			mWiseManager.startTrackingTopologyState(getActivity().getPackageName(), mService.getCode(), listener);
 		}
 	}
 	
 	@Override
-	public void onStop() {
-		try {
-			mWiseManager.stopTracking(getActivity().getPackageName());
-		} catch (RemoteException e) {
-			L.e("Stop Tracking Error");
-		}
+	public void onPause() {
+		mWiseManager.stopTrackingTopologyState(getActivity().getPackageName());
 		super.onStop();
 	};
 	
@@ -158,12 +150,7 @@ public class ProximityTopologyFragment extends BaseTopologyFragment {
 			ranges[i] = item.getRange();
 		}
 		
-		try {
-			mWiseManager.addProximityTopology(mService.getCode(), mBeaconGroup.getCode(), beaconCodes, ranges);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		
+		mWiseManager.addProximityTopology(mService.getCode(), mBeaconGroup.getCode(), beaconCodes, ranges);
 		getActivity().finish();
 	}
 	

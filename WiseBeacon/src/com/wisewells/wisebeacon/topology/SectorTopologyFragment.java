@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +13,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.WiseManager.TopologyStateListener;
 import com.wisewells.sdk.beacon.Beacon;
+import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.beacon.Region;
+import com.wisewells.sdk.service.LocationTopology.Coordinate;
+import com.wisewells.sdk.service.Sector;
 import com.wisewells.sdk.service.SectorTopology;
+import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 
@@ -22,8 +30,11 @@ public class SectorTopologyFragment extends BaseTopologyFragment {
 	public static final String BUNDLE_BEACONS = "beacons";
 	
 	private EditMode mMode;
+	private WiseManager mWiseManager;
 	private SectorTopology mTopology;
 	private ArrayList<Beacon> mBeaconsInGroup;
+	private BeaconGroup mBeaconGroup;
+	private Service mService;
 	
 	private SectorTopologyListAdapter mAdapter;
 	private ListView mListView;
@@ -33,7 +44,11 @@ public class SectorTopologyFragment extends BaseTopologyFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		mWiseManager = WiseManager.getInstance(getActivity());
 		mBeaconsInGroup = getArguments().getParcelableArrayList(DetailServiceActivity.BUNDLE_BEACONS);
+		mBeaconGroup = getArguments().getParcelable(DetailServiceActivity.BUNDLE_GROUP);
+		mService = getArguments().getParcelable(DetailServiceActivity.BUNDLE_SERVICE);
 		
 		try {
 			mTopology = (SectorTopology )getArguments().getParcelable(DetailServiceActivity.BUNDLE_TOPOLOGY);
@@ -58,7 +73,10 @@ public class SectorTopologyFragment extends BaseTopologyFragment {
 			}
 		});
 		
-		mAdapter = new SectorTopologyListAdapter(getActivity());		
+		mAdapter = new SectorTopologyListAdapter(getActivity());
+		if(mMode == EditMode.DISPLAY)
+			mAdapter.addAll(mTopology.getSectors());
+		
 		mListView = (ListView) v.findViewById(R.id.list_sector);
 		mListView.setAdapter(mAdapter);
 		return v;
@@ -69,7 +87,64 @@ public class SectorTopologyFragment extends BaseTopologyFragment {
 		if(requestCode != 1234 || resultCode != Activity.RESULT_OK)
 			return;
 		
+		ArrayList<Sector> sectors = data.getParcelableArrayListExtra(SampleCollectionActivity.EXTRA_SECTORS_WITH_SAMPLES);
+		if(sectors == null)
+			return;
+		mAdapter.replaceWith(sectors);
 	};
+	
+	private int mHighlightPosition = -1;
+	private int mPrevPosition = -1;
+	private void highlightCurrentSector(String sectorName) {
+		if(sectorName == null) {
+			L.i("Phone is not in any sector");
+			if(mHighlightPosition >= 0) { 
+				setListViewItemColor(mHighlightPosition, Color.TRANSPARENT);
+			}
+			return;
+		}
+		
+		L.i("Phone is in Sector " + sectorName);
+		mHighlightPosition = mAdapter.indexOf(sectorName);
+		if(mHighlightPosition != mPrevPosition) {
+			if(mPrevPosition >= 0) {
+				setListViewItemColor(mPrevPosition, Color.TRANSPARENT);
+			}
+			if(mHighlightPosition >= 0) {
+				setListViewItemColor(mHighlightPosition, Color.LTGRAY);
+				mPrevPosition = mHighlightPosition;
+			}
+		}		
+	}
+	
+	private void setListViewItemColor(int position, int color) {
+		mListView.getChildAt(position).setBackgroundColor(color);
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		mWiseManager.startTrackingTopologyState(getActivity().getPackageName(), mService.getCode(), new TopologyStateListener() {
+			@Override
+			public void onSectorChanged(String sectorName) {
+				highlightCurrentSector(sectorName);
+			}
+			@Override
+			public void onProximityChanged(Region region) {
+			}
+			@Override
+			public void onLocationChanged(Coordinate coordinate) {
+			}
+		});
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		if(mMode == EditMode.DISPLAY) {
+			mWiseManager.stopTrackingTopologyState(getActivity().getPackageName());
+		}
+	}
 	
 	@Override
 	public void replaceListViewData(List<Beacon> beacons) {
@@ -77,5 +152,12 @@ public class SectorTopologyFragment extends BaseTopologyFragment {
 	
 	@Override
 	public void saveTopology() {
+		ArrayList<String> beaconCodes = new ArrayList<String>();
+		for(Beacon beacon : mBeaconsInGroup) 
+			beaconCodes.add(beacon.getCode());
+		
+		mWiseManager.addSectorTopology(mService.getCode(), mBeaconGroup.getCode(), 
+				beaconCodes, mAdapter.getItems());
+		getActivity().finish();
 	}
 }

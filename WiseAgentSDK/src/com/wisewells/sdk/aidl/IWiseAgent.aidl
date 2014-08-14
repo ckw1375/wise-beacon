@@ -54,7 +54,7 @@ interface IWiseAgent {
 	void stopReceiving();
 	List<Beacon> getAllNearbyBeacons();
 	DistanceVector getBeaconDistance(in List<String> beaconCodes);
-	void startTracking(String packageName, String serviceCode, in TopologyStateChangeListener listener);
-	void stopTracking(String packageName);
+	void startTrackingTopologyState(String packageName, String serviceCode, in TopologyStateChangeListener listener);
+	void stopTrackingTopologyState(String packageName);
 	RssiVector getAverageRssiVector(in List<String> beaconCodes);
 }

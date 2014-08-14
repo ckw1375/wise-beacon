@@ -47,6 +47,10 @@ public abstract class BaseArrayAdapter<T> extends BaseAdapter {
 		mItems.addAll(items);
 		notifyDataSetChanged();
 	}
+	
+	public int indexOf(T item) {
+		return mItems.indexOf(item);
+	}
 
 	@Override
 	public int getCount() {

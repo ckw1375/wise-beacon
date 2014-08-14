@@ -3,6 +3,7 @@ package com.wisewells.wisebeacon.topology;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +24,10 @@ import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;
 
 public class SampleCollectionActivity extends Activity {
 
+	public static final String EXTRA_SECTORS_WITH_SAMPLES = "sector";
+	
+	private static final int COLLECTION_INTERVAL = 300;
+	
 	private WiseManager mWiseManager;
 	private ArrayList<Beacon> mBeaconsInGroup;
 	private ArrayList<String> mBeaconCodes;
@@ -71,7 +76,9 @@ public class SampleCollectionActivity extends Activity {
 		mSave.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				setResult(RESULT_OK);
+				Intent intent = new Intent();
+				intent.putParcelableArrayListExtra(EXTRA_SECTORS_WITH_SAMPLES, mSectors);
+				setResult(RESULT_OK, intent);
 				finish();
 			}
 		});
@@ -108,6 +115,7 @@ public class SampleCollectionActivity extends Activity {
 	protected void onPause() {
 		super.onPause();
 		mWiseManager.stopReceiving();
+		stopSampling();
 	}
 	
 	private void initBeaconData() {
@@ -181,7 +189,7 @@ public class SampleCollectionActivity extends Activity {
 				mAdapter.updateSampleNumber(mSamplingPosition);
 				L.i("Sample : " + rssi.toString());
 			}
-			mHandler.postDelayed(mSamplingRunnable, 1000);
+			mHandler.postDelayed(mSamplingRunnable, COLLECTION_INTERVAL);
 		}
 	};
 }

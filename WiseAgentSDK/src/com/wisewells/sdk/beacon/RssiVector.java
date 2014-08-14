@@ -9,12 +9,10 @@ public class RssiVector implements Parcelable {
 	private Double[] rssi;
 	
 	public static final Creator<RssiVector> CREATOR = new Creator<RssiVector>() {
-		
 		@Override
 		public RssiVector[] newArray(int size) {
 			return new RssiVector[size];
 		}
-		
 		@Override
 		public RssiVector createFromParcel(Parcel source) {
 			return new RssiVector(source);
@@ -27,6 +25,16 @@ public class RssiVector implements Parcelable {
 	
 	private RssiVector(Parcel in) {
 		rssi = (Double[]) in.readSerializable();
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeSerializable(rssi);
 	}
 
 	public int getSize() {
@@ -71,16 +79,6 @@ public class RssiVector implements Parcelable {
 			}
 		}
 		return result;
-	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeSerializable(rssi);
 	}
 	
 	@Override

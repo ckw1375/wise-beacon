@@ -29,8 +29,9 @@ public class Sector implements Parcelable {
 	}
 
 	private Sector(Parcel p) {
-		name = p.readString();
-		p.readTypedList(sectorSamples, RssiVector.CREATOR);
+		init();
+		name = p.readString();		
+		p.readTypedList(sectorSamples, RssiVector.CREATOR);		
 	}
 
 	private void init() {

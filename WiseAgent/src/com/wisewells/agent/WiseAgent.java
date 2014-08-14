@@ -57,8 +57,6 @@ public class WiseAgent extends android.app.Service {
 	private final Handler mHandler;
 	private final BeaconTracker mTracker;
 	private BeaconReceiver mBeaconReceiver;
-	
-	
 
 	public WiseAgent() {
 		mConnectorMap = new HashMap<String, ApplicationConnector>();
@@ -321,7 +319,9 @@ public class WiseAgent extends android.app.Service {
 		public void addSectorTopology(String serviceCode, String groupCode, 
 				List<String> beaconCodes, List<Sector> sectors) throws RemoteException {
 			
+			L.d("Agent try addSectorTopology");
 			SectorTopology t = new SectorTopology(makeBeaconVector(beaconCodes));
+			t.setAllSectors(sectors);
 			t.setCode(WiseServer.requestCode());
 			
 			/*
@@ -333,8 +333,8 @@ public class WiseAgent extends android.app.Service {
 		}
 		
 		@Override
-		public void startTracking(String packageName, String serviceCode, TopologyStateChangeListener listener) 
-				throws RemoteException {
+		public void startTrackingTopologyState(String packageName, String serviceCode, 
+				TopologyStateChangeListener listener) throws RemoteException {
 			mBeaconReceiver.activate();
 			ApplicationConnector connector = mConnectorMap.get(packageName);
 			List<Topology> topologies = mWiseObjects.getAllTopologiesInService(serviceCode);
@@ -351,7 +351,7 @@ public class WiseAgent extends android.app.Service {
 		}
 		
 		@Override
-		public void stopTracking(String packageName) throws RemoteException {
+		public void stopTrackingTopologyState(String packageName) throws RemoteException {
 			ApplicationConnector connector = mConnectorMap.get(packageName);
 			connector.stopTopologyChecker();
 			mBeaconReceiver.deactivate();

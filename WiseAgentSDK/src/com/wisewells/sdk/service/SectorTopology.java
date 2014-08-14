@@ -11,6 +11,7 @@ import android.util.Pair;
 
 import com.wisewells.sdk.beacon.BeaconVector;
 import com.wisewells.sdk.beacon.RssiVector;
+import com.wisewells.sdk.utils.L;
 
 public class SectorTopology extends Topology implements Parcelable {
 	
@@ -31,13 +32,18 @@ public class SectorTopology extends Topology implements Parcelable {
 	
 	public SectorTopology(BeaconVector beaconVector) {
 		super(TYPE_SECTOR, beaconVector);
-		mSectors = new ArrayList<Sector>();
+		init();
 //		sectors = new HashMap<String,SampleList>();
 	}
 	
 	private SectorTopology(Parcel in) {
 		super(in);
+		init();
 		in.readTypedList(mSectors, Sector.CREATOR);
+	}
+	
+	private void init() {
+		mSectors = new ArrayList<Sector>();
 	}
 	
 	@Override
@@ -66,6 +72,10 @@ public class SectorTopology extends Topology implements Parcelable {
 		
 		return false;
 	}
+	
+	public void setAllSectors(List<Sector> sectors) {
+		mSectors = new ArrayList<Sector>(sectors);
+	}
 
 	private boolean containsSectorName(String name) {
 		for(Sector sector : mSectors) {
@@ -87,6 +97,11 @@ public class SectorTopology extends Topology implements Parcelable {
 		}
 		return null;
 	}
+	
+	public ArrayList<Sector> getSectors() {
+		return mSectors;
+	}
+	
 	
 	//Add a new sample to the sector with a given name. 
 	public boolean addSample(String name) {
@@ -132,7 +147,10 @@ public class SectorTopology extends Topology implements Parcelable {
 	//In case of an error, return null.
 	@Override
 	public String getResult() {
-		if(mSectors.size() == 0) return null;		
+		if(mSectors.size() == 0) {
+			L.w("This Toplogy doesn't have sector");
+			return null;		
+		}
 //		if(sectors.size() == 0) return null;
 		
 		RssiVector currentVector = mTracker.getAvgRssi(mBeaconVector);		

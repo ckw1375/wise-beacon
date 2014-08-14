@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.wisewells.sdk.service.Sector;
 import com.wisewells.wisebeacon.R;
 
 public class SectorTopologyListRow extends FrameLayout {
@@ -19,7 +20,8 @@ public class SectorTopologyListRow extends FrameLayout {
 		mSampleNumber = (TextView) findViewById(R.id.txt_sample_number);
 	}
 	
-	public void setData(SectorTopologyListData data) {
-		mSectorName.setText(data.getBeacon().getName());
+	public void setData(Sector data) {
+		mSectorName.setText(data.getName());
+		mSampleNumber.setText(data.getSampleNumber() + "");
 	}
 }

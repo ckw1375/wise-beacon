@@ -189,10 +189,13 @@ public class WiseManager {
 
 	}
 
-	public void addProximityTopology(String serviceCode, String groupCode,
-			String[] beaconCodes, double[] ranges) throws RemoteException {
-
+	public void addProximityTopology(String serviceCode, String groupCode, 
+			String[] beaconCodes, double[] ranges) {
+		try {
 		mAgent.addProximityTopology(serviceCode, groupCode, beaconCodes, ranges);
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "addProximityTopology");
+		}
 	}
 
 	public void addSectorTopology(String serviceCode, String groupCode, 
@@ -279,43 +282,50 @@ public class WiseManager {
 	@SuppressWarnings("unused")
 	private int _______________Use_Agent_Function_______________;
 	
-	public void startTracking(String packageName, String serviceCode, TopologyStateListener listener) 
-			throws RemoteException {
-		
+	public void startTrackingTopologyState(String packageName, String serviceCode, 
+			TopologyStateListener listener) { 
 		mTopologyStateListener = Preconditions.checkNotNull(listener, "Listener must be not null.");
-		mAgent.startTracking(packageName, serviceCode, new TopologyStateChangeListener.Stub() {
-			@Override
-			public void onSectorChanged(final String sectorName) throws RemoteException {
-				mHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						mTopologyStateListener.onSectorChanged(sectorName);
-					}
-				});
-			}
-			@Override
-			public void onProximityChanged(final Region region) throws RemoteException {
-				mHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						mTopologyStateListener.onProximityChanged(region);
-					}
-				});
-			}
-			@Override
-			public void onLocationChanged(final Coordinate coordinate) throws RemoteException {
-				mHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						mTopologyStateListener.onLocationChanged(coordinate);
-					}
-				});
-			}
-		});
+		try {
+			mAgent.startTrackingTopologyState(packageName, serviceCode, new TopologyStateChangeListener.Stub() {
+				@Override
+				public void onSectorChanged(final String sectorName) throws RemoteException {
+					mHandler.post(new Runnable() {
+						@Override
+						public void run() {
+							mTopologyStateListener.onSectorChanged(sectorName);
+						}
+					});
+				}
+				@Override
+				public void onProximityChanged(final Region region) throws RemoteException {
+					mHandler.post(new Runnable() {
+						@Override
+						public void run() {
+							mTopologyStateListener.onProximityChanged(region);
+						}
+					});
+				}
+				@Override
+				public void onLocationChanged(final Coordinate coordinate) throws RemoteException {
+					mHandler.post(new Runnable() {
+						@Override
+						public void run() {
+							mTopologyStateListener.onLocationChanged(coordinate);
+						}
+					});
+				}
+			});
+		} catch (RemoteException e) {
+			L.e(EXCEPTION_MSG + "tracking topology state");
+		}
 	}
 
-	public void stopTracking(String packageName) throws RemoteException {
-		mAgent.stopTracking(packageName);
+	public void stopTrackingTopologyState(String packageName) {
+		try {
+			mAgent.stopTrackingTopologyState(packageName);
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "stop tracking topology state");
+		}
 	}
 
 	public void startReceiving() {
