@@ -1,19 +1,12 @@
 package com.wisewells.wisebeacon.home;
 
-import java.util.List;
-
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 
-import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.beacongroup.BeaconGroupActivity;
@@ -62,7 +55,7 @@ public class HomeActivity extends Activity {
     }
 	
 	private void onSettingButtonClicked() {
-		
+		L.e(getExternalFilesDir(null).getAbsolutePath());
 	}
 	
 

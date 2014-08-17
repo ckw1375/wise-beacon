@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -79,6 +81,13 @@ public class SectorTopologyFragment extends BaseTopologyFragment {
 		
 		mListView = (ListView) v.findViewById(R.id.list_sector);
 		mListView.setAdapter(mAdapter);
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				TopologyUtils.IO_MODE = true;
+				TopologyUtils.wrtieSampleDataToTextFile(getActivity(), mAdapter.getItem(position));
+			}
+		});
 		return v;
 	}
 	
@@ -118,7 +127,9 @@ public class SectorTopologyFragment extends BaseTopologyFragment {
 	}
 	
 	private void setListViewItemColor(int position, int color) {
-		mListView.getChildAt(position).setBackgroundColor(color);
+		View view = mListView.getChildAt(position);
+		if(view == null) return;
+		view.setBackgroundColor(color);
 	}
 	
 	@Override
