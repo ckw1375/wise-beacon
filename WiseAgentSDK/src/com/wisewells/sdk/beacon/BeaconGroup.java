@@ -1,21 +1,27 @@
 package com.wisewells.sdk.beacon;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.wisewells.sdk.service.Topology;
+import com.wisewells.sdk.utils.L;
 
 public class BeaconGroup implements Parcelable{
-		
-	protected String name;
 	
-	protected String code;
-	protected String parentCode;	
-	protected HashSet<String> childCodes;
-	protected HashSet<String> topologyCodes;
+	public static final int DEPTH_ROOT = 1;
+	public static final int DEPTH_LEAF = 2;
+	
+	private int depth;	// 1 or 2
+	private String name;
+	private String code;
+	private String parentCode;	
+	private HashSet<String> childCodes;
+	private HashSet<String> topologyCodes;
+	
+	private String uuid;
+	private Integer major;
 	
 	public static final Parcelable.Creator<BeaconGroup> CREATOR = new Creator<BeaconGroup>() {
 		
@@ -34,15 +40,25 @@ public class BeaconGroup implements Parcelable{
 		init();
 		this.name = name;
 	}
-
-	protected BeaconGroup(Parcel p) {
+	
+	public BeaconGroup(int depth, String name) {
 		init();
-		
+		if(depth > DEPTH_LEAF || depth < 1)
+			throw new RuntimeException("BeaconGroup depth can be 1 or 2");
+		this.depth = depth;
+		this.name = name;
+	}
+
+	private BeaconGroup(Parcel p) {
+		init();
+		depth = p.readInt();
 		code = p.readString();
 		name = p.readString();
 		parentCode = p.readString();
 		childCodes = (HashSet<String>) p.readSerializable();
 		topologyCodes = (HashSet<String>) p.readSerializable();
+		uuid = p.readString();
+		major = p.readInt();
 	}
 	
 	private void init() {
@@ -57,35 +73,20 @@ public class BeaconGroup implements Parcelable{
 	
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(depth);
 		dest.writeString(code);
 		dest.writeString(name);
 		dest.writeString(parentCode);
 		dest.writeSerializable(childCodes);
 		dest.writeSerializable(topologyCodes);
+		dest.writeString(uuid);
+		dest.writeInt(major);
 	}
 	
 	@Override
 	public String toString() {
 		return this.name + "(" + this.code + ")";
 	}
-	
-//	public List<Beacon> getBeaconsInGroup() {
-//		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
-//		
-//		if(this instanceof MinorGroup) { 
-//			ArrayList<Beacon> temp = ((MinorGroup) this).getBeacons();
-//			for(Beacon b : temp)
-//				beacons.add(b);
-//		}
-//		
-//		/*WiseObjects manager = WiseObjects.getInstance();
-//		for(String child : childCodes) {
-//			BeaconGroup bg = manager.getBeaconGroup(child);
-//			bg.getBeaconsInGroup();
-//		}*/
-//		
-//		return beacons;
-//	}
 
 	public void addChild(BeaconGroup child) {
 		this.childCodes.add(child.getCode());
@@ -114,7 +115,7 @@ public class BeaconGroup implements Parcelable{
 	 * 부모 노드에 add하면 수행된다.
 	 * @param parent
 	 */
-	protected void setParentCode(String parent) {
+	private void setParentCode(String parent) {
 		this.parentCode = parent;
 	}
 	
@@ -140,5 +141,36 @@ public class BeaconGroup implements Parcelable{
 	
 	public String getName() {
 		return this.name;
+	}
+
+	public String getUuid() {
+		return this.uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public int getMajor() {
+		return this.major;
+	}
+
+	public void setMajor(int major) {
+		this.major = major;
+	}
+
+	public int getDepth() {
+		return this.depth;
+	}
+	
+	public boolean addBeacon(Beacon beacon) {
+		if(this.depth != DEPTH_LEAF) {
+			L.w("Can't add beacon. Only MAX_DEPTH BeaconGroup can add beacon.");
+			return false;
+		}
+		
+		childCodes.add(beacon.getCode());
+		beacon.setBeaconGroupCode(this.code);
+		return true;
 	}
 }

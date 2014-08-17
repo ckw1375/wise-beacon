@@ -3,7 +3,6 @@ package com.wisewells.wisebeacon.beacongroup;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,16 +11,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
-import com.wisewells.sdk.beacon.MajorGroup;
+import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.wisebeacon.R;
 
 public class DetailBeaconGroupActivity extends Activity {
 	
-	public static final String EXTRA_UUID_GROUP_NAME = "uuid";
-	public static final String EXTRA_MAJOR_GROUP = "major";
+	public static final String EXTRA_ROOT_GROUP_NAME = "root";
+	public static final String EXTRA_LEAF_GROUP = "leaf";
 	
 	private WiseManager mWiseManager;
-	private MajorGroup mSelectedBeaconGroup;
+	private BeaconGroup mSelectedBeaconGroup;
 	
 	private TextView mUuidGroupNameView;
 	private TextView mMajorGroupNameView;
@@ -52,8 +51,8 @@ public class DetailBeaconGroupActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(DetailBeaconGroupActivity.this, AddBeaconToGroupActivity.class);
-				intent.putExtra(EXTRA_UUID_GROUP_NAME, uuidGroupName);
-				intent.putExtra(EXTRA_MAJOR_GROUP, mSelectedBeaconGroup);
+				intent.putExtra(EXTRA_ROOT_GROUP_NAME, uuidGroupName);
+				intent.putExtra(EXTRA_LEAF_GROUP, mSelectedBeaconGroup);
 				startActivity(intent);
 			}
 		});
@@ -89,10 +88,6 @@ public class DetailBeaconGroupActivity extends Activity {
 	}
 	
 	private void displayBeaconsInGroup() {
-		try {
-			mAdapter.replaceWith(mWiseManager.getBeacons(mSelectedBeaconGroup.getCode()));
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		mAdapter.replaceWith(mWiseManager.getBeaconsInGroup(mSelectedBeaconGroup.getCode()));
 	}
 }

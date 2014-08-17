@@ -2,8 +2,6 @@ package com.wisewells.agent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,11 +27,8 @@ import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.beacon.BeaconVector;
 import com.wisewells.sdk.beacon.DistanceVector;
-import com.wisewells.sdk.beacon.MajorGroup;
-import com.wisewells.sdk.beacon.MinorGroup;
 import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.beacon.RssiVector;
-import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.sdk.service.ProximityTopology;
 import com.wisewells.sdk.service.Sector;
 import com.wisewells.sdk.service.SectorTopology;
@@ -100,84 +95,63 @@ public class WiseAgent extends android.app.Service {
 	IWiseAgent.Stub mBinder = new Stub() {
 
 		@Override
-		public void addUuidGroup(String name) {
-			UuidGroup uuidGroup = new UuidGroup(name);
-			uuidGroup.setUuid(WiseServer.requestUuid());
-			uuidGroup.setCode(WiseServer.requestCode());
-
-			mWiseObjects.putBeaconGroup(uuidGroup);
-		}
-
-		@Override
-		public void addMajorGroup(String name, String parentCode)
-				throws RemoteException {
-			MajorGroup majorGroup = new MajorGroup(name);
-			majorGroup.setMajor(WiseServer.requestMajor());
-			majorGroup.setCode(WiseServer.requestCode());
-
-			mWiseObjects.getBeaconGroup(parentCode).addChild(majorGroup);
-			;
-			mWiseObjects.putBeaconGroup(majorGroup);
-		}
-
-		@Override
-		public void addBeaconsToBeaconGroup(String groupCode,
-				List<Beacon> beacons) throws RemoteException {
-
-			BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
-
-			for (Beacon beacon : beacons) {
-				int minor = WiseServer.requestMinor();
-				MinorGroup minorGroup = new MinorGroup("minor");
-				minorGroup.setMinor(minor);
-				minorGroup.setCode(WiseServer.requestCode());
-				minorGroup.addBeacon(beacon);
-
-				// beacon.setAddress(((UuidGroup)
-				// mWiseObjects.getBeaconGroup(parentCode)).getUuid(), major,
-				// minor);
-
-				group.addChild(minorGroup);
-
-				mWiseObjects.putBeaconGroup(minorGroup);
-				mWiseObjects.putBeacon(beacon);
+		public void addBeaconGroup(int depth, String name, String parentCode) throws RemoteException {
+			BeaconGroup group = new BeaconGroup(depth, name);
+			group.setUuid(WiseServer.requestUuid());
+			group.setMajor(WiseServer.requestMajor());
+			group.setCode(WiseServer.requestCode());
+			
+			if(parentCode != null) { 
+				mWiseObjects.getBeaconGroup(parentCode).addChild(group);
 			}
-
 			mWiseObjects.putBeaconGroup(group);
 		}
 
 		@Override
-		public void addBeaconToBeaconGroup(String groupCode, Beacon beacon)
-				throws RemoteException {
+		public BeaconGroup getBeaconGroup(String code) throws RemoteException {
+			return mWiseObjects.getBeaconGroup(code);
+		}
+
+		@Override
+		public List<BeaconGroup> getBeaconGroups(String parentCode) throws RemoteException {
+			return mWiseObjects.getBeaconGroups(parentCode);
+		}
+
+		@Override
+		public List<BeaconGroup> getBeaconGroupsInAuthority() throws RemoteException {
+			return mWiseObjects.getBeaconGroupsInAuthority();
+		}
+
+		@Override
+		public List<Beacon> getBeaconsInGroup(String groupCode) throws RemoteException {
+			return mWiseObjects.getAllBeaconsInGroup(groupCode);
+		};
+
+		@Override
+		public void addBeaconsToBeaconGroup(String groupCode, List<Beacon> beacons) throws RemoteException {
 
 			BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
-			if(!(group instanceof MajorGroup)) {
-				throw new RuntimeException("Only Major Group can add beacon. Maybe this group code is uuid or minor group's code");
+			for(Beacon beacon : beacons) {				
+				int minor = WiseServer.requestMinor();
+				beacon.setCode(WiseServer.requestCode());
+				//beacon.setAddress // 실제 비콘 하드웨어 주소 변경 
+				group.addBeacon(beacon);	// 이때 에러체크하자
+
+				mWiseObjects.putBeacon(beacon);
 			}
-			
+		}
+
+		@Override
+		public void addBeaconToBeaconGroup(String groupCode, Beacon beacon) throws RemoteException {
+
+			BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
 			beacon.setCode(WiseServer.requestCode());
 
 			int minor = WiseServer.requestMinor();
-			MinorGroup minorGroup = new MinorGroup("minor");
-			minorGroup.setMinor(minor);
-			minorGroup.setCode(WiseServer.requestCode());
-			minorGroup.addBeacon(beacon);
+			group.addBeacon(beacon);
+			//하드웨어 주소 수정!!!!!!!!!!!!!!!!!!!!!!!
 
-			group.addChild(minorGroup);
-
-			mWiseObjects.putBeaconGroup(minorGroup);
 			mWiseObjects.putBeacon(beacon);
-		}
-
-		@Override
-		public List<UuidGroup> getUuidGroups() throws RemoteException {
-			return mWiseObjects.getUuidGroups();
-		}
-
-		@Override
-		public List<MajorGroup> getMajorGroups(String uuidGroupCode)
-				throws RemoteException {
-			return mWiseObjects.getMajorGroups(uuidGroupCode);
 		}
 
 		/*@Override
@@ -191,12 +165,6 @@ public class WiseAgent extends android.app.Service {
 
 			return groups;
 		}*/
-
-		@Override
-		public List<Beacon> getBeacons(String groupCode) throws RemoteException {
-			ArrayList<Beacon> beacons = mWiseObjects.getAllBeaconsInGroup(groupCode);
-			return beacons;
-		}
 
 		@Override
 		public void addService(String name, String parentCode, EditObjectListener listener)
@@ -230,23 +198,9 @@ public class WiseAgent extends android.app.Service {
 		}
 
 		@Override
-		public Bundle getBeaconGroup(String code) throws RemoteException {
-			Bundle bundle = new Bundle();
-			bundle.putParcelable(IpcUtils.BUNDLE_KEY, mWiseObjects.getBeaconGroup(code));
-			return bundle;
-		}
-
-		@Override
 		public Bundle getTopology(String code) throws RemoteException {
 			Bundle bundle = new Bundle();
 			bundle.putParcelable(IpcUtils.BUNDLE_KEY, mWiseObjects.getTopology(code));
-			return bundle;
-		}
-
-		@Override
-		public Bundle getBeaconGroupsInAuthority() throws RemoteException {
-			Bundle bundle = new Bundle();
-			bundle.putParcelableArrayList(IpcUtils.BUNDLE_KEY, mWiseObjects.getBeaconGroupsInAuthority());
 			return bundle;
 		}
 
@@ -263,19 +217,6 @@ public class WiseAgent extends android.app.Service {
 		@Override
 		public List<Beacon> getAllNearbyBeacons() throws RemoteException {
 			return mTracker.getAllNearbyBeacons();
-		}
-
-		@Override
-		public BeaconVector getBeaconVector(String groupCode) throws RemoteException {
-			List<Beacon> beacons = getBeacons(groupCode);
-			ArrayList<Region> regions = new ArrayList<Region>();
-			for(Beacon beacon : beacons) {
-				regions.add(beacon.getRegion());
-			}
-			
-			BeaconVector beaconVector = new BeaconVector(regions.size());
-			beaconVector.setAll(regions);
-			return beaconVector;
 		}
 
 		@Override
@@ -390,6 +331,6 @@ public class WiseAgent extends android.app.Service {
 				return;
 			
 			topology.addSample(sectorName);			
-		};
+		}
 	};
 }

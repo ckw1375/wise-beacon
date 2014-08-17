@@ -1,7 +1,5 @@
 package com.wisewells.wisebeacon.beacongroup;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,8 +14,7 @@ import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.beacon.Beacon;
-import com.wisewells.sdk.beacon.MajorGroup;
-import com.wisewells.sdk.utils.L;
+import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;
@@ -25,10 +22,10 @@ import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;
 public class AddBeaconToGroupActivity extends Activity {
 
 	private WiseManager mWiseManager;
-	private MajorGroup mSelectedBeaconGroup;
+	private BeaconGroup mSelectedBeaconGroup;
 	
-	private TextView mUuidGroupNameView;
-	private TextView mMajorGroupNameView;
+	private TextView mRootGroupNameView;
+	private TextView mLeafGroupNameView;
 	private Button mAddBeaconToGroupButton;
 	private ListView mListView;;
 	private AddBeaconToGroupBeaconListAdapter mAdapter;
@@ -41,14 +38,14 @@ public class AddBeaconToGroupActivity extends Activity {
 		setContentView(R.layout.activity_add_beacon_to_group);
 		mWiseManager = WiseManager.getInstance(this);
 		
-		String uuidGroupName = getIntent().getStringExtra(DetailBeaconGroupActivity.EXTRA_UUID_GROUP_NAME);
-		mSelectedBeaconGroup = getIntent().getParcelableExtra(DetailBeaconGroupActivity.EXTRA_MAJOR_GROUP);
+		String rootGroupName = getIntent().getStringExtra(DetailBeaconGroupActivity.EXTRA_ROOT_GROUP_NAME);
+		mSelectedBeaconGroup = getIntent().getParcelableExtra(DetailBeaconGroupActivity.EXTRA_LEAF_GROUP);
 		
-		mUuidGroupNameView = (TextView) findViewById(R.id.txt_uuid_group_name);
-		mUuidGroupNameView.setText(uuidGroupName);
+		mRootGroupNameView = (TextView) findViewById(R.id.txt_uuid_group_name);
+		mRootGroupNameView.setText(rootGroupName);
 		
-		mMajorGroupNameView = (TextView) findViewById(R.id.txt_major_group_name);
-		mMajorGroupNameView.setText(mSelectedBeaconGroup.getName());
+		mLeafGroupNameView = (TextView) findViewById(R.id.txt_major_group_name);
+		mLeafGroupNameView.setText(mSelectedBeaconGroup.getName());
 		
 		mAddBeaconToGroupButton = (Button) findViewById(R.id.btn_add_beacon_to_group);
 		mAddBeaconToGroupButton.setOnClickListener(new View.OnClickListener() {
@@ -119,7 +116,7 @@ public class AddBeaconToGroupActivity extends Activity {
 				beacon.setName(str);
 				try {
 					mWiseManager.addBeaconToBeaconGroup(mSelectedBeaconGroup.getCode(), beacon);
-					mBeaconInGroupAdapter.replaceWith(mWiseManager.getBeacons(mSelectedBeaconGroup.getCode()));
+					mBeaconInGroupAdapter.replaceWith(mWiseManager.getBeaconsInGroup(mSelectedBeaconGroup.getCode()));
 				} catch (RemoteException e) {
 					e.printStackTrace();
 				}

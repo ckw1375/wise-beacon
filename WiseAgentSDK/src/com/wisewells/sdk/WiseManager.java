@@ -19,10 +19,8 @@ import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.beacon.DistanceVector;
-import com.wisewells.sdk.beacon.MajorGroup;
 import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.beacon.RssiVector;
-import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.sdk.service.LocationTopology;
 import com.wisewells.sdk.service.LocationTopology.Coordinate;
 import com.wisewells.sdk.service.Sector;
@@ -97,6 +95,26 @@ public class WiseManager {
 	
 	@SuppressWarnings("unused")
 	private int _______________Beacon_______________;
+
+	public List<Beacon> getBeaconsInGroup(String groupCode) {
+		try {
+			return mAgent.getBeaconsInGroup(groupCode);
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "getBeaconsInGroup");
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private int _______________BeaconGroup_______________;
+	
+	public void addBeaconGroup(int depth, String name, String parentCode) {
+		try {
+			mAgent.addBeaconGroup(depth, name, parentCode);
+		} catch (RemoteException e) {
+			L.e(EXCEPTION_MSG + "addBeaconGroup");
+		}
+	}
 	
 	public void addBeaconsToBeaconGroup(String groupCode, ArrayList<Beacon> beacons) throws RemoteException {
 		mAgent.addBeaconsToBeaconGroup(groupCode, beacons);
@@ -105,54 +123,34 @@ public class WiseManager {
 	public void addBeaconToBeaconGroup(String groupCode, Beacon beacon) throws RemoteException {
 		mAgent.addBeaconToBeaconGroup(groupCode, beacon);
 	}
-
-	public void modifyBeacon(Beacon beacon) {
-
-	}
-
-	public void deleteBeacon(String code) {
-
-	}
-
-	@SuppressWarnings("unused")
-	private int _______________BeaconGroup_______________;
 	
-	public void addUuidGroup(String name) throws RemoteException {
-		mAgent.addUuidGroup(name);
-	}
-	
-	public void addMajorGroup(String name, String parentCode) throws RemoteException {
-		mAgent.addMajorGroup(name, parentCode);
-	}
-
-	public void modifyBeaconGroup(BeaconGroup group) throws RemoteException {
+	public List<BeaconGroup> getBeaconGroups(String parentCode) {
+		try {
+			return mAgent.getBeaconGroups(parentCode);
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "getBeaconGroups");
+			return null;
+		}
 	}
 
-	public void deleteBeaconGroup(String code) {
-	}
-
-	public List<Beacon> getBeacons(String groupCode) throws RemoteException {
-		return mAgent.getBeacons(groupCode);
+	public List<BeaconGroup> getBeaconGroupsInAuthority() {
+		try {
+			return mAgent.getBeaconGroupsInAuthority();
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "getBeaconGroupsInAuthority");
+			return null;
+		}
 	}
 
 	public BeaconGroup getBeaconGroup(String code) {
 		try {
-			Bundle bundle = mAgent.getBeaconGroup(code);
-			bundle.setClassLoader(BeaconGroup.class.getClassLoader());
-			return bundle.getParcelable(IpcUtils.BUNDLE_KEY);
+			return mAgent.getBeaconGroup(code);
 		} catch (RemoteException e) {
 			L.e(EXCEPTION_MSG + "getBeaconGroup");
 			return null;
 		}
 	}
-
-	public List<BeaconGroup> getBeaconGroupsInAuthority()
-			throws RemoteException {
-		Bundle bundle = mAgent.getBeaconGroupsInAuthority();
-		bundle.setClassLoader(BeaconGroup.class.getClassLoader());
-		return bundle.getParcelableArrayList(IpcUtils.BUNDLE_KEY);
-	}
-
+	
 	@SuppressWarnings("unused")
 	private int _______________Topology_______________;
 	
@@ -162,15 +160,6 @@ public class WiseManager {
 
 	public void deleteTopology(String code) {
 
-	}
-
-	public List<UuidGroup> getUuidGroups() throws RemoteException {
-		return mAgent.getUuidGroups();
-	}
-
-	public List<MajorGroup> getMajorGroups(String uuidGroupCode)
-			throws RemoteException {
-		return mAgent.getMajorGroups(uuidGroupCode);
 	}
 
 	public Topology getTopology(String code) {

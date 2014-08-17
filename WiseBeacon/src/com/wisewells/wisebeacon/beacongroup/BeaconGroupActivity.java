@@ -12,17 +12,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Spinner;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.beacon.BeaconGroup;
-import com.wisewells.sdk.beacon.MajorGroup;
-import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;
@@ -35,7 +29,7 @@ public class BeaconGroupActivity extends Activity {
 	public static final String EXTRA_UUID_GROUP_NAME = "uuid group name";
 	public static final String EXTRA_MAJOR_GROUP = "major group";
 
-	private UuidGroup mSelectedUuidGroup;
+	private BeaconGroup mSelectedRootGroup;
 	
 	private WiseManager mWiseManager;
 	private ListView mListView;
@@ -95,8 +89,8 @@ public class BeaconGroupActivity extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		updateUuidGroupSpinner();		
-		if(mSelectedUuidGroup != null) updateMajorGroupListView(mSelectedUuidGroup);
+		updateRootGroupSpinner();		
+		if(mSelectedRootGroup != null) updateMajorGroupListView(mSelectedRootGroup);
 	}
 	
 	@Override
@@ -126,18 +120,13 @@ public class BeaconGroupActivity extends Activity {
 		dialog.setDialogListener(new DialogListener() {
 			@Override
 			public void onOkButtonClicked(String str) {
-				try {
-					mWiseManager.addUuidGroup(str);
-					
-					/*
-					 * 
-					 * add beacon이 완료된것이 확인되면! (리스터 이용) display 해줘야 한다!!
-					 */
-					updateUuidGroupSpinner();
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				mWiseManager.addBeaconGroup(1, str, null);
+
+				/*
+				 * 
+				 * add beacon이 완료된것이 확인되면! (리스터 이용) display 해줘야 한다!!
+				 */
+				updateRootGroupSpinner();
 			}
 		});
 
@@ -151,18 +140,14 @@ public class BeaconGroupActivity extends Activity {
 		dialog.setDialogListener(new DialogListener() {
 			@Override
 			public void onOkButtonClicked(String str) {
-				try {
-					mWiseManager.addMajorGroup(str, mSelectedUuidGroup.getCode());
-					
-					/*
-					 * 
-					 * add beacon이 완료된것이 확인되면! (리스터 이용) display 해줘야 한다!!
-					 */
-					updateMajorGroupListView(mSelectedUuidGroup);
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				mWiseManager.addBeaconGroup(2, str, mSelectedRootGroup.getCode());
+
+				/*
+				 * 
+				 * add beacon이 완료된것이 확인되면! (리스터 이용) display 해줘야 한다!!
+				 */
+				updateMajorGroupListView(mSelectedRootGroup);
+				// TODO Auto-generated catch block
 			}
 		});
 
@@ -171,36 +156,27 @@ public class BeaconGroupActivity extends Activity {
 	
 	private void onBeaconGroupListClicked(int position) {
 		Intent intent = new Intent(this, DetailBeaconGroupActivity.class);
-		intent.putExtra(EXTRA_UUID_GROUP_NAME, mSelectedUuidGroup.getName());
+		intent.putExtra(EXTRA_UUID_GROUP_NAME, mSelectedRootGroup.getName());
 		intent.putExtra(EXTRA_MAJOR_GROUP, mListAdapter.getItem(position));
 		startActivity(intent);
 	}
 
 	private void onSpinnerItemSelected(int position) {
-		mSelectedUuidGroup = (UuidGroup) mSpinnerAdapter.getItem(position).getUuidGroup();		
-		updateMajorGroupListView(mSelectedUuidGroup);
+		mSelectedRootGroup = mSpinnerAdapter.getItem(position).getRootGroup();		
+		updateMajorGroupListView(mSelectedRootGroup);
 	}
 	
-	private void updateMajorGroupListView(UuidGroup uuidGroup) {
-		List<MajorGroup> groups = new ArrayList<MajorGroup>();
-		try {
-			groups = mWiseManager.getMajorGroups(uuidGroup.getCode());
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+	private void updateMajorGroupListView(BeaconGroup rootGroup) {
+		List<BeaconGroup> childGroups = new ArrayList<BeaconGroup>();
+		childGroups = mWiseManager.getBeaconGroups(rootGroup.getCode());
 		
-		List<BeaconGroup> param = new ArrayList<BeaconGroup>(groups);
+		List<BeaconGroup> param = new ArrayList<BeaconGroup>(childGroups);
 		mListAdapter.replaceWith(param);
 	}
 	
-	private void updateUuidGroupSpinner() {
-		List<UuidGroup> groups = new ArrayList<UuidGroup>();
-		
-		try {
-			groups = mWiseManager.getUuidGroups();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+	private void updateRootGroupSpinner() {
+		List<BeaconGroup> groups = new ArrayList<BeaconGroup>();
+		groups = mWiseManager.getBeaconGroups(null);
 		
 		ArrayList<BeaconGroupSpinnerData> datas = new ArrayList<BeaconGroupSpinnerData>();
 		for(BeaconGroup group: groups) {

@@ -3,18 +3,18 @@ package com.wisewells.wisebeacon.beacongroup;
 import com.wisewells.sdk.beacon.BeaconGroup;
 
 public class BeaconGroupSpinnerData {
-	private BeaconGroup uuidGroup;
+	private BeaconGroup rootGroup;
 	
-	public BeaconGroupSpinnerData(BeaconGroup uuidGroup) {
-		this.uuidGroup  = uuidGroup;
+	public BeaconGroupSpinnerData(BeaconGroup group) {
+		this.rootGroup  = group;
 	}
 	
 	@Override
 	public String toString() {
-		return this.uuidGroup.getName();
+		return this.rootGroup.getName();
 	}
 	
-	public BeaconGroup getUuidGroup() {
-		return this.uuidGroup;
+	public BeaconGroup getRootGroup() {
+		return this.rootGroup;
 	}
 }

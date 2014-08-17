@@ -215,22 +215,14 @@ public class DetailServiceActivity extends Activity {
 		if(group == null) return null;
 		
 		List<Beacon> beacons = new ArrayList<Beacon>();
-		try {
-			beacons = mWiseManager.getBeacons(mBeaconGroup.getCode());
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		beacons = mWiseManager.getBeaconsInGroup(mBeaconGroup.getCode());
 		
 		return beacons;
 	}
 	
 	private List<BeaconGroup> receiveBeaconGroups() {
 		List<BeaconGroup> groups = new ArrayList<BeaconGroup>();
-		try {
-			groups = mWiseManager.getBeaconGroupsInAuthority();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		groups = mWiseManager.getBeaconGroupsInAuthority();
 		return groups;
 	}
 	

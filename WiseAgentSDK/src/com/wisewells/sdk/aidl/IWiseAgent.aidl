@@ -1,7 +1,5 @@
 package com.wisewells.sdk.aidl;
 
-import com.wisewells.sdk.beacon.UuidGroup;
-import com.wisewells.sdk.beacon.MajorGroup;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.Region;
@@ -22,19 +20,16 @@ import com.wisewells.sdk.aidl.EditObjectListener;
 interface IWiseAgent {
 
 	// BeaconGroup
-	void addUuidGroup(String name);
-	void addMajorGroup(String name, String parentCode);
+	void addBeaconGroup(int depth, String name, String parentCode);
 	void addBeaconsToBeaconGroup(String groupCode, in List<Beacon> beacons); // 이거 안쓰이나???
 	void addBeaconToBeaconGroup(String groupCode, in Beacon beacon);
-	List<UuidGroup> getUuidGroups();
-	List<MajorGroup> getMajorGroups(String uuidGroupCode);
+	List<BeaconGroup> getBeaconGroups(String parentCode);
+	List<BeaconGroup> getBeaconGroupsInAuthority();
+	BeaconGroup getBeaconGroup(String code);
 	//List<BeaconGroup> getBeaconGroups(in List<String> codes);
-	Bundle getBeaconGroupsInAuthority();
-	Bundle getBeaconGroup(String code);
 	
 	// Beacon
-	List<Beacon> getBeacons(String groupCode);
-	BeaconVector getBeaconVector(String groupCode);
+	List<Beacon> getBeaconsInGroup(String groupCode);
 	
 	// Topology
 	Bundle getTopology(String code);

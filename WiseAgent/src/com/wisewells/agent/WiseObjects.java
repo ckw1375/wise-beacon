@@ -11,9 +11,6 @@ import android.os.RemoteException;
 
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
-import com.wisewells.sdk.beacon.MajorGroup;
-import com.wisewells.sdk.beacon.MinorGroup;
-import com.wisewells.sdk.beacon.UuidGroup;
 import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.IpcUtils;
@@ -88,66 +85,54 @@ public class WiseObjects implements Parcelable {
 		ArrayList<Beacon> beaconsInGroup = new ArrayList<Beacon>();
 		BeaconGroup group = mBeaconGroups.get(groupCode);
 		
-		if(group instanceof UuidGroup) {
+		if(group.getDepth() != BeaconGroup.DEPTH_LEAF) {
 			for(String code : group.getChildCodes()) {
 				beaconsInGroup.addAll(getAllBeaconsInGroup(code));
 			}
 		}
 		
-		if(group instanceof MajorGroup) {
-			for(String childCode : group.getChildCodes()) {
-				MinorGroup minor = (MinorGroup) mBeaconGroups.get(childCode);
-				for(String beaconCode : minor.getChildCodes()) {
-					beaconsInGroup.add(mBeacons.get(beaconCode));
-				}
+		if(group.getDepth() == BeaconGroup.DEPTH_LEAF) {
+			for(String beaconCode : group.getChildCodes()) {
+				beaconsInGroup.add(mBeacons.get(beaconCode));
 			}
 		}
 		return beaconsInGroup;
 	}
 	
-	/**
-	 * @return 모든 UuidGroup
-	 */
-	public ArrayList<UuidGroup> getUuidGroups() {
-		ArrayList<UuidGroup> uuidGroups = new ArrayList<UuidGroup>();
+	public ArrayList<BeaconGroup> getBeaconGroups(String parentCode) {
+		if(parentCode == null)
+			return getRootBeaconGroups();
+		else
+			return getNotRootBeaconGroups(parentCode);
+	}
+	
+	private ArrayList<BeaconGroup> getNotRootBeaconGroups(String parentCode) {
+		Set<String> codes = mBeaconGroups.get(parentCode).getChildCodes();
+
+		ArrayList<BeaconGroup> willReturn = new ArrayList<BeaconGroup>();
+		for(String code : codes) {
+			willReturn.add(mBeaconGroups.get(code));
+		}
+		return willReturn;
+	}
+
+	private ArrayList<BeaconGroup> getRootBeaconGroups() {
+		ArrayList<BeaconGroup> willReturn = new ArrayList<BeaconGroup>();
 		ArrayList<BeaconGroup> beaconGroups = new ArrayList<BeaconGroup>(mBeaconGroups.values());
 		for(BeaconGroup beaconGroup : beaconGroups) {
-			if(beaconGroup instanceof UuidGroup) uuidGroups.add((UuidGroup) beaconGroup);
+			if(beaconGroup.getDepth() == BeaconGroup.DEPTH_ROOT) willReturn.add(beaconGroup);
 		}
 		
-		return uuidGroups;
+		return willReturn;
 	}
-	
-	/**
-	 * @param uuidGroupCode
-	 * @return 인자로 넘어온 UUID 그룹의 모든 자식 그룹(MajorGroup)
-	 */
-	public ArrayList<MajorGroup> getMajorGroups(String uuidGroupCode) {	
-		Set<String> majorCodes = mBeaconGroups.get(uuidGroupCode).getChildCodes();
-		
-		ArrayList<MajorGroup> majorGroups = new ArrayList<MajorGroup>();
-		
-		for(String code : majorCodes) {
-			majorGroups.add((MajorGroup) mBeaconGroups.get(code));
-		}
-		return majorGroups;
-	}
-	
+
 	/*
 	 * Parameter로 로그인 정보를 받아서 권한에 맞는 그룹만 넘겨줘야 함.
 	 * 현재는 Uuid, Major 모든 그룹을 다 리턴해줌.
 	 */
 	public ArrayList<BeaconGroup> getBeaconGroupsInAuthority() {
 		ArrayList<BeaconGroup> groups = new ArrayList<BeaconGroup>(mBeaconGroups.values());
-		ArrayList<BeaconGroup> willReturn = new ArrayList<BeaconGroup>();
-		
-		for(BeaconGroup group : groups) {
-			if(group instanceof MinorGroup)
-				continue;
-			willReturn.add(group);
-		}
-		
-		return willReturn;
+		return groups;
 	}
 	
 	public List<Topology> getAllTopologiesInService(String serviceCode) {
