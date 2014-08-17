@@ -18,7 +18,6 @@
             android:layout_height="wrap_content"
             android:text="WISE BEACON"
             android:textColor="#bb4738"
-            android:typeface=""
             android:textSize="15dp" />
 
         <TextView
