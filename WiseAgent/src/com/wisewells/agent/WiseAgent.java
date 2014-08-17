@@ -95,7 +95,7 @@ public class WiseAgent extends android.app.Service {
 	IWiseAgent.Stub mBinder = new Stub() {
 
 		@Override
-		public void addBeaconGroup(int depth, String name, String parentCode) throws RemoteException {
+		public void addBeaconGroup(int depth, String name, String parentCode, EditObjectListener listener) throws RemoteException {
 			BeaconGroup group = new BeaconGroup(depth, name);
 			group.setUuid(WiseServer.requestUuid());
 			group.setMajor(WiseServer.requestMajor());
@@ -105,6 +105,10 @@ public class WiseAgent extends android.app.Service {
 				mWiseObjects.getBeaconGroup(parentCode).addChild(group);
 			}
 			mWiseObjects.putBeaconGroup(group);
+			
+			Bundle b = new Bundle();
+			b.putParcelable(IpcUtils.BUNDLE_KEY, group);
+			listener.onEditSuccess("success add beacongroup", b);
 		}
 
 		@Override
@@ -153,18 +157,6 @@ public class WiseAgent extends android.app.Service {
 
 			mWiseObjects.putBeacon(beacon);
 		}
-
-		/*@Override
-		public List<BeaconGroup> getBeaconGroups(List<String> codes)
-				throws RemoteException {
-
-			ArrayList<BeaconGroup> groups = new ArrayList<BeaconGroup>();
-			for (String code : codes) {
-				groups.add(mWiseObjects.getBeaconGroup(code));
-			}
-
-			return groups;
-		}*/
 
 		@Override
 		public void addService(String name, String parentCode, EditObjectListener listener)

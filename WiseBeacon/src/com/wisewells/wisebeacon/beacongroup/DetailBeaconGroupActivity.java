@@ -34,8 +34,8 @@ public class DetailBeaconGroupActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_detail_beacon_group);
 		
-		final String uuidGroupName = getIntent().getStringExtra(BeaconGroupActivity.EXTRA_UUID_GROUP_NAME);
-		mSelectedBeaconGroup = getIntent().getParcelableExtra(BeaconGroupActivity.EXTRA_MAJOR_GROUP);
+		final String uuidGroupName = getIntent().getStringExtra(BeaconGroupActivity.EXTRA_ROOT_GROUP_NAME);
+		mSelectedBeaconGroup = getIntent().getParcelableExtra(BeaconGroupActivity.EXTRA_LEAF_GROUP);
 		
 		mUuidGroupNameView = (TextView) findViewById(R.id.txt_uuid_group_name);
 		mUuidGroupNameView.setText(uuidGroupName);

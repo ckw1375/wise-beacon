@@ -20,13 +20,12 @@ import com.wisewells.sdk.aidl.EditObjectListener;
 interface IWiseAgent {
 
 	// BeaconGroup
-	void addBeaconGroup(int depth, String name, String parentCode);
+	void addBeaconGroup(int depth, String name, String parentCode, in EditObjectListener listener);
 	void addBeaconsToBeaconGroup(String groupCode, in List<Beacon> beacons); // 이거 안쓰이나???
 	void addBeaconToBeaconGroup(String groupCode, in Beacon beacon);
 	List<BeaconGroup> getBeaconGroups(String parentCode);
 	List<BeaconGroup> getBeaconGroupsInAuthority();
 	BeaconGroup getBeaconGroup(String code);
-	//List<BeaconGroup> getBeaconGroups(in List<String> codes);
 	
 	// Beacon
 	List<Beacon> getBeaconsInGroup(String groupCode);

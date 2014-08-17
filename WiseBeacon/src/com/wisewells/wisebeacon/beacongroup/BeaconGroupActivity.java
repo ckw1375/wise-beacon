@@ -6,7 +6,6 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.WiseManager.EditBeaconGroupListener;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
@@ -26,16 +26,16 @@ import com.wisewells.wisebeacon.common.TitleDialogSpinnerAdapter;
 
 public class BeaconGroupActivity extends Activity {
 
-	public static final String EXTRA_UUID_GROUP_NAME = "uuid group name";
-	public static final String EXTRA_MAJOR_GROUP = "major group";
+	public static final String EXTRA_ROOT_GROUP_NAME = "root group name";
+	public static final String EXTRA_LEAF_GROUP = "leaf group";
 
 	private BeaconGroup mSelectedRootGroup;
 	
 	private WiseManager mWiseManager;
 	private ListView mListView;
 	private BeaconGroupListAdapter mListAdapter;
-	private ImageView mAddMajorButton;
-	private ImageView mAddUuidButton;
+	private ImageView mAddRootButton;
+	private ImageView mAddLeafButton;
 	private TitleDialogSpinner mSpinner;
 	private TitleDialogSpinnerAdapter<BeaconGroupSpinnerData> mSpinnerAdapter;
 		
@@ -57,16 +57,16 @@ public class BeaconGroupActivity extends Activity {
 			}
 		});
 		
-		mAddMajorButton = (ImageView) findViewById(R.id.img_add_major_group);
-		mAddMajorButton.setOnClickListener(new View.OnClickListener() {
+		mAddRootButton = (ImageView) findViewById(R.id.img_add_major_group);
+		mAddRootButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onAddMajorButtonClicked();
 			}
 		});
 		
-		mAddUuidButton = (ImageView) findViewById(R.id.img_add_uuid_group);
-		mAddUuidButton.setOnClickListener(new View.OnClickListener() {
+		mAddLeafButton = (ImageView) findViewById(R.id.img_add_uuid_group);
+		mAddLeafButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onAddUuidButtonClicked();
@@ -90,7 +90,7 @@ public class BeaconGroupActivity extends Activity {
 	protected void onStart() {
 		super.onStart();
 		updateRootGroupSpinner();		
-		if(mSelectedRootGroup != null) updateMajorGroupListView(mSelectedRootGroup);
+		if(mSelectedRootGroup != null) updateLeafGroupListView(mSelectedRootGroup);
 	}
 	
 	@Override
@@ -120,13 +120,15 @@ public class BeaconGroupActivity extends Activity {
 		dialog.setDialogListener(new DialogListener() {
 			@Override
 			public void onOkButtonClicked(String str) {
-				mWiseManager.addBeaconGroup(1, str, null);
-
-				/*
-				 * 
-				 * add beacon이 완료된것이 확인되면! (리스터 이용) display 해줘야 한다!!
-				 */
-				updateRootGroupSpinner();
+				mWiseManager.addBeaconGroup(BeaconGroup.DEPTH_ROOT, str, null, new EditBeaconGroupListener() {
+					@Override
+					public void onEditSuccess(BeaconGroup beaconGroup) {
+						mSpinnerAdapter.add(new BeaconGroupSpinnerData(beaconGroup));
+					}
+					@Override
+					public void onEditFail() {
+					}
+				});
 			}
 		});
 
@@ -140,14 +142,15 @@ public class BeaconGroupActivity extends Activity {
 		dialog.setDialogListener(new DialogListener() {
 			@Override
 			public void onOkButtonClicked(String str) {
-				mWiseManager.addBeaconGroup(2, str, mSelectedRootGroup.getCode());
-
-				/*
-				 * 
-				 * add beacon이 완료된것이 확인되면! (리스터 이용) display 해줘야 한다!!
-				 */
-				updateMajorGroupListView(mSelectedRootGroup);
-				// TODO Auto-generated catch block
+				mWiseManager.addBeaconGroup(BeaconGroup.DEPTH_LEAF, str, mSelectedRootGroup.getCode(), new EditBeaconGroupListener() {
+					@Override
+					public void onEditSuccess(BeaconGroup beaconGroup) {
+						mListAdapter.add(beaconGroup);
+					}
+					@Override
+					public void onEditFail() {
+					}
+				});
 			}
 		});
 
@@ -156,17 +159,17 @@ public class BeaconGroupActivity extends Activity {
 	
 	private void onBeaconGroupListClicked(int position) {
 		Intent intent = new Intent(this, DetailBeaconGroupActivity.class);
-		intent.putExtra(EXTRA_UUID_GROUP_NAME, mSelectedRootGroup.getName());
-		intent.putExtra(EXTRA_MAJOR_GROUP, mListAdapter.getItem(position));
+		intent.putExtra(EXTRA_ROOT_GROUP_NAME, mSelectedRootGroup.getName());
+		intent.putExtra(EXTRA_LEAF_GROUP, mListAdapter.getItem(position));
 		startActivity(intent);
 	}
 
 	private void onSpinnerItemSelected(int position) {
 		mSelectedRootGroup = mSpinnerAdapter.getItem(position).getRootGroup();		
-		updateMajorGroupListView(mSelectedRootGroup);
+		updateLeafGroupListView(mSelectedRootGroup);
 	}
 	
-	private void updateMajorGroupListView(BeaconGroup rootGroup) {
+	private void updateLeafGroupListView(BeaconGroup rootGroup) {
 		List<BeaconGroup> childGroups = new ArrayList<BeaconGroup>();
 		childGroups = mWiseManager.getBeaconGroups(rootGroup.getCode());
 		

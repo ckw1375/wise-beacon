@@ -108,9 +108,23 @@ public class WiseManager {
 	@SuppressWarnings("unused")
 	private int _______________BeaconGroup_______________;
 	
-	public void addBeaconGroup(int depth, String name, String parentCode) {
+	public void addBeaconGroup(int depth, String name, String parentCode, EditBeaconGroupListener listener) {
+		mEditGroupListener = Preconditions.checkNotNull(listener, "Listener must be not null");
 		try {
-			mAgent.addBeaconGroup(depth, name, parentCode);
+			mAgent.addBeaconGroup(depth, name, parentCode, new EditObjectListener.Stub() {
+				@Override
+				public void onEditSuccess(String result, final Bundle data) throws RemoteException {
+					mHandler.post(new Runnable() {
+						@Override
+						public void run() {
+							mEditGroupListener.onEditSuccess(IpcUtils.getParcelableFromBundle(BeaconGroup.class, data));		
+						}
+					});
+				}
+				@Override
+				public void onEditFail(String result) throws RemoteException {
+				}
+			});
 		} catch (RemoteException e) {
 			L.e(EXCEPTION_MSG + "addBeaconGroup");
 		}
@@ -391,17 +405,17 @@ public class WiseManager {
 	}
 	
 	public interface EditBeaconGroupListener {
-		public void onEditSuccess(BeaconGroup service); 
+		public void onEditSuccess(BeaconGroup beaconGroup); 
 		public void onEditFail();
 	}
 	
 	public interface EditBeaconListener {
-		public void onEditSuccess(Beacon service); 
+		public void onEditSuccess(Beacon beacon); 
 		public void onEditFail();
 	}
 
 	public interface EditTopologyListener {
-		public void onEditSuccess(Topology service); 
+		public void onEditSuccess(Topology topology); 
 		public void onEditFail();
 	}
 	
