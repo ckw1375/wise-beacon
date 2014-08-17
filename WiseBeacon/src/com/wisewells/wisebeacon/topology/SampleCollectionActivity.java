@@ -181,12 +181,12 @@ public class SampleCollectionActivity extends Activity {
 		@Override
 		public void run() {
 			RssiVector rssi = mWiseManager.getAverageRssiVector(mBeaconCodes);
+			mNowSamplingSector.addSectorSample(rssi);
+			mAdapter.updateSampleNumber(mSamplingPosition);
 			if(rssi == null) {
-				L.d("rssivector is null");
+				L.i("Sample : null");
 			} 
 			else {
-				mNowSamplingSector.addSectorSample(rssi);
-				mAdapter.updateSampleNumber(mSamplingPosition);
 				L.i("Sample : " + rssi.toString());
 			}
 			mHandler.postDelayed(mSamplingRunnable, COLLECTION_INTERVAL);
