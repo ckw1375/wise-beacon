@@ -36,6 +36,7 @@ import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.IpcUtils;
 import com.wisewells.sdk.utils.L;
+import com.wisewells.wisebeacon.db.DBOpenHelper;
 
 public class WiseAgent extends android.app.Service {
 
@@ -54,6 +55,8 @@ public class WiseAgent extends android.app.Service {
 	private BeaconReceiver mBeaconReceiver;
 
 	public WiseAgent() {
+		DBOpenHelper db = new DBOpenHelper(this);
+		db.getReadableDatabase();
 		mConnectorMap = new HashMap<String, ApplicationConnector>();
 		mApplicationRequestingFindBeacon = new HashSet<String>();
 		mWiseObjects = new WiseObjects();
