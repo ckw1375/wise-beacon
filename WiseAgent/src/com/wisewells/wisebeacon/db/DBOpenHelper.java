@@ -23,11 +23,10 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 				+ DbBeaconGroup._CODE + " VARCHAR(20) PRIMARY KEY, "
 				+ DbBeaconGroup.NAME + " VARCHAR(2000), "
 				+ DbBeaconGroup.DEPTH + " INTEGER, "
-				+ DbBeaconGroup.__PARENT_CODE + " VARCHAR(20), "
+				+ DbBeaconGroup.__PARENT_CODE + " VARCHAR(20) "
+				+ "REFERENCES " + DbBeaconGroup.TABLE_NAME + "(" + DbBeaconGroup._CODE + ") ON DELETE CASCADE, "
 				+ DbBeaconGroup.UPDATE_DATE + " VARCHAR(8), " 
-				+ DbBeaconGroup.UPDATE_TIME + " VARCHAR(6), "
-				+ "FOREIGN KEY(" + DbBeaconGroup.__PARENT_CODE + ") " 
-				+ "REFERENCES " + DbBeaconGroup.TABLE_NAME + "(" + DbBeaconGroup._CODE + ")"
+				+ DbBeaconGroup.UPDATE_TIME + " VARCHAR(6)"
 				+ ");";
 		
 		String beaconSql = 
@@ -42,9 +41,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 				+ DbBeacon.INTERVAL + " FLOAT(10,4), "
 				+ DbBeacon.BATTERY + " FLOAT(10,4), "
 				+ DbBeacon.MINOR + " VARCHAR(20), "
-				+ DbBeacon.__GROUP_CODE + " VARCHAR(20), "
-				+ "FOREIGN KEY(" + DbBeacon.__GROUP_CODE + ") " 
-				+ "REFERENCES " + DbBeaconGroup.TABLE_NAME + "(" + DbBeaconGroup._CODE + ")"
+				+ DbBeacon.__GROUP_CODE + " VARCHAR(20) "
+				+ "REFERENCES " + DbBeaconGroup.TABLE_NAME + "(" + DbBeaconGroup._CODE + ") ON DELETE CASCADE"
 				+ ");";
 		
 		db.execSQL(beaconGroupSql);
@@ -56,4 +54,12 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		L.d("DB OnUpgrade");
 	}
 
+	@Override
+	public void onOpen(SQLiteDatabase db) {
+		super.onOpen(db);
+		if (!db.isReadOnly()) {
+	        // Enable foreign key constraints
+	        db.execSQL("PRAGMA foreign_keys=ON;");
+	    }
+	}
 }
