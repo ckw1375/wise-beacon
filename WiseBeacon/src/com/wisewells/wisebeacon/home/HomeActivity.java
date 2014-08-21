@@ -13,9 +13,9 @@ import com.wisewells.wisebeacon.service.ServiceActivity;
 
 public class HomeActivity extends BaseActivity {
 
-	private Button mBeaconGroupButton;
-	private Button mServiceButton;
-	private Button mSettingButton;
+	private View mBeaconGroupButton;
+	private View mServiceButton;
+	private View mManualButton;
 		
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class HomeActivity extends BaseActivity {
         setTitle("WISEBEACON MANAGER");
         setDescription("*** 님 안녕하세요(시스템관리자)");
         
-        mBeaconGroupButton = (Button) findViewById(R.id.btn_beacon_group);
+        mBeaconGroupButton = findViewById(R.id.layout_beacon_group_button);
         mBeaconGroupButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -34,7 +34,7 @@ public class HomeActivity extends BaseActivity {
 			}
 		});
         
-        mServiceButton = (Button) findViewById(R.id.btn_service_button);
+        mServiceButton = findViewById(R.id.layout_service_button);
         mServiceButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -42,8 +42,8 @@ public class HomeActivity extends BaseActivity {
 			}
 		});
         
-        mSettingButton = (Button) findViewById(R.id.btn_setting);
-        mSettingButton.setOnClickListener(new View.OnClickListener() {
+        mManualButton = findViewById(R.id.btn_manual);
+        mManualButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onSettingButtonClicked();

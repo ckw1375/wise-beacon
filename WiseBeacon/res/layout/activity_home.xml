@@ -3,7 +3,9 @@
     android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     android:orientation="vertical"
+    android:gravity="center_horizontal"
     tools:context=".HomeActivity" >
 
     <include
@@ -12,65 +14,80 @@
         layout="@layout/view_activity_header" />
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/TextView01"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:text="TextView" />
+
+    <RelativeLayout
+        android:id="@+id/layout_beacon_group_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/main_sel" >
+
+        <TextView
+            android:id="@+id/txt_group_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:text="05"
+            android:textColor="#ffffff"
+            android:textSize="36dp" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_group_count"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="비콘 그룹 관리"
+            android:textColor="#ffffff"
+            android:textSize="13dp" />
+    </RelativeLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:id="@+id/layout_service_button"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:gravity="center"
+        android:orientation="vertical" >
 
         <TextView
-            android:layout_width="0dp"
+            android:id="@+id/txt_service_count"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/btn_beacon_group"
-            android:layout_width="150dp"
-            android:layout_height="100dp"
-            android:text="@string/string_beacon_group_management" 
-            fontPath="fonts/nanum_bold.ttf"/>
-
-        <Button
-            android:id="@+id/btn_service_button"
-            android:layout_width="150dp"
-            android:layout_height="100dp"
-            android:text="@string/string_service_managerment"
-            fontPath="fonts/name_light.ttf" />
+            android:text="03"
+            android:textColor="#ffffff"
+            android:textSize="36dp" />
 
         <TextView
-            android:layout_width="0dp"
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
-    </LinearLayout>
+            android:layout_marginTop="10dp"
+            android:text="서비스 관리"
+            android:textColor="#ffffff"
+            android:textSize="13dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/btn_setting"
-            android:layout_width="150dp"
-            android:layout_height="100dp"
-            android:text="환경설정" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
     </LinearLayout>
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:text="TextView" />
+
+    <Button
+        android:id="@+id/btn_manual"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="#ffffff"
+        android:gravity="center"
+        android:text="이용안내"
+        android:textSize="13dp" />
 
 </LinearLayout>

@@ -1,5 +1,7 @@
 package com.wisewells.wisebeacon.home;
 
+import com.wisewells.wisebeacon.R;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 import android.app.Activity;
 import android.content.Context;
@@ -9,7 +11,7 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		setContentView(R.layout.activity_login);
 	}
 	
 	@Override
