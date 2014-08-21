@@ -44,14 +44,12 @@ public class DBController {
 	public Cursor selectAll(String table) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor c = db.rawQuery("SELECT * FROM ?;", new String[]{ table });
-		db.close();
 		return c;
 	}
 	
 	public Cursor rawQuery(String sql, String[] selectionArgs) {
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		Cursor c = db.rawQuery(sql, selectionArgs);
-		db.close();
 		return c;
 	}
 }

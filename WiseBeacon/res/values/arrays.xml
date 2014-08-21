@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string-array name="topology_type">
-        <item >Proximity</item>
-        <item >Sector</item>
-        <item >Location</item>
+        <item>Proximity</item>
+        <item>Sector</item>
+        <item>Location</item>
     </string-array>
-    
+    <string-array name="popup_menu">
+        <item>비콘 그룹 관리</item>
+        <item>서비스 관리</item>
+        <item>이용안내</item>
+        <item>로그아운</item>
+    </string-array>
+
 </resources>

@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:text="TextView" />
 
-            <com.wisewells.wisebeacon.common.TitleDialogSpinner
+            <com.wisewells.wisebeacon.view.TitleDialogSpinner
                 android:id="@+id/custom_spinner_beacon_group"
                 style="@style/spinner"
                 android:layout_width="wrap_content"
@@ -123,7 +123,7 @@
                 android:layout_gravity="center_vertical"
                 android:text="TextView" />
 
-            <com.wisewells.wisebeacon.common.TitleDialogSpinner
+            <com.wisewells.wisebeacon.view.TitleDialogSpinner
                 android:id="@+id/custom_spinner_topology_type"
                 style="@style/spinner"
                 android:layout_width="wrap_content"

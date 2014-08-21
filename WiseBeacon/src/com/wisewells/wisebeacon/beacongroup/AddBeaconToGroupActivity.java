@@ -16,8 +16,8 @@ import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
-import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;
+import com.wisewells.wisebeacon.view.OneEditTwoButtonsDialog;
+import com.wisewells.wisebeacon.view.OneEditTwoButtonsDialog.DialogListener;
 
 public class AddBeaconToGroupActivity extends Activity {
 

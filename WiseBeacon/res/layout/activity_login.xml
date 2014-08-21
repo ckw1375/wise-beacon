@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#303030"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingLeft="40dp"
+    android:paddingRight="40dp"
+    android:paddingTop="100dp" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        fontPath="fonts/nanum_light.ttf"
+        android:text="WISE BEACON"
+        android:textColor="#bb4738"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        fontPath="fonts/nanum_light.ttf"
+        android:text="모바일 관리자 로그인"
+        android:textColor="#ffffff"
+        android:textSize="25dp" />
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/text_box"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="아이디"
+        android:textSize="13dp" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:background="@drawable/text_box"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="비밀번호"
+        android:textSize="13dp" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:gravity="center"
+        android:text="로그인"
+        android:textColor="#ffffff"
+        android:textSize="14dp" />
+
+    <ImageView
+        android:id="@+id/ImageView01"
+        android:layout_width="match_parent"
+        android:layout_height="18dp"
+        android:background="#363636"
+        android:src="@drawable/login_deco" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="178dp"
+        android:gravity="center"
+        android:text="@string/text_login_description"
+        android:textColor="#ffffff"
+        android:textSize="10dp" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="match_parent"
+        android:layout_height="18dp"
+        android:background="#363636"
+        android:src="@drawable/login_deco" />
+
+</LinearLayout>

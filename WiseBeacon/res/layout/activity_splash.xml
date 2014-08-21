@@ -1,5 +1,6 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:my="http://schemas.android.com/com.wisewells.wisebeacon"
     android:id="@+id/FrameLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,6 +17,7 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            fontPath="fonts/nanum_light.ttf"
             android:text="WISE BEACON"
             android:textColor="#bb4738"
             android:textSize="15dp" />
@@ -24,10 +26,10 @@
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            fontPath="fonts/nanum_light.ttf"
             android:text="MANAGER"
             android:textColor="#ffffff"
             android:textSize="25dp" />
-
     </LinearLayout>
 
 </FrameLayout>

@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.common;
+package com.wisewells.wisebeacon.view;
 
 import android.app.DialogFragment;
 import android.app.FragmentManager;
@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.common.TitleDialogSpinnerAdapter.AddItemListener;
+import com.wisewells.wisebeacon.view.TitleDialogSpinnerAdapter.AddItemListener;
 
 public class TitleDialogSpinner extends TextView implements View.OnClickListener{
 	

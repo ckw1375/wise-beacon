@@ -6,6 +6,11 @@
     android:orientation="vertical"
     tools:context=".HomeActivity" >
 
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/view_activity_header" />
+
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
@@ -25,13 +30,15 @@
             android:id="@+id/btn_beacon_group"
             android:layout_width="150dp"
             android:layout_height="100dp"
-            android:text="@string/string_beacon_group_management" />
+            android:text="@string/string_beacon_group_management" 
+            fontPath="fonts/nanum_bold.ttf"/>
 
         <Button
             android:id="@+id/btn_service_button"
             android:layout_width="150dp"
             android:layout_height="100dp"
-            android:text="@string/string_service_managerment" />
+            android:text="@string/string_service_managerment"
+            fontPath="fonts/name_light.ttf" />
 
         <TextView
             android:layout_width="0dp"

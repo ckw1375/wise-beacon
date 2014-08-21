@@ -36,17 +36,28 @@ public class BeaconGroup implements Parcelable{
 		}
 	};
 
-	public BeaconGroup(String name) {
-		init();
-		this.name = name;
-	}
-	
 	public BeaconGroup(int depth, String name) {
 		init();
 		if(depth > DEPTH_LEAF || depth < 1)
 			throw new RuntimeException("BeaconGroup depth can be 1 or 2");
 		this.depth = depth;
 		this.name = name;
+	}
+
+	public BeaconGroup(int depth, String name, String code, String parentCode,
+			HashSet<String> childCodes, HashSet<String> topologyCodes,
+			String uuid, Integer major) {
+		this.depth = depth;
+		this.name = name;
+		this.code = code;
+		this.parentCode = parentCode;
+		this.childCodes = childCodes;
+		this.topologyCodes = topologyCodes;
+		this.uuid = uuid;
+		this.major = major;
+		
+		if(this.childCodes == null) this.childCodes = new HashSet<String>();
+		if(this.topologyCodes == null) this.topologyCodes = new HashSet<String>();
 	}
 
 	private BeaconGroup(Parcel p) {
@@ -58,7 +69,7 @@ public class BeaconGroup implements Parcelable{
 		childCodes = (HashSet<String>) p.readSerializable();
 		topologyCodes = (HashSet<String>) p.readSerializable();
 		uuid = p.readString();
-		major = p.readInt();
+		major = (Integer) p.readSerializable();
 	}
 	
 	private void init() {
@@ -80,7 +91,7 @@ public class BeaconGroup implements Parcelable{
 		dest.writeSerializable(childCodes);
 		dest.writeSerializable(topologyCodes);
 		dest.writeString(uuid);
-		dest.writeInt(major);
+		dest.writeSerializable(major);
 	}
 	
 	@Override

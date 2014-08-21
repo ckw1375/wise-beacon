@@ -1,17 +1,17 @@
-package com.wisewells.wisebeacon.common;
+package com.wisewells.wisebeacon.home;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.home.HomeActivity;
 
 public class SplashActivity extends Activity {
 
@@ -53,5 +53,10 @@ public class SplashActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	protected void attachBaseContext(Context newBase) {
+		super.attachBaseContext(new CalligraphyContextWrapper(newBase));
 	}
 }

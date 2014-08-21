@@ -114,6 +114,7 @@ public class WiseManager {
 			mAgent.addBeaconGroup(depth, name, parentCode, new EditObjectListener.Stub() {
 				@Override
 				public void onEditSuccess(String result, final Bundle data) throws RemoteException {
+					L.d("TEST");
 					mHandler.post(new Runnable() {
 						@Override
 						public void run() {

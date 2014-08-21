@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:text="상위서비스" />
 
-        <com.wisewells.wisebeacon.common.TitleDialogSpinner
+        <com.wisewells.wisebeacon.view.TitleDialogSpinner
             android:id="@+id/custom_title_spinner"
             style="@style/spinner"
             android:layout_width="wrap_content"

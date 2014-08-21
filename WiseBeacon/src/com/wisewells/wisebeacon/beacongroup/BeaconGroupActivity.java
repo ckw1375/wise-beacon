@@ -17,12 +17,13 @@ import android.widget.ListView;
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.WiseManager.EditBeaconGroupListener;
 import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
-import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;
-import com.wisewells.wisebeacon.common.TitleDialogSpinner;
-import com.wisewells.wisebeacon.common.TitleDialogSpinner.OnSpinnerItemSelectedListener;
-import com.wisewells.wisebeacon.common.TitleDialogSpinnerAdapter;
+import com.wisewells.wisebeacon.view.OneEditTwoButtonsDialog;
+import com.wisewells.wisebeacon.view.TitleDialogSpinner;
+import com.wisewells.wisebeacon.view.TitleDialogSpinnerAdapter;
+import com.wisewells.wisebeacon.view.OneEditTwoButtonsDialog.DialogListener;
+import com.wisewells.wisebeacon.view.TitleDialogSpinner.OnSpinnerItemSelectedListener;
 
 public class BeaconGroupActivity extends Activity {
 
@@ -123,6 +124,7 @@ public class BeaconGroupActivity extends Activity {
 				mWiseManager.addBeaconGroup(BeaconGroup.DEPTH_ROOT, str, null, new EditBeaconGroupListener() {
 					@Override
 					public void onEditSuccess(BeaconGroup beaconGroup) {
+						L.d(beaconGroup.toString() + " is added");
 						mSpinnerAdapter.add(new BeaconGroupSpinnerData(beaconGroup));
 					}
 					@Override

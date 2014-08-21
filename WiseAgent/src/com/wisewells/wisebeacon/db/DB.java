@@ -3,9 +3,6 @@ package com.wisewells.wisebeacon.db;
 import android.provider.BaseColumns;
 
 public class DB {
-	public final static String DB_NAME = "wisebeacon.db";
-	public final static int DB_VERSION = 1;
-	
 	public static boolean intToBool(int val) {
 		return val == 1 ? true : false;
 	}
@@ -14,7 +11,7 @@ public class DB {
 		return b ? 1 : 0;
 	}
 	
-	public static class DbBeaconGroup implements BaseColumns {
+	public static class DBBeaconGroup implements BaseColumns {
 		public static final String TABLE_NAME = "BeaconGroup";
 		public static final String _CODE = "_code";	/* VARCHAR(20) */
 		public static final String NAME = "name";	/* VARCHAR(2000) */
@@ -24,7 +21,7 @@ public class DB {
 		public static final String UPDATE_TIME = "update_time"; /* VARCHAR(6) */
 	}
 	
-	public static class DbBeacon implements BaseColumns {
+	public static class DBBeacon implements BaseColumns {
 		public static final String TABLE_NAME = "Beacon";
 		public static final String _CODE = "_code";	/* VARCHAR(20) */
 		public static final String NAME = "name"; /* VARCHAR(100) */

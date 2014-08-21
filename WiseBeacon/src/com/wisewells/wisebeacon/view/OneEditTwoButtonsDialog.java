@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.common;
+package com.wisewells.wisebeacon.view;
 
 import android.app.DialogFragment;
 import android.os.Bundle;

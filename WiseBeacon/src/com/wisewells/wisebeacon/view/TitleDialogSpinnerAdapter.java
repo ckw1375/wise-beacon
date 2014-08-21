@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.common;
+package com.wisewells.wisebeacon.view;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;

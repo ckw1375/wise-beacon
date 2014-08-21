@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -36,7 +37,6 @@ import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.IpcUtils;
 import com.wisewells.sdk.utils.L;
-import com.wisewells.wisebeacon.db.DBOpenHelper;
 
 public class WiseAgent extends android.app.Service {
 
@@ -53,10 +53,9 @@ public class WiseAgent extends android.app.Service {
 	private final Handler mHandler;
 	private final BeaconTracker mTracker;
 	private BeaconReceiver mBeaconReceiver;
+	private ObjectManager mObjectManager;
 
 	public WiseAgent() {
-		DBOpenHelper db = new DBOpenHelper(this);
-		db.getReadableDatabase();
 		mConnectorMap = new HashMap<String, ApplicationConnector>();
 		mApplicationRequestingFindBeacon = new HashSet<String>();
 		mWiseObjects = new WiseObjects();
@@ -76,8 +75,9 @@ public class WiseAgent extends android.app.Service {
 		if (DEBUG_MODE)
 			android.os.Debug.waitForDebugger();
 		L.i("Creating service");
-
 		mBeaconReceiver = new BeaconReceiver(this, mHandler, mTracker);
+		mObjectManager = new ObjectManager(this, mHandler);
+		mObjectManager.getBeaconGroups(null);
 	}
 
 	public void onDestroy() {
@@ -99,16 +99,19 @@ public class WiseAgent extends android.app.Service {
 
 		@Override
 		public void addBeaconGroup(int depth, String name, String parentCode, EditObjectListener listener) throws RemoteException {
-			BeaconGroup group = new BeaconGroup(depth, name);
-			group.setUuid(WiseServer.requestUuid());
-			group.setMajor(WiseServer.requestMajor());
-			group.setCode(WiseServer.requestCode());
+//			BeaconGroup group = new BeaconGroup(depth, name);
+//			group.setUuid(WiseServer.requestUuid());
+//			group.setMajor(WiseServer.requestMajor());
+//			group.setCode(WiseServer.requestCode());
+//			
+//			if(parentCode != null) { 
+//				mWiseObjects.getBeaconGroup(parentCode).addChild(group);
+//			}
+//			mWiseObjects.putBeaconGroup(group);
+		
+			BeaconGroup group = mObjectManager.addBeaconGroup(depth, name, parentCode);
 			
-			if(parentCode != null) { 
-				mWiseObjects.getBeaconGroup(parentCode).addChild(group);
-			}
-			mWiseObjects.putBeaconGroup(group);
-			
+			mObjectManager.getBeaconGroups("group");
 			Bundle b = new Bundle();
 			b.putParcelable(IpcUtils.BUNDLE_KEY, group);
 			listener.onEditSuccess("success add beacongroup", b);
@@ -121,7 +124,8 @@ public class WiseAgent extends android.app.Service {
 
 		@Override
 		public List<BeaconGroup> getBeaconGroups(String parentCode) throws RemoteException {
-			return mWiseObjects.getBeaconGroups(parentCode);
+			return mObjectManager.getBeaconGroups(parentCode);
+//			return mWiseObjects.getBeaconGroups(parentCode);
 		}
 
 		@Override

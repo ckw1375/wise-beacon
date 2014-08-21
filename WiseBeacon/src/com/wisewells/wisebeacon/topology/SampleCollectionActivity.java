@@ -19,8 +19,8 @@ import com.wisewells.sdk.beacon.RssiVector;
 import com.wisewells.sdk.service.Sector;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog;
-import com.wisewells.wisebeacon.common.OneEditTwoButtonsDialog.DialogListener;
+import com.wisewells.wisebeacon.view.OneEditTwoButtonsDialog;
+import com.wisewells.wisebeacon.view.OneEditTwoButtonsDialog.DialogListener;
 
 public class SampleCollectionActivity extends Activity {
 

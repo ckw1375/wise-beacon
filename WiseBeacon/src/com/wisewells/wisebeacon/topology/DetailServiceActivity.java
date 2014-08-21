@@ -22,9 +22,9 @@ import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.wisebeacon.R;
-import com.wisewells.wisebeacon.common.TitleDialogSpinner;
-import com.wisewells.wisebeacon.common.TitleDialogSpinnerAdapter;
 import com.wisewells.wisebeacon.service.ServiceActivity;
+import com.wisewells.wisebeacon.view.TitleDialogSpinner;
+import com.wisewells.wisebeacon.view.TitleDialogSpinnerAdapter;
 
 public class DetailServiceActivity extends Activity {
 
