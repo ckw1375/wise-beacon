@@ -36,7 +36,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 				"CREATE TABLE " + DBBeacon.TABLE_NAME + "("
 				+ DBBeacon._CODE + " VARCHAR(20) PRIMARY KEY, "
 				+ DBBeacon.NAME + " VARCHAR(100), "
-				+ DBBeacon.MAKER + " VARCHAR(100), "
+				+ DBBeacon.__MAKER + " VARCHAR(100), "
 				+ DBBeacon.IMAGE + " VARCHAR(200), "
 				+ DBBeacon.MACADDRESS + " VARCHAR(100), "
 				+ DBBeacon.TX_POWER + " FLOAT(10,4), "
@@ -75,7 +75,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		super.onOpen(db);
 		if (!db.isReadOnly()) {
 	        // Enable foreign key constraints
-	        db.execSQL("PRAGMA foreign_keys=ON;");
+	        db.execSQL("	");
 	    }
 	}
 }

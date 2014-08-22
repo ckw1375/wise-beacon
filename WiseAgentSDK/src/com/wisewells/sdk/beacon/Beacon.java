@@ -1,5 +1,6 @@
 package com.wisewells.sdk.beacon;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -10,26 +11,26 @@ import com.wisewells.sdk.utils.L;
 
 public class Beacon implements Parcelable {
 
-	// DB에 저장되는 값
+	// static values(stored data)
 	private String code;
 	private String name;
 	private String beaconGroupCode;
 	private String macAddress;
-	private String minor;
+	private String proximityUUID;
+	private int major;
+	private int minor;
 	private double battery;
 	private double txPower;
 	private double measuredPower;
 	private double interval;
 	private String maker;
 	private String image;
+	private String updateDate;
+	private String updateTime;
 
-	// DB에 저장되지 않는 값
+	// dynamic values(not sotred data)
 	private double rssi;
 	private double distance;
-
-	// 삭제
-	private String proximityUUID;
-	private int major;
 
 	public static final Parcelable.Creator<Beacon> CREATOR = new Parcelable.Creator<Beacon>() {
 		public Beacon createFromParcel(Parcel source) {
@@ -62,18 +63,24 @@ public class Beacon implements Parcelable {
 		this.rssi = rssi;
 	}
 
-	private Beacon(Parcel parcel) {
-		this.code = parcel.readString();
-		this.beaconGroupCode = parcel.readString();
-		this.name = parcel.readString();
-		this.proximityUUID = parcel.readString();	   
-		this.macAddress = parcel.readString();
-		this.major = parcel.readInt();
-		this.minor = parcel.readInt();
-		this.measuredPower = parcel.readDouble();
-		this.rssi = parcel.readDouble();
-		this.distance = parcel.readDouble();
-		this.interval = parcel.readDouble();
+	private Beacon(Parcel in) {
+		this.code = in.readString();
+		this.name = in.readString();
+		this.beaconGroupCode = in.readString();
+		this.macAddress = in.readString();
+		this.proximityUUID = in.readString();	   
+		this.major = in.readInt();
+		this.minor = in.readInt();
+		this.battery = in.readDouble();
+		this.txPower = in.readDouble();
+		this.measuredPower = in.readDouble();
+		this.interval = in.readDouble();
+		this.maker = in.readString();
+		this.image = in.readString();
+		this.rssi = in.readDouble();
+		this.distance = in.readDouble();
+		this.updateDate = in.readString();
+		this.updateTime = in.readString();
 	}
 
 	public int describeContents() {
@@ -82,16 +89,22 @@ public class Beacon implements Parcelable {
 
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(this.code);
-		dest.writeString(this.beaconGroupCode);
 		dest.writeString(this.name);
-		dest.writeString(this.proximityUUID);	   
+		dest.writeString(this.beaconGroupCode);
 		dest.writeString(this.macAddress);
+		dest.writeString(this.proximityUUID);		
 		dest.writeInt(this.major);
 		dest.writeInt(this.minor);
+		dest.writeDouble(this.battery);
+		dest.writeDouble(this.txPower);
 		dest.writeDouble(this.measuredPower);
+		dest.writeDouble(this.interval);
+		dest.writeString(this.maker);
+		dest.writeString(this.image);
 		dest.writeDouble(this.rssi);
 		dest.writeDouble(this.distance);
-		dest.writeDouble(interval);
+		dest.writeString(this.updateDate);
+		dest.writeString(this.updateTime);
 	}
 
 	public String getProximityUUID() {
