@@ -2,63 +2,76 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:minHeight="180dp"
+    android:minWidth="235dp"
     android:orientation="vertical" >
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_height="45dp"
+        android:background="@drawable/pop_top_bg"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" >
 
         <TextView
             android:id="@+id/txt_dialog_title"
-            style="@style/dialog_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="TextView"
+            android:textColor="#ffffff"
+            android:textSize="13dp" />
 
     </LinearLayout>
 
     <LinearLayout
-        style="@style/dialog_content_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_height="90dp"
+        android:orientation="vertical"
+        android:gravity=""
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" >
 
         <TextView
             android:id="@+id/txt_edit_1_title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="이 름" />
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:text="이 름"
+            android:textSize="15dp" />
 
         <EditText
             android:id="@+id/edit_1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
+            android:background="@drawable/text_box"
             android:ems="10" >
 
             <requestFocus />
         </EditText>
-
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:gravity="center" >
 
         <ImageButton
             android:id="@+id/img_ok"
-            style="@style/dialog_ok_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:background="@drawable/pop_bottom_bg"
+            android:src="@drawable/btn_okay" />
 
         <ImageButton
             android:id="@+id/img_cancel"
-            style="@style/dialog_cancel_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:background="@drawable/pop_bottom_bg"
+            android:src="@drawable/btn_cancel" />
 
     </LinearLayout>
 

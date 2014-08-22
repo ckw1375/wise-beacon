@@ -15,7 +15,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" android:name="WiasBeaconApplication">
+        android:theme="@style/AppTheme" android:name="WiseBeaconApplication">
         <activity android:name=".beacongroup.DetailBeaconGroupActivity" >
         </activity>
         <activity

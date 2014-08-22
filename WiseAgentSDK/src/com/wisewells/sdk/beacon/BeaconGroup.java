@@ -17,6 +17,8 @@ public class BeaconGroup implements Parcelable{
 	private String name;
 	private String code;
 	private String parentCode;	
+	
+	// 곧 삭제!!!! 
 	private HashSet<String> childCodes;
 	private HashSet<String> topologyCodes;
 	

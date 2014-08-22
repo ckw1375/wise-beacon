@@ -5,21 +5,19 @@ import java.util.ArrayList;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteCursor;
-import android.os.Handler;
 
+import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.utils.L;
+import com.wisewells.wisebeacon.db.DB.DBBeacon;
 import com.wisewells.wisebeacon.db.DB.DBBeaconGroup;
 import com.wisewells.wisebeacon.db.DBController;
 
 public class ObjectManager {
 	private final DBController mDBController;	
-	private final Handler mAgentHandler;
 	
-	public ObjectManager(Context context, Handler handler) {
+	public ObjectManager(Context context) {
 		mDBController = DBController.getInstance(context);
-		mAgentHandler = handler;
 	}
 	
 	public BeaconGroup addBeaconGroup(int depth, String name, String parentCode) {
@@ -32,6 +30,7 @@ public class ObjectManager {
 		values.put(DBBeaconGroup.DEPTH, depth);
 		values.put(DBBeaconGroup.NAME, name);
 		values.put(DBBeaconGroup.__PARENT_CODE, parentCode);
+		
 		mDBController.insert(DBBeaconGroup.TABLE_NAME, values);
 		
 		BeaconGroup group = new BeaconGroup(depth, name);
@@ -41,18 +40,17 @@ public class ObjectManager {
 	
 	public ArrayList<BeaconGroup> getBeaconGroups(String parentCode) {
 		String sql;
-			if(parentCode == null) {
-				sql = String.format("SELECT * FROM %S WHERE %s IS NULL", 
-						DBBeaconGroup.TABLE_NAME, DBBeaconGroup.__PARENT_CODE);
-			}
-			else {
-				sql = String.format("SELECT * FROM %s WHERE %s='%s';", 
+		if(parentCode == null) {
+			sql = String.format("SELECT * FROM %s WHERE %s IS NULL", 
+					DBBeaconGroup.TABLE_NAME, DBBeaconGroup.__PARENT_CODE);
+		}
+		else {
+			sql = String.format("SELECT * FROM %s WHERE %s='%s';", 
 					DBBeaconGroup.TABLE_NAME, DBBeaconGroup.__PARENT_CODE, parentCode);
-			}
-		L.i("SQL : " + sql);
+		}
+		L.d("query : " + sql);
 		
 		Cursor c = mDBController.rawQuery(sql, null);
-
 		ArrayList<BeaconGroup> groups = new ArrayList<BeaconGroup>();
 		if(c == null)
 			return groups;
@@ -69,6 +67,34 @@ public class ObjectManager {
 		
 		c.close();
 		return groups;
+	}
+	
+	public ArrayList<Beacon> getBeaconsInGroup(String groupCode) {
+		String sql = String.format("SELECT * FROM %s WHERE %s='%s';", 
+				DBBeacon.TABLE_NAME, DBBeacon.__GROUP_CODE, groupCode);
+		L.d("query : " + sql);
+		
+		Cursor c = mDBController.rawQuery(sql, null);
+		ArrayList<Beacon> beacons = new ArrayList<Beacon>();
+		if(c == null) 
+			return beacons;
+		
+		while(c.moveToNext()) {
+			String _code = c.getString(0);
+			String name = c.getString(1);
+			String maker = c.getString(2);
+			String image = c.getString(3);
+			String mac = c.getString(4);
+			float tx = c.getFloat(5);
+			float measured = c.getFloat(6);
+			float interval = c.getFloat(7);
+			float battery = c.getFloat(8);
+			String minor = c.getString(9);
+			String __groupCode = c.getString(10);
+			
+		}
+		
+		return null;
 	}
 }
  

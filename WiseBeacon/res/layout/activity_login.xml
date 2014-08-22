@@ -73,7 +73,7 @@
         android:layout_width="wrap_content"
         android:layout_height="178dp"
         android:gravity="center"
-        android:text="@string/text_login_description"
+        android:text="@string/string_login_description"
         android:textColor="#ffffff"
         android:textSize="10dp" />
 

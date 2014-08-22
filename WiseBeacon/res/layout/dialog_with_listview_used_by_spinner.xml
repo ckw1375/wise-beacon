@@ -3,20 +3,39 @@
     android:id="@+id/LinearLayout1"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:minWidth="235dp"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/txt_dialog_title"
-        style="@style/dialog_title"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@drawable/pop_top_bg"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp" >
+
+        <TextView
+            android:id="@+id/txt_dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="TextView"
+            android:textColor="#ffffff"
+            android:textSize="13dp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="TextView" />
+        android:orientation="vertical" >
 
-    <ListView
-        android:id="@+id/list_dialog"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" >
-    </ListView>
+        <ListView
+            android:id="@+id/list_dialog"
+            android:layout_width="235dp"
+            android:layout_height="300dp" >
+
+        </ListView>
+
+    </LinearLayout>
 
 </LinearLayout>

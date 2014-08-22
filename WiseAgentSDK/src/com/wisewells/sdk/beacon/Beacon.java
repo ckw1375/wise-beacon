@@ -10,17 +10,26 @@ import com.wisewells.sdk.utils.L;
 
 public class Beacon implements Parcelable {
 
+	// DB에 저장되는 값
 	private String code;
+	private String name;
 	private String beaconGroupCode;
-	private String name;	
-	private String proximityUUID;
 	private String macAddress;
-	private int major;
-	private int minor;
+	private String minor;
+	private double battery;
+	private double txPower;
 	private double measuredPower;
+	private double interval;
+	private String maker;
+	private String image;
+
+	// DB에 저장되지 않는 값
 	private double rssi;
 	private double distance;
-	private double interval;
+
+	// 삭제
+	private String proximityUUID;
+	private int major;
 
 	public static final Parcelable.Creator<Beacon> CREATOR = new Parcelable.Creator<Beacon>() {
 		public Beacon createFromParcel(Parcel source) {

@@ -5,7 +5,7 @@
     android:orientation="vertical" >
 
     <LinearLayout
-        style="@style/title_section"
+        style="@style/title_section_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@null" >

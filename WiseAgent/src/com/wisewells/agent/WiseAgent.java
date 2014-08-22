@@ -76,8 +76,7 @@ public class WiseAgent extends android.app.Service {
 			android.os.Debug.waitForDebugger();
 		L.i("Creating service");
 		mBeaconReceiver = new BeaconReceiver(this, mHandler, mTracker);
-		mObjectManager = new ObjectManager(this, mHandler);
-		mObjectManager.getBeaconGroups(null);
+		mObjectManager = new ObjectManager(this);
 	}
 
 	public void onDestroy() {
@@ -111,7 +110,6 @@ public class WiseAgent extends android.app.Service {
 		
 			BeaconGroup group = mObjectManager.addBeaconGroup(depth, name, parentCode);
 			
-			mObjectManager.getBeaconGroups("group");
 			Bundle b = new Bundle();
 			b.putParcelable(IpcUtils.BUNDLE_KEY, group);
 			listener.onEditSuccess("success add beacongroup", b);
@@ -135,6 +133,7 @@ public class WiseAgent extends android.app.Service {
 
 		@Override
 		public List<Beacon> getBeaconsInGroup(String groupCode) throws RemoteException {
+			
 			return mWiseObjects.getAllBeaconsInGroup(groupCode);
 		};
 

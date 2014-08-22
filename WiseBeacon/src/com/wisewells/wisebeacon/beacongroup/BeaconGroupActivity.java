@@ -3,7 +3,9 @@ package com.wisewells.wisebeacon.beacongroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,19 +15,21 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.WiseManager.EditBeaconGroupListener;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
+import com.wisewells.wisebeacon.common.BaseActivity;
 import com.wisewells.wisebeacon.view.OneEditTwoButtonsDialog;
 import com.wisewells.wisebeacon.view.TitleDialogSpinner;
 import com.wisewells.wisebeacon.view.TitleDialogSpinnerAdapter;
 import com.wisewells.wisebeacon.view.OneEditTwoButtonsDialog.DialogListener;
 import com.wisewells.wisebeacon.view.TitleDialogSpinner.OnSpinnerItemSelectedListener;
 
-public class BeaconGroupActivity extends Activity {
+public class BeaconGroupActivity extends BaseActivity {
 
 	public static final String EXTRA_ROOT_GROUP_NAME = "root group name";
 	public static final String EXTRA_LEAF_GROUP = "leaf group";
@@ -44,6 +48,8 @@ public class BeaconGroupActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_beacon_group);
+		setTitle("비콘 그룹 관리");
+		setDescription("시스템에 등록된 비콘그룹 정보 및 현재 모바일로 수신되는 비콘 그룹 정보를 목록으로 조회합니다.");
 		
 		mWiseManager = WiseManager.getInstance(this);
 		
@@ -62,7 +68,7 @@ public class BeaconGroupActivity extends Activity {
 		mAddRootButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onAddMajorButtonClicked();
+				onAddLeafButtonClicked();
 			}
 		});
 		
@@ -70,7 +76,7 @@ public class BeaconGroupActivity extends Activity {
 		mAddLeafButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onAddUuidButtonClicked();
+				onAddRootButtonClicked();
 			}
 		});
 
@@ -114,7 +120,7 @@ public class BeaconGroupActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	private void onAddUuidButtonClicked() {
+	private void onAddRootButtonClicked() {
 		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
 		dialog.setPrompt("비콘 그룹 생성");
 		dialog.setEditTitle("그룹명");
@@ -137,7 +143,12 @@ public class BeaconGroupActivity extends Activity {
 		dialog.show(getFragmentManager(), "dialog");
 	}
 
-	private void onAddMajorButtonClicked() {		
+	private void onAddLeafButtonClicked() {	
+		if(mSelectedRootGroup == null) {
+			Toast.makeText(this, "상위 그룹을 선택해주세요.", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
 		OneEditTwoButtonsDialog dialog = new OneEditTwoButtonsDialog();
 		dialog.setPrompt("비콘 그룹 생성");
 		dialog.setEditTitle("그룹명");
@@ -190,5 +201,10 @@ public class BeaconGroupActivity extends Activity {
 		
 		mSpinnerAdapter.clear();
 		mSpinnerAdapter.addAll(datas);
+	}
+	
+	@Override
+	protected void attachBaseContext(Context newBase) {
+		super.attachBaseContext(new CalligraphyContextWrapper(newBase));
 	}
 }

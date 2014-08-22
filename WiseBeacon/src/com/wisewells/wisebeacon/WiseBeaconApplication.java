@@ -3,7 +3,7 @@ package com.wisewells.wisebeacon;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import android.app.Application;
 
-public class WiasBeaconApplication extends Application {
+public class WiseBeaconApplication extends Application {
 
 	@Override
 	public void onCreate() {

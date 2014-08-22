@@ -229,11 +229,11 @@ containing a value of this type.
         public static final int string_beacon_group_management=0x7f04000f;
         public static final int string_cancel=0x7f04000e;
         public static final int string_location_information=0x7f04000a;
+        public static final int string_login_description=0x7f040013;
         public static final int string_proximity_information=0x7f04000b;
         public static final int string_save=0x7f04000d;
         public static final int string_sector_information=0x7f04000c;
         public static final int string_service_managerment=0x7f040010;
-        public static final int text_login_description=0x7f040013;
         public static final int title_activity_add_beacon_to_group=0x7f040007;
         public static final int title_activity_add_topology=0x7f040005;
         public static final int title_activity_detail_beacon=0x7f040011;
@@ -271,11 +271,17 @@ containing a value of this type.
 
 
 
+
+
+
     
 
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
+
+
+
 
 
 
@@ -299,13 +305,9 @@ containing a value of this type.
  All customizations that are NOT specific to a particular API-level can go here. 
          */
         public static final int AppTheme=0x7f050001;
-        public static final int box_style=0x7f050009;
-        public static final int dialog_button=0x7f050002;
-        public static final int dialog_cancel_button=0x7f050004;
-        public static final int dialog_content_layout=0x7f050006;
-        public static final int dialog_ok_button=0x7f050003;
-        public static final int dialog_title=0x7f050005;
-        public static final int spinner=0x7f050007;
-        public static final int title_section=0x7f050008;
+        public static final int box_style=0x7f050005;
+        public static final int spinner=0x7f050002;
+        public static final int title_section_1=0x7f050003;
+        public static final int title_section_2=0x7f050004;
     }
 }

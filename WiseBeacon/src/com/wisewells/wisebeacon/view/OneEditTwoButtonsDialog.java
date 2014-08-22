@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -59,6 +60,7 @@ public class OneEditTwoButtonsDialog extends DialogFragment {
 			}
 		});		
 		
+		getDialog().getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 		return v;
 	}
 	

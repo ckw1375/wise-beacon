@@ -20,7 +20,9 @@
     <string name="string_service_managerment">서비스 관리</string>
     <string name="title_activity_detail_beacon">DetailBeaconActivity</string>
     <string name="title_activity_sample_collection">SampleCollectionActivity</string>
-    <string name="text_login_description">
+    
+    
+    <string name="string_login_description">
         - 아이디/패스워드는 시스템 관리자로부터 발급받습니다.\n
         - 모바일의 경우 시스템에 등록된 핸드폰번호까지\n일치해야 로그인 가능합니다.\n
         - 로그인이 안도딜 시 시스템 관리자에게 문의하시기 바랍니다.\n

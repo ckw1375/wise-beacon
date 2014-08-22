@@ -2,53 +2,36 @@
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
     <style name="AppBaseTheme" parent="android:Theme.Light">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
+            backward-compatibility can go here.
         -->
     </style>
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->        
-    </style>
-
-    <style name="dialog_button">
-        <item name="android:background">@color/dialog_button_backgrond</item>
-        <item name="android:padding">5dp</item>
-    </style>
-
-    <style name="dialog_ok_button" parent="dialog_button">
-        <item name="android:src">@android:drawable/ic_menu_save</item>
-    </style>
-
-    <style name="dialog_cancel_button" parent="dialog_button">
-        <item name="android:src">@android:drawable/ic_menu_close_clear_cancel</item>
-    </style>
-
-    <style name="dialog_title">
-        <item name="android:background">@color/dialog_title</item>
-        <item name="android:padding">15dp</item>
-        <item name="android:width">300dp</item>
-        <item name="android:textColor">@android:color/white</item>
-    </style>
-
-    <style name="dialog_content_layout">
-        <item name="android:padding">10dp</item>
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
     <style name="spinner">
-        <item name="android:background">@drawable/background_spinner</item>
+        <item name="android:background">@drawable/dropdown</item>
         <item name="android:gravity">center</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_marginRight">17dp</item>
     </style>
 
-    <style name="title_section">
-        <item name="android:background">@color/title</item>
-        <item name="android:padding">8dp</item>
+    <style name="title_section_1" parent="@style/title_section_2">
+        <item name="android:background">@drawable/title_1_bg</item>
+    </style>
+    
+    <style name="title_section_2">
+        <item name="android:paddingLeft">22dp</item>
+        <item name="android:paddingRight">17dp</item>
+        <item name="android:layout_height">55dp</item>
         <item name="android:gravity">center_vertical</item>
     </style>
 

@@ -7,7 +7,7 @@
     tools:context="com.wisewells.wisebeacon.topology.DetailServiceActivity" >
 
     <LinearLayout
-        style="@style/title_section"
+        style="@style/title_section_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
