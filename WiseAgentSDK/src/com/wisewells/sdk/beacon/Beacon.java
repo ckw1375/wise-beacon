@@ -1,6 +1,5 @@
 package com.wisewells.sdk.beacon;
 
-import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -12,25 +11,25 @@ import com.wisewells.sdk.utils.L;
 public class Beacon implements Parcelable {
 
 	// static values(stored data)
-	private String code;
-	private String name;
-	private String beaconGroupCode;
-	private String macAddress;
-	private String proximityUUID;
-	private int major;
-	private int minor;
-	private double battery;
-	private double txPower;
-	private double measuredPower;
-	private double interval;
-	private String maker;
-	private String image;
-	private String updateDate;
-	private String updateTime;
+	private String mCode;
+	private String mName;
+	private String mBeaconGroupCode;
+	private String mMacAddress;
+	private String mProximityUUID;
+	private int mMajor;
+	private int mMinor;
+	private double mBattery;
+	private double mTxPower;
+	private double mMeasuredPower;
+	private double mInterval;
+	private String mMaker;
+	private String mImage;
+	private String mUpdateDate;
+	private String mUpdateTime;
 
 	// dynamic values(not sotred data)
-	private double rssi;
-	private double distance;
+	private double mRssi;
+	private double mDistance;
 
 	public static final Parcelable.Creator<Beacon> CREATOR = new Parcelable.Creator<Beacon>() {
 		public Beacon createFromParcel(Parcel source) {
@@ -43,44 +42,66 @@ public class Beacon implements Parcelable {
 
 	public Beacon(String proximityUUID, String name, String macAddress, 
 			int major, int minor, double measuredPower, double rssi, double distance) {
-		this.proximityUUID = BeaconUtils.normalizeProximityUUID(proximityUUID);
-		this.name = name;
-		this.macAddress = macAddress;
-		this.major = major;
-		this.minor = minor;
-		this.measuredPower = measuredPower;
-		this.rssi = rssi;
-		this.distance = distance;
+		mProximityUUID = BeaconUtils.normalizeProximityUUID(proximityUUID);
+		mName = name;
+		mMacAddress = macAddress;
+		mMajor = major;
+		mMinor = minor;
+		mMeasuredPower = measuredPower;
+		rssi = rssi;
+		distance = distance;
 	}
 
 	public Beacon(String macAddress, String uuid, int major, int minor, double measuredPower, double rssi) {
 		super();
-		this.macAddress = macAddress;
-		this.proximityUUID = uuid;
-		this.major = major;
-		this.minor = minor;
-		this.measuredPower = measuredPower;
-		this.rssi = rssi;
+		mMacAddress = macAddress;
+		mProximityUUID = uuid;
+		mMajor = major;
+		mMinor = minor;
+		mMeasuredPower = measuredPower;
+		rssi = rssi;
+	}
+	
+	public Beacon(String code, String name, String groupCode, String macAddress, 
+			String uuid, int major, int minor, double battery, double txPower,
+			double measuredPower, double interval, String maker, String image,
+			String updateDate, String updateTime) {
+		
+		mCode = code;
+		mName = name;
+		mBeaconGroupCode = groupCode;
+		mMacAddress = macAddress;
+		mProximityUUID = uuid;
+		mMajor = major;
+		mMinor = minor;
+		mBattery = battery;
+		mTxPower = txPower;
+		mMeasuredPower = measuredPower;
+		mInterval = interval;
+		mMaker = maker;
+		mImage = image;
+		mUpdateDate = updateDate;
+		mUpdateTime = updateTime;
 	}
 
 	private Beacon(Parcel in) {
-		this.code = in.readString();
-		this.name = in.readString();
-		this.beaconGroupCode = in.readString();
-		this.macAddress = in.readString();
-		this.proximityUUID = in.readString();	   
-		this.major = in.readInt();
-		this.minor = in.readInt();
-		this.battery = in.readDouble();
-		this.txPower = in.readDouble();
-		this.measuredPower = in.readDouble();
-		this.interval = in.readDouble();
-		this.maker = in.readString();
-		this.image = in.readString();
-		this.rssi = in.readDouble();
-		this.distance = in.readDouble();
-		this.updateDate = in.readString();
-		this.updateTime = in.readString();
+		mCode = in.readString();
+		mName = in.readString();
+		mBeaconGroupCode = in.readString();
+		mMacAddress = in.readString();
+		mProximityUUID = in.readString();	   
+		mMajor = in.readInt();
+		mMinor = in.readInt();
+		mBattery = in.readDouble();
+		mTxPower = in.readDouble();
+		mMeasuredPower = in.readDouble();
+		mInterval = in.readDouble();
+		mMaker = in.readString();
+		mImage = in.readString();
+		mRssi = in.readDouble();
+		mDistance = in.readDouble();
+		mUpdateDate = in.readString();
+		mUpdateTime = in.readString();
 	}
 
 	public int describeContents() {
@@ -88,75 +109,75 @@ public class Beacon implements Parcelable {
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(this.code);
-		dest.writeString(this.name);
-		dest.writeString(this.beaconGroupCode);
-		dest.writeString(this.macAddress);
-		dest.writeString(this.proximityUUID);		
-		dest.writeInt(this.major);
-		dest.writeInt(this.minor);
-		dest.writeDouble(this.battery);
-		dest.writeDouble(this.txPower);
-		dest.writeDouble(this.measuredPower);
-		dest.writeDouble(this.interval);
-		dest.writeString(this.maker);
-		dest.writeString(this.image);
-		dest.writeDouble(this.rssi);
-		dest.writeDouble(this.distance);
-		dest.writeString(this.updateDate);
-		dest.writeString(this.updateTime);
+		dest.writeString(mCode);
+		dest.writeString(mName);
+		dest.writeString(mBeaconGroupCode);
+		dest.writeString(mMacAddress);
+		dest.writeString(mProximityUUID);		
+		dest.writeInt(mMajor);
+		dest.writeInt(mMinor);
+		dest.writeDouble(mBattery);
+		dest.writeDouble(mTxPower);
+		dest.writeDouble(mMeasuredPower);
+		dest.writeDouble(mInterval);
+		dest.writeString(mMaker);
+		dest.writeString(mImage);
+		dest.writeDouble(mRssi);
+		dest.writeDouble(mDistance);
+		dest.writeString(mUpdateDate);
+		dest.writeString(mUpdateTime);
 	}
 
 	public String getProximityUUID() {
-		return this.proximityUUID;
+		return mProximityUUID;
 	}
 
 	public String getName() {
-		return this.name;
+		return mName;
 	}
 
 	public String getMacAddress() {
-		return this.macAddress;
+		return mMacAddress;
 	}
 
 	public String getCode() {
-		return this.code;
+		return mCode;
 	}
 
 	public int getMajor() {
-		return this.major;
+		return mMajor;
 	}
 
 	public int getMinor() {
-		return this.minor;
+		return mMinor;
 	}
 
 	public double getMeasuredPower() {
-		return this.measuredPower;
+		return mMeasuredPower;
 	}
 
 	public double getRssi() {
-		return this.rssi;
+		return mRssi;
 	}
 
 	public double getDistance() {
-		return this.distance;
+		return mDistance;
 	}
 	
 	public void setDistance(double distance) {
-		this.distance = distance;
+		distance = distance;
 	}
 
 	public Region getRegion() {
-		return new Region(proximityUUID, major, minor);
+		return new Region(mProximityUUID, mMajor, mMinor);
 	}
 
 	public void setCode(String code) {
-		this.code = code;
+		mCode = code;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		mName = name;
 	}
 
 	/**
@@ -165,11 +186,11 @@ public class Beacon implements Parcelable {
 	 * @param code
 	 */
 	 void setBeaconGroupCode(String code) {
-		 beaconGroupCode = code;
+		 mBeaconGroupCode = code;
 	 }
 
 	 public String toString() {
-		 return Objects.toStringHelper(this).add("macAddress", this.macAddress).add("proximityUUID", this.proximityUUID).add("major", this.major).add("minor", this.minor).add("measuredPower", this.measuredPower).add("rssi", this.rssi).toString();
+		 return Objects.toStringHelper(this).add("macAddress", mMacAddress).add("proximityUUID", mProximityUUID).add("major", mMajor).add("minor", mMinor).add("measuredPower", mMeasuredPower).add("rssi", mRssi).toString();
 	 }
 
 	 public boolean equals(Object o) {
@@ -178,19 +199,19 @@ public class Beacon implements Parcelable {
 
 		 Beacon beacon = (Beacon)o;
 
-		 if (this.major != beacon.major) return false;
-		 if (this.minor != beacon.minor) return false;
-		 return this.proximityUUID.equals(beacon.proximityUUID);
+		 if (mMajor != beacon.mMajor) return false;
+		 if (mMinor != beacon.mMinor) return false;
+		 return mProximityUUID.equals(beacon.mProximityUUID);
 	 }
 
 	 public int hashCode() {
-		 int result = this.proximityUUID.hashCode();
-		 result = 31 * result + this.major;
-		 result = 31 * result + this.minor;
+		 int result = mProximityUUID.hashCode();
+		 result = 31 * result + mMajor;
+		 result = 31 * result + mMinor;
 		 return result;
 	 }
 
 	 public void setHadwareAddress() {
-		 L.w("Beacon Address set [ UUID : " + proximityUUID + " major : " + major + " minor : " + minor + "]");
+		 L.w("Beacon Address set [ UUID : " + mProximityUUID + " major : " + mMajor + " minor : " + mMinor + "]");
 	 }
 }

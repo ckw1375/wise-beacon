@@ -1,6 +1,5 @@
 package com.wisewells.sdk.beacon;
 
-import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,22 +10,20 @@ public class BeaconGroup implements Parcelable{
 	public static final int DEPTH_ROOT = 1;
 	public static final int DEPTH_LEAF = 2;
 	
-	private int depth;	// 1 or 2
-	private String name;
-	private String code;
-	private String parentCode;	
-	private String uuid;
-	private Integer major;
-	private String updateDate;
-	private String updateTime;
+	private int mDepth;	// 1 or 2
+	private String mName;
+	private String mCode;
+	private String mParentCode;	
+	private String mUuid;
+	private Integer mMajor;
+	private String mUpdateDate;
+	private String mUpdateTime;
 	
 	public static final Parcelable.Creator<BeaconGroup> CREATOR = new Creator<BeaconGroup>() {
-		
 		@Override
 		public BeaconGroup[] newArray(int size) {
 			return new BeaconGroup[size];
 		}
-		
 		@Override
 		public BeaconGroup createFromParcel(Parcel source) {
 			return new BeaconGroup(source);
@@ -34,31 +31,40 @@ public class BeaconGroup implements Parcelable{
 	};
 
 	public BeaconGroup(int depth, String name) {
-		if(depth > DEPTH_LEAF || depth < 1)
-			throw new RuntimeException("BeaconGroup depth can be 1 or 2");
-		this.depth = depth;
-		this.name = name;
+		if(depth > DEPTH_LEAF || depth < DEPTH_ROOT)
+			throw new RuntimeException("BeaconGroup depth is wrong");
+		mDepth = depth;
+		mName = name;
+	}
+	
+	public BeaconGroup(int depth, String name, String code, String parentCode,
+			String uuid, int major) {
+		mDepth = depth;
+		mName = name;
+		mCode = code;
+		mParentCode = parentCode;
+		mUuid = uuid;
+		mMajor = major;
+	}
+	
+	public BeaconGroup(int depth, String name, String code, String parentCode, 
+			String uuid, int major, String updateDate, String updateTime) {
+		this(depth, name, code, parentCode, uuid, major);
+		mUpdateDate = updateDate;
+		mUpdateTime = updateTime;
 	}
 
-	public BeaconGroup(int depth, String name, String code, String parentCode,
-			String uuid, Integer major) {
-		this.depth = depth;
-		this.name = name;
-		this.code = code;
-		this.parentCode = parentCode;
-		this.uuid = uuid;
-		this.major = major;
-	}
+	
 
 	private BeaconGroup(Parcel in) {
-		depth = in.readInt();
-		code = in.readString();
-		name = in.readString();
-		parentCode = in.readString();
-		uuid = in.readString();
-		major = (Integer) in.readSerializable();
-		updateDate = in.readString();
-		updateTime = in.readString();
+		mDepth = in.readInt();
+		mCode = in.readString();
+		mName = in.readString();
+		mParentCode = in.readString();
+		mUuid = in.readString();
+		mMajor = (Integer) in.readSerializable();
+		mUpdateDate = in.readString();
+		mUpdateTime = in.readString();
 	}
 	
 	
@@ -69,35 +75,35 @@ public class BeaconGroup implements Parcelable{
 	
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(depth);
-		dest.writeString(code);
-		dest.writeString(name);
-		dest.writeString(parentCode);
-		dest.writeString(uuid);
-		dest.writeSerializable(major);
-		dest.writeString(updateDate);
-		dest.writeString(updateTime);
+		dest.writeInt(mDepth);
+		dest.writeString(mCode);
+		dest.writeString(mName);
+		dest.writeString(mParentCode);
+		dest.writeString(mUuid);
+		dest.writeSerializable(mMajor);
+		dest.writeString(mUpdateDate);
+		dest.writeString(mUpdateTime);
 	}
 	
 	@Override
 	public String toString() {
-		return this.name + "(" + this.code + ")";
+		return mName + "(" + mCode + ")";
 	}
 
 	public void addChild(BeaconGroup child) {
-		child.setParentCode(this.code);
+		child.setParentCode(mCode);
 	}
 	
 	public String getCode() {
-		return code;
+		return mCode;
 	}
 
 	public void setCode(String code) {
-		this.code = code;
+		mCode = code;
 	}
 
 	public String getParentCode() {
-		return parentCode;
+		return mParentCode;
 	}
 
 	/**
@@ -106,44 +112,44 @@ public class BeaconGroup implements Parcelable{
 	 * @param parent
 	 */
 	private void setParentCode(String parent) {
-		this.parentCode = parent;
+		mParentCode = parent;
 	}
 	
 	public void setName(String name) {
-		this.name = name;		
+		mName = name;		
 	}
 	
 	public String getName() {
-		return this.name;
+		return mName;
 	}
 
 	public String getUuid() {
-		return this.uuid;
+		return mUuid;
 	}
 
 	public void setUuid(String uuid) {
-		this.uuid = uuid;
+		mUuid = uuid;
 	}
 
 	public int getMajor() {
-		return this.major;
+		return mMajor;
 	}
 
 	public void setMajor(int major) {
-		this.major = major;
+		mMajor = major;
 	}
 
 	public int getDepth() {
-		return this.depth;
+		return mDepth;
 	}
 	
 	public boolean addBeacon(Beacon beacon) {
-		if(this.depth != DEPTH_LEAF) {
+		if(mDepth != DEPTH_LEAF) {
 			L.w("Can't add beacon. Only MAX_DEPTH BeaconGroup can add beacon.");
 			return false;
 		}
 		
-		beacon.setBeaconGroupCode(this.code);
+		beacon.setBeaconGroupCode(mCode);
 		return true;
 	}
 }

@@ -1,6 +1,5 @@
-package com.wisewells.wisebeacon.db;
+package com.wisewells.agent.db;
 
-import android.provider.BaseColumns;
 
 public class DB {
 	public static boolean intToBool(int val) {
@@ -18,7 +17,7 @@ public class DB {
 		public static final String NAME = "g_name";	/* VARCHAR(2000) */
 		public static final String DEPTH = "g_depth"; /* INT */
 		public static final String __PARENT_CODE = "g_parent_code"; /* VARCHAR(20) */
-		public static final String UUID = "g_uuid"; /* INT */
+		public static final String UUID = "g_uuid"; /* VARCHAR(200) */
 		public static final String MAJOR = "g_major"; /* INT */
 		public static final String UPDATE_DATE = "g_update_date"; /* VARCHAR(8) */
 		public static final String UPDATE_TIME = "g_update_time"; /* VARCHAR(6) */
@@ -36,7 +35,7 @@ public class DB {
 		public static final String MEASURED_POWER = "b_measure_pw"; /* FLOAT(10,4) */
 		public static final String INTERVAL = "b_interval"; /* FLOAT(10,4) */
 		public static final String BATTERY = "b_battery"; /* FLOAT(10,4) */
-		public static final String MINOR = "b_minor"; /* VARCHAR(20) */
+		public static final String MINOR = "b_minor"; /* INTEGER */
 		public static final String __GROUP_CODE = "b_group_code"; /* VARCHAR(20) */
 		public static final String UPDATE_DATE = "b_update_date"; /* VARCHAR(8) */
 		public static final String UPDATE_TIME = "b_update_time"; /* VARCHAR(6) */
@@ -64,5 +63,4 @@ public class DB {
 		public static final String UPDATE_TIME = "t_update_time";	/* VARCHAR(6) */ 
 	}
 	
-	public static class 
 }

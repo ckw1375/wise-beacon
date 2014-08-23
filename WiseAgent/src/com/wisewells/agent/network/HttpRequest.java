@@ -1,4 +1,4 @@
-package com.wisewells.wisebeacon.network;
+package com.wisewells.agent.network;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;

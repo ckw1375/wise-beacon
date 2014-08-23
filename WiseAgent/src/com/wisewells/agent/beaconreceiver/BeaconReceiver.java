@@ -19,6 +19,12 @@ import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.utils.BeaconUtils;
 import com.wisewells.sdk.utils.L;
 
+/**
+ * @file	BeaconReceiver.java
+ * @author 	Mingook
+ * @date	2014. 8. 23.
+ * @description
+ */
 public class BeaconReceiver {
 	
 	private Context mContext;

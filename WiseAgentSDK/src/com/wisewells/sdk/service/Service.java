@@ -7,52 +7,39 @@ import android.os.Parcelable;
 
 public class Service implements Parcelable{
 	
-	public static final int SERVICE_TREE_ROOT = 0;
-	public static final int SERVICE_TREE_NODE_1 = 1;
-//	public static final int SERVICE_TREE_NODE_2 = 2;
+	public static final int DEPTH_ROOT = 1;
+	public static final int DEPTH_LEAF = 2;
 	
-	private String name;
-	
-	private String code;
-	private String topologyCode;
-	private String parentCode;
-	private HashSet<String> childCodes;
-	/**
-	 * Zero is root node in tree data structure.
-	 */
-	private int treeLevel;
+	private String mCode;
+	private String mName;
+	private String mParentCode;
+	private String mUpdateDate;
+	private String mUpdateTime;
+	private int mDepth;
 	
 	public static final Parcelable.Creator<Service> CREATOR = new Creator<Service>() {
-		
 		@Override
 		public Service[] newArray(int size) {
 			return new Service[size];
 		}
-		
 		@Override
 		public Service createFromParcel(Parcel source) {
 			return new Service(source);
 		}
 	};
 
-	public Service(String name) {
-		init();
-		this.name = name;
+	public Service(int depth, String name) {
+		mDepth = depth;
+		mName = name;
 	}
 	
 	private Service(Parcel in) {
-		init();
-		name = in.readString();
-		code = in.readString();
-		topologyCode = in.readString();
-		parentCode = in.readString();		
-		childCodes = (HashSet<String>) in.readSerializable();
-		treeLevel = in.readInt();
-	}
-	
-	private void init() {
-		childCodes = new HashSet<String>();
-		treeLevel = SERVICE_TREE_ROOT;
+		mCode = in.readString();
+		mName = in.readString();
+		mParentCode = in.readString();
+		mUpdateDate = in.readString();
+		mUpdateTime = in.readString();
+		mDepth = in.readInt();
 	}
 	
 	@Override
@@ -62,52 +49,32 @@ public class Service implements Parcelable{
 	
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(name);
-		dest.writeString(code);
-		dest.writeString(topologyCode);
-		dest.writeString(parentCode);
-		dest.writeSerializable(childCodes);
-		dest.writeInt(treeLevel);
-	}
-	
-	public void attachTo(Topology t) {
-		topologyCode = t.getCode();
-		t.setServiceCode(this.code);
-	}
-	
-	public void addChild(Service s) {
-		childCodes.add(s.getCode());
-		
-		s.setTreeLevel(treeLevel + 1);
-		s.setParentCode(this.code);
+		dest.writeString(mCode);
+		dest.writeString(mName);
+		dest.writeString(mParentCode);
+		dest.writeString(mUpdateDate);
+		dest.writeString(mUpdateTime);
+		dest.writeInt(mDepth);
 	}
 
 	public String getName() {
-		return name;
+		return mName;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		mName = name;
 	}
 
 	public String getCode() {
-		return code;
+		return mCode;
 	}
 
 	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getTopologyCode() {
-		return topologyCode;
-	}
-
-	public void setTopologyCode(String topologyCode) {
-		this.topologyCode = topologyCode;
+		mCode = code;
 	}
 
 	public String getParentCode() {
-		return parentCode;
+		return mParentCode;
 	}
 
 	/**
@@ -116,22 +83,10 @@ public class Service implements Parcelable{
 	 * @param parentCode
 	 */
 	void setParentCode(String parentCode) {
-		this.parentCode = parentCode;
+		mParentCode = parentCode;
 	}
 
-	public HashSet<String> getChildCodes() {
-		return childCodes;
-	}
-
-	private void setChildCodes(HashSet<String> childCodes) {
-		this.childCodes = childCodes;
-	}
-	
-	public int getTreeLevel() {
-		return this.treeLevel;
-	}
-	
-	private void setTreeLevel(int level) {
-		this.treeLevel = level;
+	public int getDepth() {
+		return mDepth;
 	}
 }

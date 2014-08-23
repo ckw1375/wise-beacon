@@ -88,7 +88,7 @@ public class WiseAgent extends android.app.Service {
 
 	public IBinder onBind(Intent intent) {
 		String name = intent.getStringExtra("package name");
-		ApplicationConnector connector = new ApplicationConnector(name, mHandler);
+		ApplicationConnector connector = new ApplicationConnector(name);
 		mConnectorMap.put(name, connector);
 		
 		return mBinder;
@@ -281,7 +281,7 @@ public class WiseAgent extends android.app.Service {
 				t.setBeaconTracker(mTracker);
 			
 			L.i(topologies.size() + "");
-			connector.startTopologyChecker(listener, topologies);
+			connector.startTopologyChecker(topologies, listener);
 		}
 		
 		@Override

@@ -12,7 +12,13 @@ import com.wisewells.sdk.service.LocationTopology;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.L;
 
-class TopologyStateChecker {
+/**
+ * @file	TopologyStateChecker.java
+ * @author 	Mingook
+ * @date	2014. 8. 23.
+ * @description
+ */
+/* package */class TopologyStateChecker {
 	private final TopologyStateChangeListener mListener;
 	private final List<Topology> mTopologies;
 	private final Thread mThread;

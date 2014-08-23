@@ -8,17 +8,21 @@ import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.L;
 
+/**
+ * @file	ApplicationConnector.java
+ * @author 	Mingook
+ * @date	2014. 8. 23.
+ * @description
+ */
 public class ApplicationConnector {
 	private final String mAppPackageName;
-	private final Handler mAgentHandler;
 	private TopologyStateChecker mTopologyChecker;
 	
-	public ApplicationConnector(String packageName, Handler handler) {
+	public ApplicationConnector(String packageName) {
 		mAppPackageName = packageName;
-		mAgentHandler = handler;		
 	}
 	
-	public void startTopologyChecker(TopologyStateChangeListener listener, List<Topology> topologies) {
+	public void startTopologyChecker(List<Topology> topologies, TopologyStateChangeListener listener) {
 		mTopologyChecker = new TopologyStateChecker(listener, topologies);
 		mTopologyChecker.startCheck();
 	}

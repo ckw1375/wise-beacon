@@ -1,13 +1,15 @@
-package com.wisewells.wisebeacon.db;
+package com.wisewells.agent.db;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.wisewells.agent.db.DB.DBBeacon;
+import com.wisewells.agent.db.DB.DBBeaconGroup;
+import com.wisewells.agent.db.DB.DBService;
+import com.wisewells.agent.db.DB.DBTopology;
 import com.wisewells.sdk.utils.L;
-import com.wisewells.wisebeacon.db.DB.DBBeacon;
-import com.wisewells.wisebeacon.db.DB.DBBeaconGroup;
 
 public class DBOpenHelper extends SQLiteOpenHelper {
 	private final static String DB_NAME = "wisebeacon.db";
@@ -28,9 +30,12 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 				+ DBBeaconGroup.DEPTH + " INTEGER, "
 				+ DBBeaconGroup.__PARENT_CODE + " VARCHAR(20) "
 				+ "REFERENCES " + DBBeaconGroup.TABLE_NAME + "(" + DBBeaconGroup._CODE + ") ON DELETE CASCADE, "
+				+ DBBeaconGroup.UUID + " VARCHAR(200), "
+				+ DBBeaconGroup.MAJOR + " INTEGER, " 
 				+ DBBeaconGroup.UPDATE_DATE + " VARCHAR(8), " 
 				+ DBBeaconGroup.UPDATE_TIME + " VARCHAR(6)"
 				+ ");";
+		db.execSQL(beaconGroupSql);
 		
 		String beaconSql = 
 				"CREATE TABLE " + DBBeacon.TABLE_NAME + "("
@@ -43,23 +48,38 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 				+ DBBeacon.MEASURED_POWER + " FLOAT(10,4), "
 				+ DBBeacon.INTERVAL + " FLOAT(10,4), "
 				+ DBBeacon.BATTERY + " FLOAT(10,4), "
-				+ DBBeacon.MINOR + " VARCHAR(20), "
+				+ DBBeacon.MINOR + " INTEGER, "
 				+ DBBeacon.__GROUP_CODE + " VARCHAR(20) "
-				+ "REFERENCES " + DBBeaconGroup.TABLE_NAME + "(" + DBBeaconGroup._CODE + ") ON DELETE CASCADE"
+				+ "REFERENCES " + DBBeaconGroup.TABLE_NAME + "(" + DBBeaconGroup._CODE + ") ON DELETE CASCADE, "
+				+ DBBeacon.UPDATE_DATE + " VARCHAR(8), "
+				+ DBBeacon.UPDATE_TIME + " VARCHAR(6)"
 				+ ");";
-		
-		db.execSQL(beaconGroupSql);
 		db.execSQL(beaconSql);
 		
-		ContentValues groupValues = new ContentValues();
-		groupValues.put(DBBeaconGroup._CODE, "group");
-		groupValues.put(DBBeaconGroup.NAME, "지오다노");
-		groupValues.put(DBBeaconGroup.DEPTH, 1);
-		db.insert(DBBeaconGroup.TABLE_NAME, null, groupValues);
+		String serviceSql =
+				"CREATE TABLE " + DBService.TABLE_NAME + "("
+				+ DBService._CODE + " VARCHAR(20) PRIMARY KEY, "
+				+ DBService.NAME + " VARCHAR(200), "
+				+ DBService.DEPTH + " INTEGER, "
+				+ DBService.__PARENT_CODE + " VARCHAR(20) "
+				+ "REFERENCES " + DBService.TABLE_NAME + "(" + DBService._CODE + ") ON DELETE CASCADE, "
+				+ DBService.UPDATE_DATE + " VARCHAR(8), "
+				+ DBService.UPDATE_TIME + " VARCHAR(6)"
+				+ ");";
+		db.execSQL(serviceSql);
 		
-		ContentValues beaconValues = new ContentValues();
-		beaconValues.put(DBBeacon._CODE, "beacon");
-		beaconValues.put(DBBeacon.__GROUP_CODE, "group");
+		String topologySql = 
+				"CREATE TABLE " + DBTopology.TABLE_NAME + "("
+						+ DBTopology._ID + " INTEGER PRIMARY KEY, "
+						+ DBTopology.__SERVICE_CODE + " VARCHAR(20) "
+						+ "REFERENCES " + DBService.TABLE_NAME + "(" + DBService._CODE + ") ON DELETE CASCADE, "
+						+ DBTopology.__GROUP_CODE + " VARCHAR(20) "
+						+ "REFERENCES " + DBBeaconGroup.TABLE_NAME + "(" + DBBeaconGroup._CODE + ") ON DELETE CASCADE, "
+						+ DBTopology.TYPE + " VARCHAR(1), "
+						+ DBTopology.UPDATE_DATE + " VARCHAR(8), "
+						+ DBTopology.UPDATE_TIME + " VARCHAR(6)"
+						+ ");";
+		db.execSQL(topologySql);
 	}
 
 	@Override
@@ -75,7 +95,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		super.onOpen(db);
 		if (!db.isReadOnly()) {
 	        // Enable foreign key constraints
-	        db.execSQL("	");
+	        db.execSQL("PRAGMA foreign_keys=ON;");
 	    }
 	}
 }

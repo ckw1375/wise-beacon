@@ -14,14 +14,17 @@ public abstract class Topology implements Parcelable {
 	public static final int TYPE_PROXIMITY = 1;
 	public static final int TYPE_SECTOR = 2;
 	public static final int TYPE_LOCATION = 3;
-	
-	protected String mCode;
+
+	// store DB
+	protected int mId;
+	protected int mType;
 	protected String mBeaconGroupCode;
 	protected String mServiceCode;
-	protected int mType;
+	protected String mUpdateDate;
+	protected String mUpdateTime;
 	
 	/**
-	 * BeaconVector, BeaconTracker는 Agent에서만 생성된다.
+	 * BeaconVector, BeaconTracker는 Agent에서 생성된다.
 	 */
 	protected BeaconVector mBeaconVector;
 	protected BeaconTracker mTracker;
@@ -32,11 +35,13 @@ public abstract class Topology implements Parcelable {
 		mBeaconVector = beaconVector;
 	}
 
-	protected Topology(Parcel p) {
-		mCode = p.readString();
-		mBeaconGroupCode = p.readString();
-		mServiceCode = p.readString();
-		mType = p.readInt();
+	protected Topology(Parcel in) {
+		mId= in.readInt();
+		mType = in.readInt();
+		mBeaconGroupCode = in.readString();
+		mServiceCode = in.readString();
+		mUpdateDate = in.readString();
+		mUpdateTime = in.readString();
 	}
 
 	@Override
@@ -47,28 +52,16 @@ public abstract class Topology implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		L.w(getClass().getName());
-		dest.writeString(mCode);
+		dest.writeInt(mId);
+		dest.writeInt(mType);
 		dest.writeString(mBeaconGroupCode);
 		dest.writeString(mServiceCode);
-		dest.writeInt(mType);
+		dest.writeString(mUpdateDate);
+		dest.writeString(mUpdateTime);
 	}
 
-	public void attachTo(BeaconGroup bg) {
-		mBeaconGroupCode = bg.getCode();
-		bg.addTopologyCode(mCode);
-	}
-	
-	public void attachTo(Service service) {
-		mServiceCode = service.getCode();
-		service.setTopologyCode(mCode);
-	}
-
-	public String getCode() {
-		return mCode;
-	}
-
-	public void setCode(String code) {
-		this.mCode = code;
+	public int getId() {
+		return mId;
 	}
 
 	public String getBeaconGroupCode() {
