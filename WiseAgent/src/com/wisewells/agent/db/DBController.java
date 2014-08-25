@@ -19,6 +19,10 @@ public class DBController {
 		mDBHelper = new DBOpenHelper(context);
 	}
 	
+	public SQLiteDatabase getWritableDatabase() {
+		return mDBHelper.getWritableDatabase();
+	}
+	
 	public long insert(String table, ContentValues values) {
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
 		long result = db.insert(table, null, values);

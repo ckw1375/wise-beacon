@@ -1,5 +1,6 @@
 package com.wisewells.agent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -179,22 +180,9 @@ public class WiseAgent extends android.app.Service {
 
 		@Override
 		public void addProximityTopology(String serviceCode, String groupCode, 
-				String[] beaconCodes, double[] ranges) throws RemoteException {
+				List<String> beaconCodes, double[] ranges, RPCListener listener) throws RemoteException {
 			
-			if(beaconCodes.length != ranges.length) 
-				throw new RuntimeException("Beacon and range pair is not same");
-			
-			Double[] temp = new Double[ranges.length];
-			for(int i=0; i<ranges.length; i++) {
-				temp[i] = ranges[i];
-			}
-						
-			ProximityTopology t = new ProximityTopology(makeBeaconVector(Arrays.asList(beaconCodes)), temp);
-			t.setCode(WiseServer.requestCode());
-			
-			mWiseObjects.getService(serviceCode).attachTo(t);
-			mWiseObjects.getBeaconGroup(groupCode).attachTo(t);
-			mWiseObjects.putTopology(t);
+			mTopologyModel.addProximityTopology(serviceCode, groupCode, beaconCodes, ranges, listener);
 		}
 		
 		private BeaconVector makeBeaconVector(List<String> beaconCodes) {

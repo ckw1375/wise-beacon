@@ -4,11 +4,15 @@ import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.RemoteException;
 
-import com.wisewells.agent.db.DBController;
+import com.wisewells.agent.db.DB.DBProximity;
 import com.wisewells.agent.db.DB.DBTopology;
+import com.wisewells.agent.db.DBController;
 import com.wisewells.sdk.aidl.RPCListener;
+import com.wisewells.sdk.utils.L;
 
 public class TopologyModel {
 
@@ -19,18 +23,35 @@ public class TopologyModel {
 	}
 	
 	public void addProximityTopology(String serviceCode, String groupCode, List<String> beaconCodes, 
-			List<Double> ranges, RPCListener listener) throws RemoteException {
+			double[] ranges, RPCListener listener) throws RemoteException {
 		
-		if(addTopology(serviceCode, groupCode, "Proximity") < 0) {
-			listener.onFail("Add Topology is failed");
+		if(beaconCodes.size() != ranges.length) {
+			listener.onFail("Beacon and Range number is not same.");
 			return;
 		}
 		
-		ContentValues values = new ContentValues();
+		int topologyId = addTopology(serviceCode, groupCode, "Proximity");
+		
+		SQLiteDatabase db = mDB.getWritableDatabase();
+		try {
+			db.beginTransaction();
+			for(int i=0; i<beaconCodes.size(); i++) {
+				ContentValues values = new ContentValues();
+				values.put(DBProximity.__TOPOLOGY_ID, topologyId);
+				values.put(DBProximity.__BEACON_CODE, beaconCodes.get(i));
+				values.put(DBProximity.RANGE, ranges[i]);
+			}
+			db.setTransactionSuccessful();
+		} catch(SQLiteException e) {
+			L.e("Error while transaction.");
+		} finally {
+			db.endTransaction();
+			db.close();
+		}
 		
 	}
 	
-	private long addTopology(String serviceCode, String groupCode, String type) {
+	private int addTopology(String serviceCode, String groupCode, String type) {
 		int id = (int) (Math.random() * 100000);
 		
 		String date = Utils.getCurrentDate();
@@ -43,7 +64,8 @@ public class TopologyModel {
 		values.put(DBTopology.TYPE, type);
 		values.put(DBTopology.UPDATE_DATE, date);
 		values.put(DBTopology.UPDATE_TIME, time);
+		mDB.insert(DBTopology.TABLE_NAME, values);
 		
-		return mDB.insert(DBTopology.TABLE_NAME, values);
+		return id; 
 	}
 }

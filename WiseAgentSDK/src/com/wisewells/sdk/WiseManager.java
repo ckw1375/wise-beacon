@@ -204,9 +204,9 @@ public class WiseManager {
 	}
 
 	public void addProximityTopology(String serviceCode, String groupCode, 
-			String[] beaconCodes, double[] ranges) {
+			List<String> beaconCodes, double[] ranges, RPCListener listener) {
 		try {
-		mAgent.addProximityTopology(serviceCode, groupCode, beaconCodes, ranges);
+		mAgent.addProximityTopology(serviceCode, groupCode, beaconCodes, ranges, listener);
 		} catch(RemoteException e) {
 			L.e(EXCEPTION_MSG + "addProximityTopology");
 		}
