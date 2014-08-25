@@ -55,8 +55,8 @@ public class WiseAgent extends android.app.Service {
 	private BeaconReceiver mBeaconReceiver;
 
 	public WiseAgent() {
-		DBOpenHelper db = new DBOpenHelper(this);
-		db.getReadableDatabase();
+//		DBOpenHelper db = new DBOpenHelper(this);
+//		db.getReadableDatabase();
 		mConnectorMap = new HashMap<String, ApplicationConnector>();
 		mApplicationRequestingFindBeacon = new HashSet<String>();
 		mWiseObjects = new WiseObjects();
