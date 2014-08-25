@@ -179,7 +179,29 @@ public class Beacon implements Parcelable {
 	public void setName(String name) {
 		mName = name;
 	}
-
+	
+	public double getTxPower() {
+		return mTxPower;
+	}
+	
+	public double getBattery() {
+		return mBattery;
+	}
+	
+	public void setUpdateDate(String date) {
+		mUpdateDate = date;
+	}
+	
+	public void setUpdateTime(String time) {
+		mUpdateTime = time;
+	}
+	
+	public void setAddress(String uuid, int major, int minor) {
+		mProximityUUID = uuid;
+		mMajor = major;
+		mMinor = minor;
+	}
+	
 	/**
 	 * 이 함수는 직접 사용되지 않는다
 	 * MinorGroup에 addBeacon을 통해 beacon을 추가하면  추가된다.

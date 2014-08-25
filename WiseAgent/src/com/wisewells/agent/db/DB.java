@@ -63,4 +63,39 @@ public class DB {
 		public static final String UPDATE_TIME = "t_update_time";	/* VARCHAR(6) */ 
 	}
 	
+	public static class DBProximity {
+		public static final String TABLE_NAME = "Proximity";	
+		
+		public static final String __TOPOLOGY_ID = "prox_t_id";		/* INTEGER */
+		public static final String __BEACON_CODE = "prox_b_code";	/* VARCHAR(20) */
+		public static final String RANGE = "prox_range";	/* INTEGER */
+	}
+	
+	public static class DBSector {
+		public static final String TABLE_NAME = "Sector";	
+		
+		public static final String __TOPOLOGY_ID = "sect_t_id";	/* INTEGER */
+		public static final String _ID = "sect_id";		/* INTEGER */
+		public static final String NAME = "sect_name";	/* VARCHAR(200) */
+	}
+	
+	public static class DBSample {
+		public static final String TABLE_NAME = "Sample";
+		
+		public static final String __TOPOLOGY_ID = "samp_t_id";		/* INTEGER */
+		public static final String __SECTOR_ID = "samp_sect_id";	/* INTEGER */
+		public static final String __BEACON_CODE = "samp_b_code";	/* VARCHAR(20) */
+		public static final String _ID = "samp_id";		/* INTEGER */
+		public static final String RSSI = "samp_rssi";	/* DOUBLE */
+	}
+	
+	public static class DBLocation {
+		public static final String TABLE_NAME = "Location";
+		
+		public static final String __TOPOLOGY_ID = "loc_t_id";		/* INTEGER */
+		public static final String __BEACON_CODE = "loc_b_code";	/* VARCHAR(20) */
+		public static final String X_COORDINATE = "loc_x";	/* DOUBLE */
+		public static final String Y_COORDINATE = "loc_y";	/* DOUBLE */
+	}
+	
 }

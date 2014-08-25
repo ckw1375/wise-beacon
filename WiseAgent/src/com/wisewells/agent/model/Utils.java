@@ -1,5 +1,7 @@
 package com.wisewells.agent.model;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import android.database.Cursor;
@@ -23,5 +25,17 @@ public class Utils {
 		}
 		
 		return newColumns;
+	}
+	
+	public static String getCurrentDate() {
+		Date date = new Date(System.currentTimeMillis());
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		return format.format(date);
+	}
+	
+	public static String getCurrentTime() {
+		Date date = new Date(System.currentTimeMillis());
+		SimpleDateFormat format = new SimpleDateFormat("HHmmss");
+		return format.format(date);
 	}
 }

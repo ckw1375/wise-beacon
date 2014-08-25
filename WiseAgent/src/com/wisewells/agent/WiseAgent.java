@@ -1,15 +1,12 @@
 package com.wisewells.agent;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -18,11 +15,15 @@ import android.os.RemoteException;
 
 import com.wisewells.agent.beaconreceiver.BeaconReceiver;
 import com.wisewells.agent.connector.ApplicationConnector;
+import com.wisewells.agent.model.BeaconGroupModel;
+import com.wisewells.agent.model.BeaconModel;
+import com.wisewells.agent.model.ServiceModel;
+import com.wisewells.agent.model.TopologyModel;
 import com.wisewells.sdk.BeaconTracker;
 import com.wisewells.sdk.BeaconTracker.Filter;
-import com.wisewells.sdk.aidl.EditObjectListener;
 import com.wisewells.sdk.aidl.IWiseAgent;
 import com.wisewells.sdk.aidl.IWiseAgent.Stub;
+import com.wisewells.sdk.aidl.RPCListener;
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
@@ -48,17 +49,19 @@ public class WiseAgent extends android.app.Service {
 
 	private final HashMap<String, ApplicationConnector> mConnectorMap;
 	private final HashSet<String> mApplicationRequestingFindBeacon;
-	private final WiseObjects mWiseObjects;
 	private final HandlerThread mHandlerThread;
 	private final Handler mHandler;
 	private final BeaconTracker mTracker;
 	private BeaconReceiver mBeaconReceiver;
-	private ObjectManager mObjectManager;
+	
+	private BeaconModel mBeaconModel;
+	private BeaconGroupModel mGroupModel;
+	private ServiceModel mServiceModel;
+	private TopologyModel mTopologyModel;
 
 	public WiseAgent() {
 		mConnectorMap = new HashMap<String, ApplicationConnector>();
 		mApplicationRequestingFindBeacon = new HashSet<String>();
-		mWiseObjects = new WiseObjects();
 		mHandlerThread = new HandlerThread(THREAD_NAME_AGENT, 10);
 		mHandlerThread.start();
 		mHandler = new Handler(mHandlerThread.getLooper());
@@ -76,7 +79,11 @@ public class WiseAgent extends android.app.Service {
 			android.os.Debug.waitForDebugger();
 		L.i("Creating service");
 		mBeaconReceiver = new BeaconReceiver(this, mHandler, mTracker);
-		mObjectManager = new ObjectManager(this);
+		
+		mBeaconModel = new BeaconModel(this);
+		mGroupModel = new BeaconGroupModel(this);
+		mServiceModel = new ServiceModel(this);
+		mTopologyModel = new TopologyModel(this);
 	}
 
 	public void onDestroy() {
@@ -97,102 +104,50 @@ public class WiseAgent extends android.app.Service {
 	IWiseAgent.Stub mBinder = new Stub() {
 
 		@Override
-		public void addBeaconGroup(int depth, String name, String parentCode, EditObjectListener listener) throws RemoteException {
-//			BeaconGroup group = new BeaconGroup(depth, name);
-//			group.setUuid(WiseServer.requestUuid());
-//			group.setMajor(WiseServer.requestMajor());
-//			group.setCode(WiseServer.requestCode());
-//			
-//			if(parentCode != null) { 
-//				mWiseObjects.getBeaconGroup(parentCode).addChild(group);
-//			}
-//			mWiseObjects.putBeaconGroup(group);
-		
-			BeaconGroup group = mObjectManager.addBeaconGroup(depth, name, parentCode);
-			
-			Bundle b = new Bundle();
-			b.putParcelable(IpcUtils.BUNDLE_KEY, group);
-			listener.onEditSuccess("success add beacongroup", b);
+		public void addBeaconGroup(int depth, String name, String parentCode, RPCListener listener) throws RemoteException {
+			mGroupModel.add(depth, name, parentCode, listener);
 		}
 
 		@Override
 		public BeaconGroup getBeaconGroup(String code) throws RemoteException {
-			return mWiseObjects.getBeaconGroup(code);
+			return mGroupModel.get(code);
 		}
 
 		@Override
 		public List<BeaconGroup> getBeaconGroups(String parentCode) throws RemoteException {
-			return mObjectManager.getBeaconGroups(parentCode);
-//			return mWiseObjects.getBeaconGroups(parentCode);
+			return mGroupModel.getChildren(parentCode);
 		}
 
 		@Override
 		public List<BeaconGroup> getBeaconGroupsInAuthority() throws RemoteException {
-			return mWiseObjects.getBeaconGroupsInAuthority();
+			return mGroupModel.getAll();
 		}
 
 		@Override
 		public List<Beacon> getBeaconsInGroup(String groupCode) throws RemoteException {
-			
-			return mWiseObjects.getAllBeaconsInGroup(groupCode);
+			return mBeaconModel.getAllBeaconsInGroup(groupCode);
 		};
 
 		@Override
-		public void addBeaconsToBeaconGroup(String groupCode, List<Beacon> beacons) throws RemoteException {
-
-			BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
-			for(Beacon beacon : beacons) {				
-				int minor = WiseServer.requestMinor();
-				beacon.setCode(WiseServer.requestCode());
-				//beacon.setAddress // 실제 비콘 하드웨어 주소 변경 
-				group.addBeacon(beacon);	// 이때 에러체크하자
-
-				mWiseObjects.putBeacon(beacon);
-			}
-		}
-
-		@Override
-		public void addBeaconToBeaconGroup(String groupCode, Beacon beacon) throws RemoteException {
-
-			BeaconGroup group = mWiseObjects.getBeaconGroup(groupCode);
-			beacon.setCode(WiseServer.requestCode());
-
-			int minor = WiseServer.requestMinor();
-			group.addBeacon(beacon);
-			//하드웨어 주소 수정!!!!!!!!!!!!!!!!!!!!!!!
-
-			mWiseObjects.putBeacon(beacon);
-		}
-
-		@Override
-		public void addService(String name, String parentCode, EditObjectListener listener)
+		public void addBeaconToBeaconGroup(String groupCode, Beacon beacon, RPCListener listener) 
 				throws RemoteException {
+			mBeaconModel.addTo(groupCode, beacon, listener);
+		}
 
-			Service service = new Service(name);
-			service.setCode(WiseServer.requestCode());
-
-			if(parentCode != null) mWiseObjects.getService(parentCode).addChild(service);
-			mWiseObjects.putService(service);
-			
-			Bundle b = new Bundle();
-			b.putParcelable(IpcUtils.BUNDLE_KEY, service);
-			listener.onEditSuccess("Success Add Service", b);
+		@Override
+		public void addService(int depth, String name, String parentCode, RPCListener listener)
+				throws RemoteException {
+			mServiceModel.add(depth, name, parentCode, listener);
 		}
 
 		@Override
 		public List<Service> getRootServices() throws RemoteException {
-			return mWiseObjects.getRootServices();
+			return mServiceModel.getRootServices();
 		}
 		
 		@Override
 		public List<Service> getChildServices(String parentCode) throws RemoteException {
-			Set<String> codes = mWiseObjects.getService(parentCode).getChildCodes();
-			ArrayList<Service> willReturn = new ArrayList<Service>();
-			for(String code : codes) {
-				willReturn.add(mWiseObjects.getService(code));
-			}
-			
-			return willReturn;
+			return mServiceModel.getChildren(parentCode);
 		}
 
 		@Override

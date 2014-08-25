@@ -1,7 +1,5 @@
 package com.wisewells.sdk.service;
 
-import java.util.HashSet;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -31,6 +29,14 @@ public class Service implements Parcelable{
 	public Service(int depth, String name) {
 		mDepth = depth;
 		mName = name;
+	}
+	
+	public Service(int depth, String name, String code, String updateDate, String updateTime) {
+		mDepth = depth;
+		mName = name;
+		mCode = code;
+		mUpdateDate = updateDate;
+		mUpdateTime = updateTime;
 	}
 	
 	private Service(Parcel in) {

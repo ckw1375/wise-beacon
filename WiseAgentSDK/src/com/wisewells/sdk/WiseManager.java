@@ -13,8 +13,8 @@ import android.os.IBinder;
 import android.os.RemoteException;
 
 import com.estimote.sdk.internal.Preconditions;
-import com.wisewells.sdk.aidl.EditObjectListener;
 import com.wisewells.sdk.aidl.IWiseAgent;
+import com.wisewells.sdk.aidl.RPCListener;
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
@@ -111,32 +111,42 @@ public class WiseManager {
 	public void addBeaconGroup(int depth, String name, String parentCode, EditBeaconGroupListener listener) {
 		mEditGroupListener = Preconditions.checkNotNull(listener, "Listener must be not null");
 		try {
-			mAgent.addBeaconGroup(depth, name, parentCode, new EditObjectListener.Stub() {
+			mAgent.addBeaconGroup(depth, name, parentCode, new RPCListener.Stub() {
 				@Override
-				public void onEditSuccess(String result, final Bundle data) throws RemoteException {
-					L.d("TEST");
+				public void onSuccess(final Bundle data) throws RemoteException {
 					mHandler.post(new Runnable() {
 						@Override
 						public void run() {
-							mEditGroupListener.onEditSuccess(IpcUtils.getParcelableFromBundle(BeaconGroup.class, data));		
+							mEditGroupListener.onSuccess(IpcUtils.getParcelableFromBundle(BeaconGroup.class, data));		
 						}
 					});
 				}
 				@Override
-				public void onEditFail(String result) throws RemoteException {
+				public void onFail(String err) throws RemoteException {
 				}
 			});
 		} catch (RemoteException e) {
 			L.e(EXCEPTION_MSG + "addBeaconGroup");
 		}
 	}
-	
-	public void addBeaconsToBeaconGroup(String groupCode, ArrayList<Beacon> beacons) throws RemoteException {
-		mAgent.addBeaconsToBeaconGroup(groupCode, beacons);
-	}
 
-	public void addBeaconToBeaconGroup(String groupCode, Beacon beacon) throws RemoteException {
-		mAgent.addBeaconToBeaconGroup(groupCode, beacon);
+	public void addBeaconToBeaconGroup(String groupCode, Beacon beacon, EditBeaconListener listener) throws RemoteException {
+		mEditBeaconListener = listener;
+		try {
+			mAgent.addBeaconToBeaconGroup(groupCode, beacon, new RPCListener.Stub() {
+				@Override
+				public void onSuccess(Bundle data) throws RemoteException {
+					mEditBeaconListener.onSuccess(IpcUtils.getParcelableFromBundle(Beacon.class, data));
+				}
+				
+				@Override
+				public void onFail(String err) throws RemoteException {
+				}
+			});
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "addBeaconToBeaconGroup");
+		}
+		
 	}
 	
 	public List<BeaconGroup> getBeaconGroups(String parentCode) {
@@ -231,25 +241,24 @@ public class WiseManager {
 	@SuppressWarnings("unused")
 	private int _______________Service_______________;
 	
-	public void addService(String name, String parentCode, EditServiceListener listener) {
+	public void addService(int depth, String name, String parentCode, EditServiceListener listener) {
 		mEditServiceListener = Preconditions.checkNotNull(listener, "Listener must be not null");
 
 		try {
-			mAgent.addService(name, parentCode, new EditObjectListener.Stub() {
+			mAgent.addService(depth, name, parentCode, new RPCListener.Stub() {
 				@Override
-				public void onEditSuccess(String result, Bundle data) throws RemoteException {
+				public void onSuccess(Bundle data) throws RemoteException {
 					final Service s = IpcUtils.getParcelableFromBundle(Service.class, data);
 					mHandler.post(new Runnable() {
 						@Override
 						public void run() {
-							mEditServiceListener.onEditSuccess(s);
+							mEditServiceListener.onSuccess(s);
 						}
 					});
 				}
 
 				@Override
-				public void onEditFail(String result) throws RemoteException {
-					L.e(result);
+				public void onFail(String err) throws RemoteException {
 				}
 			});
 		} catch (RemoteException e) {
@@ -401,23 +410,23 @@ public class WiseManager {
 	}
 	
 	public interface EditServiceListener {
-		public void onEditSuccess(Service service); 
-		public void onEditFail();
+		public void onSuccess(Service service); 
+		public void onFail();
 	}
 	
 	public interface EditBeaconGroupListener {
-		public void onEditSuccess(BeaconGroup beaconGroup); 
-		public void onEditFail();
+		public void onSuccess(BeaconGroup beaconGroup); 
+		public void onFail();
 	}
 	
 	public interface EditBeaconListener {
-		public void onEditSuccess(Beacon beacon); 
-		public void onEditFail();
+		public void onSuccess(Beacon beacon); 
+		public void onFail();
 	}
 
 	public interface EditTopologyListener {
-		public void onEditSuccess(Topology topology); 
-		public void onEditFail();
+		public void onSuccess(Topology topology); 
+		public void onFail();
 	}
 	
 	public interface TopologyStateListener {

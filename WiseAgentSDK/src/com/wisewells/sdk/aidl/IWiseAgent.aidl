@@ -10,7 +10,7 @@ import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.service.Service;
 import com.wisewells.sdk.service.Sector;
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
-import com.wisewells.sdk.aidl.EditObjectListener;
+import com.wisewells.sdk.aidl.RPCListener;
 
 /*
  *	AIDL에서는 Parcel.CREATOR을 클래스에서 직접 지정해줘서, 다형성을 살릴 수 없다.
@@ -20,9 +20,8 @@ import com.wisewells.sdk.aidl.EditObjectListener;
 interface IWiseAgent {
 
 	// BeaconGroup
-	void addBeaconGroup(int depth, String name, String parentCode, in EditObjectListener listener);
-	void addBeaconsToBeaconGroup(String groupCode, in List<Beacon> beacons); // 이거 안쓰이나???
-	void addBeaconToBeaconGroup(String groupCode, in Beacon beacon);
+	void addBeaconGroup(int depth, String name, String parentCode, in RPCListener listener);
+	void addBeaconToBeaconGroup(String groupCode, in Beacon beacon, in RPCListener listener);
 	List<BeaconGroup> getBeaconGroups(String parentCode);
 	List<BeaconGroup> getBeaconGroupsInAuthority();
 	BeaconGroup getBeaconGroup(String code);
@@ -39,7 +38,7 @@ interface IWiseAgent {
 	boolean addSector(String topologyCode, String sectorName);
 	
 	// Service
-	void addService(String name, String parentCode, in EditObjectListener listener);
+	void addService(int depth, String name, String parentCode, in RPCListener listener);
 	List<Service> getRootServices();
 	List<Service> getChildServices(String parentCode);
 	

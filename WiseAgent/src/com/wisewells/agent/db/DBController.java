@@ -1,4 +1,4 @@
-com.wisewells.agent.db;
+package com.wisewells.agent.db;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -55,8 +55,12 @@ public class DBController {
 	
 	public Cursor query(String table, String[] columns, String selectionColumn, String selectionArg) {
 		SQLiteDatabase db = mDBHelper.getReadableDatabase();
-		String selection = selectionColumn + "=?";
-		String[] selectionArgs = { selectionArg }; 
+		String selection = selectionColumn + "='?'";; 
+		String[] selectionArgs = { selectionArg };
+		if(selectionArg == null) {
+			selection = selectionColumn + " IS NULL";
+		}
+		
 		Cursor c = db.query(table, columns, selection, selectionArgs, null, null, null);
 		return c;
 	}
