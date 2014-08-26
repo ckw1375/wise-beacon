@@ -45,34 +45,30 @@ public class BeaconModel {
 		mGroupModel = new BeaconGroupModel(context);
 	}
 	
+	public Beacon get(String code) {
+		Cursor c = mDB.query(DBBeacon.TABLE_NAME, ALL_COLUMNS, DBBeacon._CODE, code);
+		if(!c.moveToNext()) {
+			return null;
+		}
+		
+		int[] indexes = Utils.getColumnIndexes(ALL_COLUMNS, c);
+		return makeBeacon(c, indexes);
+	}
+	
 	public ArrayList<Beacon> getAllBeaconsInGroup(String groupCode) {
 		ArrayList<Beacon> result = new ArrayList<Beacon>();
+		
+		BeaconGroup group = mGroupModel.get(groupCode);
+		if(group.getDepth() != BeaconGroup.DEPTH_LEAF) {
+			result.addAll(getAllBeaconsInGroup(groupCode));
+		}
 		
 		Cursor c = mDB.joinQuery(DBBeacon.TABLE_NAME, DBBeaconGroup.TABLE_NAME, 
 				DBBeacon.__GROUP_CODE, DBBeaconGroup._CODE);
 
-		int[] idx = Utils.getColumnIndexes(ALL_COLUMNS, c);
+		int[] indexes = Utils.getColumnIndexes(ALL_COLUMNS, c);
 		while(c.moveToNext()) {
-			String code = c.getString(idx[0]);
-			String name = c.getString(idx[1]);
-			String maker = c.getString(idx[2]);
-			String image = c.getString(idx[3]);
-			String mac = c.getString(idx[4]);
-			float tx = c.getFloat(idx[5]);
-			float measured = c.getFloat(idx[6]);
-			float interval = c.getFloat(idx[7]);
-			float battery = c.getFloat(idx[8]);
-			int minor = c.getInt(idx[9]);
-			String g_code = c.getString(idx[10]);
-			String date = c.getString(idx[11]);
-			String time = c.getString(idx[12]);
-			String uuid = c.getString(idx[13]);
-			int major = c.getInt(idx[14]);
-			
-			Beacon beacon = new Beacon(code, name, g_code, mac, 
-					uuid, major, minor, battery, tx, measured, 
-					interval, maker, image, date, time);
-			result.add(beacon);
+			result.add(makeBeacon(c, indexes));
 		}
 		
 		c.close();
@@ -122,8 +118,25 @@ public class BeaconModel {
 		listener.onSuccess(data);
 	}
 	
-	public interface ResultListener {
-		void onSuccess(Beacon beacon);
-		void onFail();
+	private Beacon makeBeacon(Cursor c, int[] indexes) {
+		String code = c.getString(indexes[0]);
+		String name = c.getString(indexes[1]);
+		String maker = c.getString(indexes[2]);
+		String image = c.getString(indexes[3]);
+		String mac = c.getString(indexes[4]);
+		float tx = c.getFloat(indexes[5]);
+		float measured = c.getFloat(indexes[6]);
+		float interval = c.getFloat(indexes[7]);
+		float battery = c.getFloat(indexes[8]);
+		int minor = c.getInt(indexes[9]);
+		String g_code = c.getString(indexes[10]);
+		String date = c.getString(indexes[11]);
+		String time = c.getString(indexes[12]);
+		String uuid = c.getString(indexes[13]);
+		int major = c.getInt(indexes[14]);
+		
+		return new Beacon(code, name, g_code, mac, 
+				uuid, major, minor, battery, tx, measured, 
+				interval, maker, image, date, time);
 	}
 }

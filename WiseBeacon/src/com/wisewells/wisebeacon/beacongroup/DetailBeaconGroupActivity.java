@@ -44,7 +44,7 @@ public class DetailBeaconGroupActivity extends Activity {
 		mMajorGroupNameView.setText(mSelectedBeaconGroup.getName());
 		
 		mBeaconNumberInGroupView = (TextView) findViewById(R.id.txt_beacon_number_in_group);
-		mBeaconNumberInGroupView.setText(String.valueOf(mSelectedBeaconGroup.getChildCodes().size()));
+//		mBeaconNumberInGroupView.setText(String.valueOf(mSelectedBeaconGroup.getChildCodes().size()));
 		
 		mAddBeaconButton = (Button) findViewById(R.id.btn_add_beacon_to_group);
 		mAddBeaconButton.setOnClickListener(new View.OnClickListener() {

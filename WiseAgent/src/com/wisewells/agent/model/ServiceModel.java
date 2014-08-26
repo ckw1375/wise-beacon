@@ -10,6 +10,7 @@ import android.os.RemoteException;
 
 import com.wisewells.agent.WiseServer;
 import com.wisewells.agent.db.DB.DBService;
+import com.wisewells.agent.db.DB.DBTopology;
 import com.wisewells.agent.db.DBController;
 import com.wisewells.sdk.aidl.RPCListener;
 import com.wisewells.sdk.service.Service;
@@ -23,7 +24,7 @@ public class ServiceModel {
 		DBService.DEPTH,
 		DBService.__PARENT_CODE,
 		DBService.UPDATE_DATE,
-		DBService.UPDATE_TIME
+		DBService.UPDATE_TIME,
 	};
 	
 	private final DBController mDB;

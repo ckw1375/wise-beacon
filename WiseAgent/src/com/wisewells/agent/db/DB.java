@@ -58,7 +58,7 @@ public class DB {
 		public static final String _ID = "t_id";	/* INTEGER */
 		public static final String __SERVICE_CODE = "t_service_code";	/* VARCHAR(20) */
 		public static final String __GROUP_CODE = "t_group_code";	/* VARCHAR(20) */
-		public static final String TYPE = "t_type";	/* VARCHAR(1) */
+		public static final String TYPE = "t_type";	/* INTEGER */
 		public static final String UPDATE_DATE = "t_update_date";	/* VARCHAR(8) */
 		public static final String UPDATE_TIME = "t_update_time";	/* VARCHAR(6) */ 
 	}

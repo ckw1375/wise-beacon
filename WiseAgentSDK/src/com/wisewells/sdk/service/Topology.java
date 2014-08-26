@@ -1,5 +1,7 @@
 package com.wisewells.sdk.service;
 
+import java.util.UUID;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -12,8 +14,8 @@ import com.wisewells.sdk.utils.L;
 public abstract class Topology implements Parcelable {
 
 	public static final int TYPE_PROXIMITY = 1;
-	public static final int TYPE_SECTOR = 2;
-	public static final int TYPE_LOCATION = 3;
+	public static final int TYPE_LOCATION = 2;
+	public static final int TYPE_SECTOR = 3;
 
 	// store DB
 	protected int mId;
@@ -29,10 +31,19 @@ public abstract class Topology implements Parcelable {
 	protected BeaconVector mBeaconVector;
 	protected BeaconTracker mTracker;
 	
-	protected Topology(int type, BeaconVector beaconVector) {
-		
+//	protected Topology(int type, BeaconVector beaconVector) {
+//		
+//		mType = type;
+//		mBeaconVector = beaconVector;
+//	}
+	
+	protected Topology(int id, int type, String groupCode, String serviceCode, String updateDate, String updateTime) {
+		mId = id;
 		mType = type;
-		mBeaconVector = beaconVector;
+		mBeaconGroupCode = groupCode;
+		mServiceCode = serviceCode;
+		mUpdateDate = updateDate;
+		mUpdateTime = updateTime;
 	}
 
 	protected Topology(Parcel in) {

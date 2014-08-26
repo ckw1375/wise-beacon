@@ -23,6 +23,6 @@ public class BeaconGroupListRow extends FrameLayout {
 
 	public void setData(BeaconGroup beaconGroup) {
 		mNameView.setText(beaconGroup.getName());
-		mChildCountView.setText(String.valueOf(beaconGroup.getChildCodes().size()));
+//		mChildCountView.setText(String.valueOf(beaconGroup.getChildCodes().size()));
 	}
 }

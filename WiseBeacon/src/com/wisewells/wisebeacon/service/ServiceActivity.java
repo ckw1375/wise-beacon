@@ -108,14 +108,13 @@ public class ServiceActivity extends Activity {
 			@Override
 			public void onOkButtonClicked(String str) {
 
-				mWiseManager.addService(str, null, new EditServiceListener() {
+				mWiseManager.addService(Service.DEPTH_ROOT, str, null, new EditServiceListener() {
 					@Override
-					public void onEditSuccess(Service service) {
+					public void onSuccess(Service service) {
 						mSpinnerAdapter.add(new ServiceSpinnerData(service));
 					}
 					@Override
-					public void onEditFail() {
-
+					public void onFail() {
 					}
 				}); 
 
@@ -132,15 +131,14 @@ public class ServiceActivity extends Activity {
 		dialog.setDialogListener(new OneEditTwoButtonsDialog.DialogListener() {
 			@Override
 			public void onOkButtonClicked(String str) {
-				mWiseManager.addService(str, mSelectedRootService.getCode(), new EditServiceListener() {
+				mWiseManager.addService(Service.DEPTH_LEAF, str, mSelectedRootService.getCode(), new EditServiceListener() {
 					@Override
-					public void onEditSuccess(Service service) {
+					public void onSuccess(Service service) {
 						mListAdapter.add(new ServiceListData(mWiseManager, service));
 						mListAdapter.notifyDataSetChanged();
 					}
 					@Override
-					public void onEditFail() {
-
+					public void onFail() {
 					}
 				});
 			}

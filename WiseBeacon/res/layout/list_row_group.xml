@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/table_item"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/holo_orange_dark"
-    android:orientation="horizontal"
-    android:padding="20dp" >
+    android:layout_height="40dp"
+    android:orientation="horizontal" >
 
     <TextView
         android:id="@+id/group_txt_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-
-    <TextView
-        android:id="@+id/textView2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:text="TextView"
+        android:textColor="#464646"
+        android:textSize="12dp" />
 
     <TextView
         android:id="@+id/group_txt_child_count"
-        android:layout_width="wrap_content"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:gravity="center_horizontal"
+        android:text="3"
+        android:textColor="#464646"
+        android:textSize="12dp" />
+
+    <ImageView
+        android:id="@+id/img_connection_state"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_connect" />
 
 </LinearLayout>

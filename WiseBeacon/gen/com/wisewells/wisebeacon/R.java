@@ -75,47 +75,49 @@ containing a value of this type.
         public static final int icon_zoom=0x7f02001a;
         public static final int login_deco=0x7f02001b;
         public static final int main_sel=0x7f02001c;
-        public static final int pop_bottom_bg=0x7f02001d;
-        public static final int pop_top_bg=0x7f02001e;
-        public static final int selector_popup_menu=0x7f02001f;
-        public static final int table_top_bg=0x7f020020;
-        public static final int text_box=0x7f020021;
-        public static final int title_1_bg=0x7f020022;
-        public static final int title_2_bg=0x7f020023;
-        public static final int top_bg=0x7f020024;
-        public static final int top_margin=0x7f020025;
+        public static final int manager_icon=0x7f02001d;
+        public static final int pop_bottom_bg=0x7f02001e;
+        public static final int pop_top_bg=0x7f02001f;
+        public static final int selector_popup_menu=0x7f020020;
+        public static final int table_top_bg=0x7f020021;
+        public static final int text_box=0x7f020022;
+        public static final int title_1_bg=0x7f020023;
+        public static final int title_2_bg=0x7f020024;
+        public static final int top_bg=0x7f020025;
+        public static final int top_margin=0x7f020026;
     }
     public static final class id {
         public static final int FrameLayout1=0x7f0a0031;
         public static final int ImageView01=0x7f0a0028;
-        public static final int Img_sample_reset=0x7f0a0053;
+        public static final int Img_sample_reset=0x7f0a0054;
         public static final int LinearLayout1=0x7f0a0000;
-        public static final int TextView01=0x7f0a0013;
-        public static final int TextView02=0x7f0a0015;
-        public static final int TextView03=0x7f0a0018;
-        public static final int action_settings=0x7f0a0059;
+        public static final int TextView01=0x7f0a0014;
+        public static final int TextView02=0x7f0a0016;
+        public static final int TextView03=0x7f0a0019;
+        public static final int aDD1=0x7f0a005a;
+        public static final int action_settings=0x7f0a005b;
         public static final int add_topology_row_background=0x7f0a003e;
         public static final int add_topology_txt_child_number=0x7f0a0040;
         public static final int add_topology_txt_group_name=0x7f0a003f;
         public static final int btn_add_beacon_to_group=0x7f0a0006;
         public static final int btn_add_sector=0x7f0a002a;
-        public static final int btn_cancel=0x7f0a001f;
-        public static final int btn_display_list=0x7f0a001c;
+        public static final int btn_cancel=0x7f0a0020;
+        public static final int btn_display_list=0x7f0a001d;
         public static final int btn_manual=0x7f0a0025;
         public static final int btn_reset_all_samples=0x7f0a002b;
-        public static final int btn_save=0x7f0a001e;
-        public static final int custom_spinner_beacon_group=0x7f0a0017;
-        public static final int custom_spinner_topology_type=0x7f0a001a;
+        public static final int btn_save=0x7f0a001f;
+        public static final int custom_spinner_beacon_group=0x7f0a0018;
+        public static final int custom_spinner_topology_type=0x7f0a001b;
         public static final int custom_spinner_uuidgroup=0x7f0a0009;
         public static final int custom_title_spinner=0x7f0a002d;
-        public static final int done=0x7f0a005a;
+        public static final int done=0x7f0a005c;
         public static final int editText1=0x7f0a0026;
         public static final int editText2=0x7f0a0027;
         public static final int edit_1=0x7f0a0034;
-        public static final int edit_range=0x7f0a004e;
-        public static final int edit_x_coordinate=0x7f0a004a;
-        public static final int edit_y_coordinate=0x7f0a004b;
-        public static final int group_listview=0x7f0a000c;
+        public static final int edit_range=0x7f0a004f;
+        public static final int edit_x_coordinate=0x7f0a004b;
+        public static final int edit_y_coordinate=0x7f0a004c;
+        public static final int group_listview=0x7f0a000f;
         public static final int group_txt_child_count=0x7f0a0049;
         public static final int group_txt_name=0x7f0a0048;
         public static final int imageView1=0x7f0a0029;
@@ -124,26 +126,27 @@ containing a value of this type.
         public static final int img_add_service=0x7f0a002f;
         public static final int img_add_uuid_group=0x7f0a000a;
         public static final int img_cancel=0x7f0a0036;
+        public static final int img_connection_state=0x7f0a004a;
         public static final int img_done=0x7f0a003a;
-        public static final int img_home=0x7f0a0057;
+        public static final int img_home=0x7f0a0058;
         public static final int img_modify=0x7f0a0039;
         public static final int img_modify_sector=0x7f0a003c;
-        public static final int img_modify_service_info=0x7f0a0011;
+        public static final int img_modify_service_info=0x7f0a0012;
         public static final int img_ok=0x7f0a0035;
-        public static final int img_popup_menu=0x7f0a0054;
-        public static final int img_sample_state=0x7f0a0050;
-        public static final int layout_beacon_group_button=0x7f0a0020;
-        public static final int layout_fragment_container=0x7f0a001b;
-        public static final int layout_row_background=0x7f0a004c;
-        public static final int layout_save_cancel_group=0x7f0a001d;
-        public static final int layout_service_button=0x7f0a0022;
+        public static final int img_popup_menu=0x7f0a0055;
+        public static final int img_sample_state=0x7f0a0051;
+        public static final int layout_beacon_group_button=0x7f0a0021;
+        public static final int layout_fragment_container=0x7f0a001c;
+        public static final int layout_row_background=0x7f0a004d;
+        public static final int layout_save_cancel_group=0x7f0a001e;
+        public static final int layout_service_button=0x7f0a0023;
         public static final int list_beacon_in_group=0x7f0a0008;
         public static final int list_beacon_list=0x7f0a0007;
-        public static final int list_beacons_in_group=0x7f0a000f;
+        public static final int list_beacons_in_group=0x7f0a0011;
         public static final int list_dialog=0x7f0a0037;
         public static final int list_location_topology_setting=0x7f0a0038;
         public static final int list_low_rank_service=0x7f0a0030;
-        public static final int list_popup_menu=0x7f0a0058;
+        public static final int list_popup_menu=0x7f0a0059;
         public static final int list_proximity_topology=0x7f0a003b;
         public static final int list_sample_collection=0x7f0a002c;
         public static final int list_sector=0x7f0a003d;
@@ -152,30 +155,30 @@ containing a value of this type.
         public static final int row_major=0x7f0a0045;
         public static final int row_minor=0x7f0a0046;
         public static final int row_uuid=0x7f0a0044;
-        public static final int textView1=0x7f0a0010;
+        public static final int textView1=0x7f0a000c;
         public static final int textView2=0x7f0a0001;
         public static final int textView3=0x7f0a0003;
         public static final int textView4=0x7f0a000d;
-        public static final int textView5=0x7f0a0024;
+        public static final int textView5=0x7f0a000e;
         public static final int txt_beacon_distance=0x7f0a0042;
-        public static final int txt_beacon_group_name=0x7f0a0016;
+        public static final int txt_beacon_group_name=0x7f0a0017;
         public static final int txt_beacon_name=0x7f0a0041;
-        public static final int txt_beacon_number_in_group=0x7f0a000e;
-        public static final int txt_child_service_name=0x7f0a0014;
-        public static final int txt_description=0x7f0a0056;
+        public static final int txt_beacon_number_in_group=0x7f0a0010;
+        public static final int txt_child_service_name=0x7f0a0015;
+        public static final int txt_description=0x7f0a0057;
         public static final int txt_dialog_title=0x7f0a0032;
-        public static final int txt_distance=0x7f0a004d;
+        public static final int txt_distance=0x7f0a004e;
         public static final int txt_edit_1_title=0x7f0a0033;
-        public static final int txt_group_count=0x7f0a0021;
-        public static final int txt_header_title=0x7f0a0055;
+        public static final int txt_group_count=0x7f0a0022;
+        public static final int txt_header_title=0x7f0a0056;
         public static final int txt_major_group_name=0x7f0a0004;
-        public static final int txt_parent_service_name=0x7f0a0012;
-        public static final int txt_range=0x7f0a004f;
-        public static final int txt_sample_number=0x7f0a0052;
-        public static final int txt_sector_name=0x7f0a0051;
-        public static final int txt_service_count=0x7f0a0023;
+        public static final int txt_parent_service_name=0x7f0a0013;
+        public static final int txt_range=0x7f0a0050;
+        public static final int txt_sample_number=0x7f0a0053;
+        public static final int txt_sector_name=0x7f0a0052;
+        public static final int txt_service_count=0x7f0a0024;
         public static final int txt_service_name=0x7f0a0005;
-        public static final int txt_topology_type=0x7f0a0019;
+        public static final int txt_topology_type=0x7f0a001a;
         public static final int txt_uuid_group_name=0x7f0a0002;
     }
     public static final class layout {
@@ -274,11 +277,13 @@ containing a value of this type.
 
 
 
+
     
 
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
+
 
 
 
@@ -307,6 +312,8 @@ containing a value of this type.
         public static final int AppTheme=0x7f050001;
         public static final int box_style=0x7f050005;
         public static final int spinner=0x7f050002;
+        public static final int table_item=0x7f050007;
+        public static final int table_title=0x7f050006;
         public static final int title_section_1=0x7f050003;
         public static final int title_section_2=0x7f050004;
     }

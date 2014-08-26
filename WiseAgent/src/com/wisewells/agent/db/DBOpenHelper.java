@@ -1,6 +1,5 @@
 package com.wisewells.agent.db;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -17,7 +16,7 @@ import com.wisewells.sdk.utils.L;
 
 public class DBOpenHelper extends SQLiteOpenHelper {
 	private final static String DB_NAME = "wisebeacon.db";
-	private final static int DB_VERSION = 2;
+	private final static int DB_VERSION = 5;
 	
 	public DBOpenHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
@@ -79,7 +78,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 				+ "REFERENCES " + DBService.TABLE_NAME + "(" + DBService._CODE + ") ON DELETE CASCADE, "
 				+ DBTopology.__GROUP_CODE + " VARCHAR(20) "
 				+ "REFERENCES " + DBBeaconGroup.TABLE_NAME + "(" + DBBeaconGroup._CODE + ") ON DELETE CASCADE, "
-				+ DBTopology.TYPE + " VARCHAR(1), "
+				+ DBTopology.TYPE + " INTEGER, "
 				+ DBTopology.UPDATE_DATE + " VARCHAR(8), "
 				+ DBTopology.UPDATE_TIME + " VARCHAR(6)"
 				+ ");";
@@ -141,6 +140,12 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		L.d("DB OnUpgrade");
 		db.execSQL("DROP TABLE " + DBBeaconGroup.TABLE_NAME);
 		db.execSQL("DROP TABLE " + DBBeacon.TABLE_NAME);
+		db.execSQL("DROP TABLE " + DBService.TABLE_NAME);
+		db.execSQL("DROP TABLE " + DBTopology.TABLE_NAME);
+		db.execSQL("DROP TABLE " + DBLocation.TABLE_NAME);
+		db.execSQL("DROP TABLE " + DBProximity.TABLE_NAME);
+		db.execSQL("DROP TABLE " + DBSector.TABLE_NAME);
+		db.execSQL("DROP TABLE " + DBSample.TABLE_NAME);
 		onCreate(db);
 	}
 

@@ -15,15 +15,10 @@ public class ServiceListData {
 		this.topology = null;
 		this.beaconGroup = null;
 		
-		String tc = service.getTopologyCode();
-		if(tc == null || tc.equals("")) 
-			return;
-		this.topology = manager.getTopology(tc);
-		
-		String gc = this.topology.getBeaconGroupCode();
-		if(this.topology == null || gc == null || gc.equals(""))
-			return;
-		this.beaconGroup = manager.getBeaconGroup(gc);
+		this.topology = manager.getTopologyRelatedTo(service.getCode());
+		if(this.topology == null) return;
+
+		this.beaconGroup = manager.getBeaconGroup(this.topology.getBeaconGroupCode());
 	}
 
 	public Service getService() {

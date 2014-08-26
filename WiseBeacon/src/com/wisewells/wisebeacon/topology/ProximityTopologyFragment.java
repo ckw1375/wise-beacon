@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.WiseManager.EditTopologyListener;
 import com.wisewells.sdk.WiseManager.TopologyStateListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
@@ -19,6 +19,7 @@ import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.service.LocationTopology.Coordinate;
 import com.wisewells.sdk.service.ProximityTopology;
 import com.wisewells.sdk.service.Service;
+import com.wisewells.sdk.service.Topology;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 
@@ -141,16 +142,24 @@ public class ProximityTopologyFragment extends BaseTopologyFragment {
 	@Override
 	public void saveTopology() {
 		int size = mAdapter.getCount();
-		String[] beaconCodes = new String[size];
+		List<String> beaconCodes = new ArrayList<String>();
 		double[] ranges = new double[size];
 		
 		for(int i=0; i<size; i++) {
 			ProximityTopologyListData item = mAdapter.getItem(i);
-			beaconCodes[i] = item.getBeacon().getCode();
+			beaconCodes.add(item.getBeacon().getCode());
 			ranges[i] = item.getRange();
 		}
 		
-		mWiseManager.addProximityTopology(mService.getCode(), mBeaconGroup.getCode(), beaconCodes, ranges);
+		mWiseManager.addProximityTopology(mService.getCode(), mBeaconGroup.getCode(), beaconCodes, ranges, new EditTopologyListener() {
+			@Override
+			public void onSuccess(Topology topology) {
+				
+			}
+			@Override
+			public void onFail() {
+			}
+		});
 		getActivity().finish();
 	}
 	

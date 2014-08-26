@@ -17,9 +17,11 @@ public class LocationTopology extends Topology implements Parcelable {
 
 	private final static double ITER_PER_SEC = 10D; //Number of Quasi-Newton iterations for a second
 	private final static int MAX_ITER = 100; //Maximum number of iterations in one update
-	
+
+	private BeaconVector mBeaconVector;
 	private Coordinate[] mCoordinates;
-	private Coordinate mCurrentCorrdinate; //Current coordinate 
+	private Coordinate mCurrentCorrdinate; //Current coordinate
+	
 	private long mLastUpdate; //in nanoseconds
 	
 	public static final Creator<LocationTopology> CREATOR = new Creator<LocationTopology>() {
@@ -32,18 +34,14 @@ public class LocationTopology extends Topology implements Parcelable {
 			return new LocationTopology(source);
 		}
 	};
-
-	public LocationTopology(BeaconVector beaconVector) {
-		super(TYPE_LOCATION, beaconVector);		
+	
+	public LocationTopology (int id, int type, String groupCode, 
+			String serviceCode, String updateDate, String updateTime,
+			BeaconVector beaconVector, Coordinate[] coordinates) {
 		
-		int size = mBeaconVector.getSize();
-		mCoordinates = new Coordinate[size];
-		
-		for (int ind = 0; ind < size; ind++)
-			mCoordinates[ind] = new Coordinate(0, 0);
-		
-		mCurrentCorrdinate = new Coordinate(0, 0);
-		mLastUpdate = -1;
+		super(id, type, groupCode, serviceCode, updateDate, updateTime);
+		mBeaconVector = beaconVector;
+		mCoordinates = coordinates;
 	}
 	
 	private LocationTopology(Parcel in) {

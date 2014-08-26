@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wisewells.sdk.WiseManager;
+import com.wisewells.sdk.WiseManager.EditBeaconListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.wisebeacon.R;
@@ -114,12 +115,17 @@ public class AddBeaconToGroupActivity extends Activity {
 			public void onOkButtonClicked(String str) {
 				Beacon beacon = mAdapter.getItem(mListView.getCheckedItemPosition());				
 				beacon.setName(str);
-				try {
-					mWiseManager.addBeaconToBeaconGroup(mSelectedBeaconGroup.getCode(), beacon);
-					mBeaconInGroupAdapter.replaceWith(mWiseManager.getBeaconsInGroup(mSelectedBeaconGroup.getCode()));
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				}
+				mWiseManager.addBeaconToBeaconGroup(mSelectedBeaconGroup.getCode(), beacon, new EditBeaconListener() {
+					@Override
+					public void onSuccess(Beacon beacon) {
+						mBeaconInGroupAdapter.add(beacon);
+					}
+					@Override
+					public void onFail() {
+					}
+				});
+				
+				mBeaconInGroupAdapter.replaceWith(mWiseManager.getBeaconsInGroup(mSelectedBeaconGroup.getCode()));
 			}
 		});
 		

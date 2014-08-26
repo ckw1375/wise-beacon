@@ -15,6 +15,7 @@ import com.wisewells.sdk.utils.L;
 
 public class SectorTopology extends Topology implements Parcelable {
 	
+	private BeaconVector mBeaconVector;
 	private ArrayList<Sector> mSectors;
 //	private HashMap<String,SampleList> sectors;
 	private static final int K = 5; //Parameter for KNN algorithm
@@ -30,10 +31,12 @@ public class SectorTopology extends Topology implements Parcelable {
 		}
 	};
 	
-	public SectorTopology(BeaconVector beaconVector) {
-		super(TYPE_SECTOR, beaconVector);
+	public SectorTopology(int id, int type, String groupCode, String serviceCode, 
+			String updateDate, String updateTime, BeaconVector beaconVector) {
+		
+		super(id, type, groupCode, serviceCode, updateDate, updateTime);
+		mBeaconVector = beaconVector;
 		init();
-//		sectors = new HashMap<String,SampleList>();
 	}
 	
 	private SectorTopology(Parcel in) {

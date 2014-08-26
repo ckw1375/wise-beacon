@@ -30,7 +30,8 @@ interface IWiseAgent {
 	List<Beacon> getBeaconsInGroup(String groupCode);
 	
 	// Topology
-	Bundle getTopology(String code);
+	Bundle getTopology(int id);
+	Bundle getTopologyRelatedTo(String serviceCode);
 	void addProximityTopology(String serviceCode, String groupCode, in List<String> beaconCodes, in double[] ranges, RPCListener listener);
 	void addLocationTopology();
 	void addSectorTopology(String serviceCode, String groupCode, in List<String> beaconCodes, in List<Sector> sectors);

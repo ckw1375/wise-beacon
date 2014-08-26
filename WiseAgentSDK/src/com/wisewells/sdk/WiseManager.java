@@ -130,7 +130,7 @@ public class WiseManager {
 		}
 	}
 
-	public void addBeaconToBeaconGroup(String groupCode, Beacon beacon, EditBeaconListener listener) throws RemoteException {
+	public void addBeaconToBeaconGroup(String groupCode, Beacon beacon, EditBeaconListener listener) {
 		mEditBeaconListener = listener;
 		try {
 			mAgent.addBeaconToBeaconGroup(groupCode, beacon, new RPCListener.Stub() {
@@ -187,9 +187,9 @@ public class WiseManager {
 
 	}
 
-	public Topology getTopology(String code) {
+	public Topology getTopology(int id) {
 		try {
-			Bundle bundle = mAgent.getTopology(code);
+			Bundle bundle = mAgent.getTopology(id);
 			bundle.setClassLoader(Topology.class.getClassLoader());
 			return bundle.getParcelable(IpcUtils.BUNDLE_KEY);
 		} catch (RemoteException e) {
@@ -197,16 +197,35 @@ public class WiseManager {
 			return null;
 		}
 	}
-
+	
+	public Topology getTopologyRelatedTo(String serviceCode) {
+		try {
+			Bundle bundle = mAgent.getTopologyRelatedTo(serviceCode);
+			bundle.setClassLoader(Topology.class.getClassLoader());
+			return bundle.getParcelable(IpcUtils.BUNDLE_KEY);
+		} catch (RemoteException e) {
+			L.e(EXCEPTION_MSG + "getTopology");
+			return null;
+		}
+	}
+	
 	public void addLocationTopology(String serviceCode, String groupCode)
 			throws RemoteException {
 
 	}
 
 	public void addProximityTopology(String serviceCode, String groupCode, 
-			List<String> beaconCodes, double[] ranges, RPCListener listener) {
+			List<String> beaconCodes, double[] ranges, EditTopologyListener listener) {
 		try {
-		mAgent.addProximityTopology(serviceCode, groupCode, beaconCodes, ranges, listener);
+		mAgent.addProximityTopology(serviceCode, groupCode, beaconCodes, ranges, new RPCListener.Stub() {
+			@Override
+			public void onSuccess(Bundle data) throws RemoteException {
+				
+			}
+			@Override
+			public void onFail(String err) throws RemoteException {
+			}
+		});
 		} catch(RemoteException e) {
 			L.e(EXCEPTION_MSG + "addProximityTopology");
 		}

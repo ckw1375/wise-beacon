@@ -23,6 +23,10 @@ public class DBController {
 		return mDBHelper.getWritableDatabase();
 	}
 	
+	public SQLiteDatabase getReadableDatabase() {
+		return mDBHelper.getReadableDatabase();
+	}
+	
 	public long insert(String table, ContentValues values) {
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
 		long result = db.insert(table, null, values);
@@ -47,7 +51,7 @@ public class DBController {
 	
 	public Cursor selectAll(String table) {
 		SQLiteDatabase db = mDBHelper.getReadableDatabase();
-		Cursor c = db.rawQuery("SELECT * FROM ?;", new String[]{ table });
+		Cursor c = db.rawQuery("SELECT * FROM " + table + ";", null);
 		return c;
 	}
 	
@@ -59,10 +63,11 @@ public class DBController {
 	
 	public Cursor query(String table, String[] columns, String selectionColumn, String selectionArg) {
 		SQLiteDatabase db = mDBHelper.getReadableDatabase();
-		String selection = selectionColumn + "='?'";; 
+		String selection = selectionColumn + "=?";; 
 		String[] selectionArgs = { selectionArg };
 		if(selectionArg == null) {
 			selection = selectionColumn + " IS NULL";
+			selectionArgs = null;
 		}
 		
 		Cursor c = db.query(table, columns, selection, selectionArgs, null, null, null);

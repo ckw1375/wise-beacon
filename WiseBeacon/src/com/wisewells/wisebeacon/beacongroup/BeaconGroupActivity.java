@@ -129,12 +129,12 @@ public class BeaconGroupActivity extends BaseActivity {
 			public void onOkButtonClicked(String str) {
 				mWiseManager.addBeaconGroup(BeaconGroup.DEPTH_ROOT, str, null, new EditBeaconGroupListener() {
 					@Override
-					public void onEditSuccess(BeaconGroup beaconGroup) {
+					public void onSuccess(BeaconGroup beaconGroup) {
 						L.d(beaconGroup.toString() + " is added");
 						mSpinnerAdapter.add(new BeaconGroupSpinnerData(beaconGroup));
 					}
 					@Override
-					public void onEditFail() {
+					public void onFail() {
 					}
 				});
 			}
@@ -157,11 +157,11 @@ public class BeaconGroupActivity extends BaseActivity {
 			public void onOkButtonClicked(String str) {
 				mWiseManager.addBeaconGroup(BeaconGroup.DEPTH_LEAF, str, mSelectedRootGroup.getCode(), new EditBeaconGroupListener() {
 					@Override
-					public void onEditSuccess(BeaconGroup beaconGroup) {
+					public void onSuccess(BeaconGroup beaconGroup) {
 						mListAdapter.add(beaconGroup);
 					}
 					@Override
-					public void onEditFail() {
+					public void onFail() {
 					}
 				});
 			}
