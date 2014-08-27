@@ -1,6 +1,5 @@
 package com.wisewells.sdk;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ComponentName;
@@ -18,6 +17,7 @@ import com.wisewells.sdk.aidl.RPCListener;
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.beacon.BeaconVector;
 import com.wisewells.sdk.beacon.DistanceVector;
 import com.wisewells.sdk.beacon.Region;
 import com.wisewells.sdk.beacon.RssiVector;
@@ -402,6 +402,15 @@ public class WiseManager {
 			return mAgent.getAverageRssiVector(beaconCodes);
 		} catch(RemoteException e) {
 			L.e(EXCEPTION_MSG + "getAverageRssiVector");
+			return null;
+		}
+	}
+	
+	public boolean[] isNearbyBeacon(BeaconVector beaconVector) {
+		try{
+			return mAgent.isNearbyBeacon(beaconVector);
+		} catch(RemoteException e) {
+			L.e(EXCEPTION_MSG + "isNearbyBeacon");
 			return null;
 		}
 	}

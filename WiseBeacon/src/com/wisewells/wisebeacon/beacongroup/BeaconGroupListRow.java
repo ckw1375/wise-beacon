@@ -5,6 +5,7 @@ import java.util.List;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wisewells.sdk.beacon.Beacon;
@@ -14,6 +15,7 @@ public class BeaconGroupListRow extends FrameLayout {
 
 	private TextView mNameView;
 	private TextView mChildCountView;
+	private ImageView mConnectionState;
 	
 	public BeaconGroupListRow(Context context) {
 		super(context);
@@ -21,6 +23,7 @@ public class BeaconGroupListRow extends FrameLayout {
 		
 		mNameView = (TextView) findViewById(R.id.group_txt_name);
 		mChildCountView = (TextView) findViewById(R.id.group_txt_child_count);
+		mConnectionState = (ImageView) findViewById(R.id.img_connection_state);
 	}
 
 	public void setData(BeaconGroupListData data) {
@@ -28,5 +31,8 @@ public class BeaconGroupListRow extends FrameLayout {
 		
 		List<Beacon> beacons = data.getBeacons();
 		mChildCountView.setText(beacons.size() + "");
+		
+		if(data.getIsNearby()) mConnectionState.setImageResource(R.drawable.icon_connect);
+		else mConnectionState.setImageResource(R.drawable.icon_disconnect);
 	}
 }

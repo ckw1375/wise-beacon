@@ -14,7 +14,6 @@ public class Region implements Parcelable {
 		public Region createFromParcel(Parcel source) {
 			return new Region(source);
 		}
-
 		public Region[] newArray(int size) {
 			return new Region[size];
 		}

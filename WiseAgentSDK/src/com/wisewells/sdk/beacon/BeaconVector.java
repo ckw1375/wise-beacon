@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class BeaconVector implements Parcelable {
+	private int size;
 	private Region[] beacons;
 	
 	public static final Creator<BeaconVector> CREATOR = new Creator<BeaconVector>() {
@@ -20,6 +21,7 @@ public class BeaconVector implements Parcelable {
 	};
 
 	public BeaconVector(int size) {
+		this.size = size;
 		beacons = new Region[size];
 	}
 
@@ -67,6 +69,8 @@ public class BeaconVector implements Parcelable {
 	}
 	
 	private BeaconVector(Parcel in) {
+		size = in.readInt();
+		beacons = new Region[size];
 		in.readTypedArray(beacons, Region.CREATOR);
 	}
 
@@ -77,6 +81,7 @@ public class BeaconVector implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(size);
 		dest.writeTypedArray(beacons, 0);
 	}
 }

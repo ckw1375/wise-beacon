@@ -7,6 +7,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -61,7 +62,7 @@ public class BeaconGroupActivity extends BaseActivity {
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-				onBeaconGroupListClicked(position);
+				onBeaconGroupListItemClicked(position);
 			}
 		});
 		
@@ -92,33 +93,9 @@ public class BeaconGroupActivity extends BaseActivity {
 				onSpinnerItemSelected(position);
 			}
 		});
-	}
-	
-	@Override
-	protected void onStart() {
-		super.onStart();
+		
 		updateRootGroupSpinner();		
 		if(mSelectedRootGroup != null) updateLeafGroupListView(mSelectedRootGroup);
-	}
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.beacon, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
 	}
 	
 	private void onAddRootButtonClicked() {
@@ -171,7 +148,7 @@ public class BeaconGroupActivity extends BaseActivity {
 		dialog.show(getFragmentManager(), "dialog");
 	}
 	
-	private void onBeaconGroupListClicked(int position) {
+	private void onBeaconGroupListItemClicked(int position) {
 		Intent intent = new Intent(this, DetailBeaconGroupActivity.class);
 		intent.putExtra(EXTRA_ROOT_GROUP_NAME, mSelectedRootGroup.getName());
 		intent.putExtra(EXTRA_LEAF_GROUP, mListAdapter.getItem(position).getBeaconGroup());
@@ -189,7 +166,7 @@ public class BeaconGroupActivity extends BaseActivity {
 	private void updateLeafGroupListView(BeaconGroup rootGroup) {
 		List<BeaconGroup> childGroups = new ArrayList<BeaconGroup>();
 		childGroups = mWiseManager.getBeaconGroups(rootGroup.getCode());
-		
+
 		List<BeaconGroupListData> param = new ArrayList<BeaconGroupListData>();
 		for(BeaconGroup group : childGroups) {
 			param.add(new BeaconGroupListData(mWiseManager, group));
@@ -210,4 +187,25 @@ public class BeaconGroupActivity extends BaseActivity {
 		mSpinnerAdapter.clear();
 		mSpinnerAdapter.addAll(datas);
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		handler.post(updateLeafGroupState);
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		handler.removeCallbacks(updateLeafGroupState);
+	}
+	
+	private Handler handler = new Handler();
+	private Runnable updateLeafGroupState = new Runnable() {
+		@Override
+		public void run() {
+			mListAdapter.notifyDataSetChanged();
+			handler.postDelayed(this, 500);
+		}
+	};
 }

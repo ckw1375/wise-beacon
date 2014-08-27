@@ -279,5 +279,18 @@ public class WiseAgent extends android.app.Service {
 //			
 //			topology.addSample(sectorName);			
 		}
+
+		@Override
+		public boolean[] isNearbyBeacon(BeaconVector beaconVector) throws RemoteException {
+			List<Boolean> list = mTracker.isNearby(beaconVector);
+			boolean[] willReturn = new boolean[list.size()];
+			int i = 0;
+			for(Boolean b : list) {
+				willReturn[i] = b;
+				i++;
+			}
+			
+			return null;
+		}
 	};
 }

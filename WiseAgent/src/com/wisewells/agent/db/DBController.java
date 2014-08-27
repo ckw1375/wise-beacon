@@ -74,12 +74,17 @@ public class DBController {
 		return c;
 	}
 	
-	public Cursor joinQuery(String leftTable, String rightTable, String leftColumn, String rightColumn) {
+	public Cursor joinQuery(String leftTable, String rightTable, String leftJoinColumn, String rightJoinColumn, String whereClause) {
 		SQLiteDatabase db = mDBHelper.getReadableDatabase();
 		
-		String sql = String.format("SELECT * FROM %s JOIN %s ON %s=%s;",
-				leftTable, rightTable, leftColumn, rightColumn);
-		Cursor c = db.rawQuery(sql, null);
+		String sql = String.format("SELECT * FROM %s JOIN %s ON %s=%s",
+				leftTable, rightTable, leftJoinColumn, rightJoinColumn);
+		
+		StringBuffer sb = new StringBuffer(sql);
+		if(whereClause != null) sb.append(String.format(" WHERE %s;", whereClause));
+		else sb.append(";");
+		
+		Cursor c = db.rawQuery(sb.toString(), null);
 		return c;
 	}
 }

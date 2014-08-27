@@ -57,7 +57,6 @@ public class BeaconGroupModel {
 		
 		mDB.insert(DBBeaconGroup.TABLE_NAME, values);
 		
-		
 		BeaconGroup group = new BeaconGroup(depth, name, code, parentCode, uuid, major, date, time);
 		Bundle data = new Bundle();
 		data.putParcelable(IpcUtils.BUNDLE_KEY, group);

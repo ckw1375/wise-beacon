@@ -1,10 +1,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:my="http://schemas.android.com/com.wisewells.wisebeacon"
     android:id="@+id/FrameLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background" >
+    android:background="#303030" >
 
     <LinearLayout
         android:layout_width="wrap_content"

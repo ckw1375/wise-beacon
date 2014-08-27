@@ -66,8 +66,9 @@ public class BeaconModel {
 			}
 		}
 		else {
+			String whereClause = DBBeacon.__GROUP_CODE + "=" + groupCode;
 			Cursor c = mDB.joinQuery(DBBeacon.TABLE_NAME, DBBeaconGroup.TABLE_NAME, 
-					DBBeacon.__GROUP_CODE, DBBeaconGroup._CODE);
+					DBBeacon.__GROUP_CODE, DBBeaconGroup._CODE, whereClause);
 
 			int[] indexes = Utils.getColumnIndexes(ALL_COLUMNS, c);
 			while(c.moveToNext()) {
