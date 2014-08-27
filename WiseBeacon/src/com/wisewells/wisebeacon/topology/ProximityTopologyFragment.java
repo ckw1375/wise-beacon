@@ -154,7 +154,7 @@ public class ProximityTopologyFragment extends BaseTopologyFragment {
 		mWiseManager.addProximityTopology(mService.getCode(), mBeaconGroup.getCode(), beaconCodes, ranges, new EditTopologyListener() {
 			@Override
 			public void onSuccess(Topology topology) {
-				
+				getActivity().finish();
 			}
 			@Override
 			public void onFail() {

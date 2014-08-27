@@ -60,18 +60,22 @@ public class BeaconModel {
 		
 		BeaconGroup group = mGroupModel.get(groupCode);
 		if(group.getDepth() != BeaconGroup.DEPTH_LEAF) {
-			result.addAll(getAllBeaconsInGroup(groupCode));
+			ArrayList<BeaconGroup> children = mGroupModel.getChildren(groupCode);
+			for(BeaconGroup child : children) {
+				result.addAll(getAllBeaconsInGroup(child.getCode()));
+			}
 		}
-		
-		Cursor c = mDB.joinQuery(DBBeacon.TABLE_NAME, DBBeaconGroup.TABLE_NAME, 
-				DBBeacon.__GROUP_CODE, DBBeaconGroup._CODE);
+		else {
+			Cursor c = mDB.joinQuery(DBBeacon.TABLE_NAME, DBBeaconGroup.TABLE_NAME, 
+					DBBeacon.__GROUP_CODE, DBBeaconGroup._CODE);
 
-		int[] indexes = Utils.getColumnIndexes(ALL_COLUMNS, c);
-		while(c.moveToNext()) {
-			result.add(makeBeacon(c, indexes));
+			int[] indexes = Utils.getColumnIndexes(ALL_COLUMNS, c);
+			while(c.moveToNext()) {
+				result.add(makeBeacon(c, indexes));
+			}
+
+			c.close();
 		}
-		
-		c.close();
 		return result;
 	}
 	

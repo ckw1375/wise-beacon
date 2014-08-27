@@ -31,10 +31,11 @@ public class Service implements Parcelable{
 		mName = name;
 	}
 	
-	public Service(int depth, String name, String code, String updateDate, String updateTime) {
+	public Service(int depth, String name, String code, String parentCode, String updateDate, String updateTime) {
 		mDepth = depth;
 		mName = name;
 		mCode = code;
+		mParentCode = parentCode;
 		mUpdateDate = updateDate;
 		mUpdateTime = updateTime;
 	}

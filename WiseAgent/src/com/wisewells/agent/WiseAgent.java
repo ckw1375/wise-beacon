@@ -101,7 +101,6 @@ public class WiseAgent extends android.app.Service {
 	
 
 	IWiseAgent.Stub mBinder = new Stub() {
-
 		@Override
 		public void addBeaconGroup(int depth, String name, String parentCode, RPCListener listener) throws RemoteException {
 			mGroupModel.add(depth, name, parentCode, listener);
@@ -226,14 +225,11 @@ public class WiseAgent extends android.app.Service {
 		@Override
 		public void startTrackingTopologyState(String packageName, String serviceCode, 
 				TopologyStateChangeListener listener) throws RemoteException {
-//			mBeaconReceiver.activate();
-//			ApplicationConnector connector = mConnectorMap.get(packageName);
-//			List<Topology> topologies = mWiseObjects.getAllTopologiesInService(serviceCode);
-//			for(Topology t : topologies) 
-//				t.setBeaconTracker(mTracker);
-//			
-//			L.i(topologies.size() + "");
-//			connector.startTopologyChecker(topologies, listener);
+			mBeaconReceiver.activate();
+			ApplicationConnector connector = mConnectorMap.get(packageName);
+			Topology topology = mTopologyModel.getTopologyRelatedTo(serviceCode);
+			topology.setBeaconTracker(mTracker);
+			connector.startTopologyChecker(topology, listener);
 		}
 		
 		@Override

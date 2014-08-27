@@ -3,106 +3,153 @@
     android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.wisewells.wisebeacon.beacongroup.DetailBeaconGroupActivity" >
+    android:background="@color/background"
+    android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Group 정보"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <LinearLayout
+    <include
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="1dp" >
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="상위 비콘 그룹" />
-
-        <TextView
-            android:id="@+id/txt_uuid_group_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
-
-    </LinearLayout>
+        layout="@layout/view_activity_header" />
 
     <LinearLayout
+        style="@style/title_section_1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="1dp" >
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="하위 비콘 그룹" />
-
-        <TextView
-            android:id="@+id/txt_major_group_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="1dp" >
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="비콘 수" />
-
-        <TextView
-            android:id="@+id/txt_beacon_number_in_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/txt_service_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Beacon 정보"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:gravity="center_vertical" >
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:text="Group 정보"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#ffffff"
+            android:textSize="13dp" />
 
-        <Button
-            android:id="@+id/btn_add_beacon_to_group"
-            style="?android:attr/buttonStyleSmall"
+        <ImageView
+            android:id="@+id/imageView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="비콘 추가" />
+            android:src="@drawable/icon_edit" />
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="1dp"
+        android:background="#ffffff"
+        android:gravity="center_vertical"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp" >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="상위비콘그룹"
+            android:textColor="#464646"
+            android:textSize="9dp" />
+
+        <TextView
+            android:id="@+id/txt_uuid_group_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="TextView"
+            android:textSize="15dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="1dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginTop="1dp"
+        android:background="#ffffff"
+        android:gravity="center_vertical"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp" >
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="하위비콘그룹"
+            android:textColor="#464646"
+            android:textSize="9dp" />
+
+        <TextView
+            android:id="@+id/txt_major_group_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="TextView"
+            android:textSize="15dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="1dp"
+        android:background="#ffffff"
+        android:gravity="center_vertical"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp" >
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="비콘수"
+            android:textColor="#464646"
+            android:textSize="9dp" />
+
+        <TextView
+            android:id="@+id/txt_beacon_number_in_group"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="TextView"
+            android:textSize="15dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/title_section_2"
+        android:layout_width="match_parent" >
+
+        <TextView
+            android:id="@+id/txt_service_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="비콘 정보"
+            android:textSize="13dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/img_add_beacon_to_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_add" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
     </LinearLayout>
 
     <ListView
         android:id="@+id/list_beacons_in_group"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" >
     </ListView>
 
 </LinearLayout>

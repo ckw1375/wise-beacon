@@ -52,7 +52,7 @@ public class ServiceModel {
 		
 		mDB.insert(DBService.TABLE_NAME, values);
 		
-		Service service = new Service(depth, name, code, date, time);
+		Service service = new Service(depth, name, code, parentCode, date, time);
 		
 		Bundle data = new Bundle();
 		data.putParcelable(IpcUtils.BUNDLE_KEY, service);
@@ -93,6 +93,6 @@ public class ServiceModel {
 		String updateDate = c.getString(indexes[4]);
 		String updateTime = c.getString(indexes[5]);
 		
-		return new Service(depth, name, parentCode, updateDate, updateTime);
+		return new Service(depth, name, code, parentCode, updateDate, updateTime);
 	}
 }

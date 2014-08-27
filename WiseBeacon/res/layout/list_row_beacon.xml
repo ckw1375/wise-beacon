@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/table_item"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="10dp"
+    android:background="#ffffff"
     android:orientation="horizontal" >
 
     <TextView
@@ -10,13 +10,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Beacon" />
+        android:text="Beacon"
+        android:textSize="15dp" />
 
     <TextView
         android:id="@+id/txt_beacon_distance"
-        android:layout_width="0dp"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="거리" />
+        android:gravity="center"
+        android:text="50m"
+        android:textSize="15dp" />
 
 </LinearLayout>

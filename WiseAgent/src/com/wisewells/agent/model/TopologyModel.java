@@ -65,7 +65,7 @@ public class TopologyModel {
 			return;
 		}
 		
-		int topologyId = addTopology(serviceCode, groupCode, "Proximity");
+		int topologyId = addTopology(serviceCode, groupCode, Topology.TYPE_PROXIMITY);
 		
 		SQLiteDatabase db = mDB.getWritableDatabase();
 		try {
@@ -86,7 +86,7 @@ public class TopologyModel {
 		
 	}
 	
-	private int addTopology(String serviceCode, String groupCode, String type) {
+	private int addTopology(String serviceCode, String groupCode, int type) {
 		int id = (int) (Math.random() * 100000);
 		
 		String date = Utils.getCurrentDate();

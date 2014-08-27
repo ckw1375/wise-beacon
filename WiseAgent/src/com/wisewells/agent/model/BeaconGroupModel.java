@@ -14,6 +14,7 @@ import com.wisewells.agent.db.DBController;
 import com.wisewells.sdk.aidl.RPCListener;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.utils.IpcUtils;
+import com.wisewells.sdk.utils.L;
 
 public class BeaconGroupModel {
 	

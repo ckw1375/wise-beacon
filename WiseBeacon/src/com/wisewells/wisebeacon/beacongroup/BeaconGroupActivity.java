@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,20 +18,22 @@ import android.widget.Toast;
 
 import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.WiseManager.EditBeaconGroupListener;
+import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.BaseActivity;
 import com.wisewells.wisebeacon.view.OneEditTwoButtonsDialog;
-import com.wisewells.wisebeacon.view.TitleDialogSpinner;
-import com.wisewells.wisebeacon.view.TitleDialogSpinnerAdapter;
 import com.wisewells.wisebeacon.view.OneEditTwoButtonsDialog.DialogListener;
+import com.wisewells.wisebeacon.view.TitleDialogSpinner;
 import com.wisewells.wisebeacon.view.TitleDialogSpinner.OnSpinnerItemSelectedListener;
+import com.wisewells.wisebeacon.view.TitleDialogSpinnerAdapter;
 
 public class BeaconGroupActivity extends BaseActivity {
 
 	public static final String EXTRA_ROOT_GROUP_NAME = "root group name";
 	public static final String EXTRA_LEAF_GROUP = "leaf group";
+	public static final String EXTRA_BEACONS_IN_GROUP = "beacons in group";
 
 	private BeaconGroup mSelectedRootGroup;
 	
@@ -43,7 +44,7 @@ public class BeaconGroupActivity extends BaseActivity {
 	private ImageView mAddLeafButton;
 	private TitleDialogSpinner mSpinner;
 	private TitleDialogSpinnerAdapter<BeaconGroupSpinnerData> mSpinnerAdapter;
-		
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -158,7 +159,7 @@ public class BeaconGroupActivity extends BaseActivity {
 				mWiseManager.addBeaconGroup(BeaconGroup.DEPTH_LEAF, str, mSelectedRootGroup.getCode(), new EditBeaconGroupListener() {
 					@Override
 					public void onSuccess(BeaconGroup beaconGroup) {
-						mListAdapter.add(beaconGroup);
+						mListAdapter.add(new BeaconGroupListData(mWiseManager, beaconGroup));
 					}
 					@Override
 					public void onFail() {
@@ -173,7 +174,10 @@ public class BeaconGroupActivity extends BaseActivity {
 	private void onBeaconGroupListClicked(int position) {
 		Intent intent = new Intent(this, DetailBeaconGroupActivity.class);
 		intent.putExtra(EXTRA_ROOT_GROUP_NAME, mSelectedRootGroup.getName());
-		intent.putExtra(EXTRA_LEAF_GROUP, mListAdapter.getItem(position));
+		intent.putExtra(EXTRA_LEAF_GROUP, mListAdapter.getItem(position).getBeaconGroup());
+		
+		ArrayList<Beacon> beacons = new ArrayList<Beacon>(mListAdapter.getItem(position).getBeacons());
+		intent.putParcelableArrayListExtra(EXTRA_BEACONS_IN_GROUP, beacons);
 		startActivity(intent);
 	}
 
@@ -186,7 +190,11 @@ public class BeaconGroupActivity extends BaseActivity {
 		List<BeaconGroup> childGroups = new ArrayList<BeaconGroup>();
 		childGroups = mWiseManager.getBeaconGroups(rootGroup.getCode());
 		
-		List<BeaconGroup> param = new ArrayList<BeaconGroup>(childGroups);
+		List<BeaconGroupListData> param = new ArrayList<BeaconGroupListData>();
+		for(BeaconGroup group : childGroups) {
+			param.add(new BeaconGroupListData(mWiseManager, group));
+		}
+		
 		mListAdapter.replaceWith(param);
 	}
 	
@@ -201,10 +209,5 @@ public class BeaconGroupActivity extends BaseActivity {
 		
 		mSpinnerAdapter.clear();
 		mSpinnerAdapter.addAll(datas);
-	}
-	
-	@Override
-	protected void attachBaseContext(Context newBase) {
-		super.attachBaseContext(new CalligraphyContextWrapper(newBase));
 	}
 }

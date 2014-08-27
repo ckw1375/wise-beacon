@@ -1,8 +1,7 @@
 package com.wisewells.agent.connector;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import android.os.Handler;
 
 import com.wisewells.sdk.aidl.TopologyStateChangeListener;
 import com.wisewells.sdk.service.Topology;
@@ -23,6 +22,13 @@ public class ApplicationConnector {
 	}
 	
 	public void startTopologyChecker(List<Topology> topologies, TopologyStateChangeListener listener) {
+		mTopologyChecker = new TopologyStateChecker(listener, topologies);
+		mTopologyChecker.startCheck();
+	}
+	
+	public void startTopologyChecker(Topology topology, TopologyStateChangeListener listener) {
+		ArrayList<Topology> topologies = new ArrayList<Topology>();
+		topologies.add(topology);
 		mTopologyChecker = new TopologyStateChecker(listener, topologies);
 		mTopologyChecker.startCheck();
 	}
