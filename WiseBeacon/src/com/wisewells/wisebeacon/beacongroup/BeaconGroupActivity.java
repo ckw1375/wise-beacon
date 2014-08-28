@@ -21,6 +21,7 @@ import com.wisewells.sdk.WiseManager;
 import com.wisewells.sdk.WiseManager.EditBeaconGroupListener;
 import com.wisewells.sdk.beacon.Beacon;
 import com.wisewells.sdk.beacon.BeaconGroup;
+import com.wisewells.sdk.beacon.BeaconVector;
 import com.wisewells.sdk.utils.L;
 import com.wisewells.wisebeacon.R;
 import com.wisewells.wisebeacon.common.BaseActivity;
@@ -136,7 +137,7 @@ public class BeaconGroupActivity extends BaseActivity {
 				mWiseManager.addBeaconGroup(BeaconGroup.DEPTH_LEAF, str, mSelectedRootGroup.getCode(), new EditBeaconGroupListener() {
 					@Override
 					public void onSuccess(BeaconGroup beaconGroup) {
-						mListAdapter.add(new BeaconGroupListData(mWiseManager, beaconGroup));
+						mListAdapter.add(makeBeaconGroupListData(beaconGroup));
 					}
 					@Override
 					public void onFail() {
@@ -167,12 +168,45 @@ public class BeaconGroupActivity extends BaseActivity {
 		List<BeaconGroup> childGroups = new ArrayList<BeaconGroup>();
 		childGroups = mWiseManager.getBeaconGroups(rootGroup.getCode());
 
-		List<BeaconGroupListData> param = new ArrayList<BeaconGroupListData>();
+		List<BeaconGroupListData> items = new ArrayList<BeaconGroupListData>();
 		for(BeaconGroup group : childGroups) {
-			param.add(new BeaconGroupListData(mWiseManager, group));
+			BeaconGroupListData item = makeBeaconGroupListData(group);
+			items.add(item);
 		}
 		
-		mListAdapter.replaceWith(param);
+		mListAdapter.replaceWith(items);
+	}
+	
+	private BeaconGroupListData makeBeaconGroupListData(BeaconGroup group) {
+		List<Beacon> beacons = mWiseManager.getBeaconsInGroup(group.getCode());
+		
+		BeaconVector beaconVector = new BeaconVector(beacons.size());
+		for(int i=0; i<beaconVector.getSize(); i++) {
+			Beacon beacon = beacons.get(i);
+			beaconVector.set(i, beacon.getRegion());
+		}
+
+		boolean isNearbyGroup = checkIsThereBeaconGroupAroundHere(beacons);
+		return new BeaconGroupListData(group, beacons, isNearbyGroup);
+	}
+	
+	private boolean checkIsThereBeaconGroupAroundHere(List<Beacon> beaconsInGroup) {
+		BeaconVector beaconVector = new BeaconVector(beaconsInGroup.size());
+		for(int i=0; i<beaconVector.getSize(); i++) {
+			Beacon beacon = beaconsInGroup.get(i);
+			beaconVector.set(i, beacon.getRegion());
+		}
+
+		boolean[] isNearbyBeacon = mWiseManager.isNearbyBeacon(beaconVector);
+		if(isNearbyBeacon == null)
+			return false;
+		
+		for(int i=0; i<isNearbyBeacon.length; i++) {
+			if(isNearbyBeacon[i]) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private void updateRootGroupSpinner() {
@@ -204,7 +238,11 @@ public class BeaconGroupActivity extends BaseActivity {
 	private Runnable updateLeafGroupState = new Runnable() {
 		@Override
 		public void run() {
-			mListAdapter.notifyDataSetChanged();
+			for(BeaconGroupListData item : mListAdapter.getItems()) {
+				boolean b = checkIsThereBeaconGroupAroundHere(item.getBeacons());
+				L.d(b + "");
+				item.setIsNearbyGroup(b);
+			}
 			handler.postDelayed(this, 500);
 		}
 	};

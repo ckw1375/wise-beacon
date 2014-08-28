@@ -16,7 +16,7 @@ import com.wisewells.sdk.utils.L;
 
 public class DBOpenHelper extends SQLiteOpenHelper {
 	private final static String DB_NAME = "wisebeacon.db";
-	private final static int DB_VERSION = 5;
+	private final static int DB_VERSION = 6;
 	
 	public DBOpenHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);

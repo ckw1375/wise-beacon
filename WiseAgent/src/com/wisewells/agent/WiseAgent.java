@@ -289,8 +289,7 @@ public class WiseAgent extends android.app.Service {
 				willReturn[i] = b;
 				i++;
 			}
-			
-			return null;
+			return willReturn;
 		}
 	};
 }

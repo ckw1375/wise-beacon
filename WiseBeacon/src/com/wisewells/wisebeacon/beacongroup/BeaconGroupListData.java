@@ -11,34 +11,16 @@ import com.wisewells.sdk.utils.L;
 public class BeaconGroupListData {
 	private BeaconGroup mBeaconGroup;
 	private List<Beacon> mBeacons;
-	private boolean mIsNearby;
+	private boolean mIsNearbyGroup;
 	
 	public BeaconGroupListData(BeaconGroup group) {
 		mBeaconGroup = group;
 	}
 	
-	public BeaconGroupListData(WiseManager manager, BeaconGroup group) {
+	public BeaconGroupListData(BeaconGroup group, List<Beacon> beacons, boolean isNearby) {
 		mBeaconGroup = group;
-		mBeacons = manager.getBeaconsInGroup(group.getCode());
-		mIsNearby = false;
-		
-		int i = 0;
-		BeaconVector bv = new BeaconVector(mBeacons.size());
-		for(Beacon beacon : mBeacons) {
-			bv.set(i++, beacon.getRegion());
-		}
-		
-		L.d("Beacon Group List Data");
-		boolean[] allBeaconsNearby = manager.isNearbyBeacon(bv);
-		if(allBeaconsNearby == null)
-			return;
-		
-		for(int k=0; k<allBeaconsNearby.length; k++) {
-			if(allBeaconsNearby[k]) {
-				mIsNearby = true;
-				break;
-			}
-		}
+		mBeacons = beacons;
+		mIsNearbyGroup = isNearby;
 	}
 	
 	public BeaconGroup getBeaconGroup() {
@@ -49,7 +31,11 @@ public class BeaconGroupListData {
 		return mBeacons;
 	}
 	
-	public boolean getIsNearby() {
-		return mIsNearby;
+	public boolean getIsNearbyGroup() {
+		return mIsNearbyGroup;
+	}
+	
+	public void setIsNearbyGroup(boolean b) {
+		mIsNearbyGroup = b;
 	}
 }

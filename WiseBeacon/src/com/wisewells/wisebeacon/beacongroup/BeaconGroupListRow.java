@@ -32,7 +32,7 @@ public class BeaconGroupListRow extends FrameLayout {
 		List<Beacon> beacons = data.getBeacons();
 		mChildCountView.setText(beacons.size() + "");
 		
-		if(data.getIsNearby()) mConnectionState.setImageResource(R.drawable.icon_connect);
+		if(data.getIsNearbyGroup()) mConnectionState.setImageResource(R.drawable.icon_connect);
 		else mConnectionState.setImageResource(R.drawable.icon_disconnect);
 	}
 }
